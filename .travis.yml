@@ -5,6 +5,9 @@ services:
 
 language: node_js
 
+before_script:
+  - yarn danger ci
+
 script: "npm test"
 
 node_js:
