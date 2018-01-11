@@ -5,5 +5,5 @@ module.exports.log = {
   debug: noop,
   info: noop,
   warn: console.warn.bind(console),
-  error: console.error.bind(console)
+  error: noop
 };

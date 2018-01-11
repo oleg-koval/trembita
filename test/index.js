@@ -4,12 +4,11 @@ const helpers = require('./helpers');
 
 const Trembita = require('../');
 
-describe('Trembita', () => {
+describe('Trembita:', () => {
   let scope;
   const clientOptions = {
     endpoint: 'https://example.com/api',
-    log: helpers.log,
-    requestId: 1,
+    log: helpers.log
   };
 
   before(() => { return tbita = new Trembita(clientOptions); });
@@ -20,11 +19,10 @@ describe('Trembita', () => {
   afterEach(() => { return scope.done(); });
 
   it(
-    'should be created with six properties: requestRaw, request, endpoint, requestId, log, client', () => {
-      expect(tbita).to.have.property('requestRaw');
+    'should be created with six properties: raw, request, endpoint, log, client', () => {
+      expect(tbita).to.have.property('raw');
       expect(tbita).to.have.property('request');
       expect(tbita).to.have.property('endpoint');
-      expect(tbita).to.have.property('requestId');
       expect(tbita).to.have.property('log');
       expect(tbita).to.have.property('client');
     });
