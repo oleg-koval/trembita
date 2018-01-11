@@ -5,10 +5,9 @@ services:
 
 language: node_js
 
-before_script:
+script: 
+  - npm test
   - yarn danger ci
-
-script: "npm test"
 
 node_js:
   - "8"
