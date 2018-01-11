@@ -4,7 +4,7 @@ const helpers = require('./helpers');
 
 const Trembita = require('../');
 
-describe('Trembita', () => {
+describe.only('Trembita', () => {
   let scope;
   const clientOptions = {
     endpoint: 'https://example.com/api',
