@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "lint": "eslint *.js"
+    "lint": "eslint *.js",
+    "ci": "npm run lint && npm run test"
   },
   "author": "Oleg Koval <oleg@wearereasonablepeople.com> (http://wearereasonablepeople.com/)",
   "license": "MIT",

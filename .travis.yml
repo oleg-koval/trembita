@@ -5,8 +5,8 @@ services:
 
 language: node_js
 
-script: 
-  - npm test
+script:
+  - npm run ci
   - yarn danger ci
 
 node_js:

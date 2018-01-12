@@ -16,9 +16,7 @@ const mdTableGen = (headers, rows) => {
 
   const splitterStr = `|${temp.join('|')}|`;
 
-  const rowStr = rows.map(row => {
-    return `|${row.join('|')}|`;
-  }).join('\n');
+  const rowStr = rows.map(row => `|${row.join('|')}|`).join('\n');
 
   return `${headerStr}\n${splitterStr}\n${rowStr}\n`;
 };
@@ -29,9 +27,7 @@ if (danger.github.pr.body.length < 10) {
 }
 
 // Check test exclusion (.only) is included
-const modifiedTestFiles = modified.filter(filePath => {
-  return filePath.match(/test\/.+?\.(js|jsx|ts|tsx)$/);
-});
+const modifiedTestFiles = modified.filter(filePath => filePath.match(/test\/.+?\.(js|jsx|ts|tsx)$/));
 
 const testFilesIncludeExclusion = modifiedTestFiles.reduce((acc, filePath) => {
   const content = fs.readFileSync(filePath).toString();
@@ -48,7 +44,7 @@ if (testFilesIncludeExclusion.length > 0) {
 
 // Validate if commit message in PR conforms conventional change log, notify if it doesn't
 const invalidCommits = commits.reduce((acc, commit) => {
-  const invalid = !commit.message.match(/(breaking|build|ci|chore|docs|feat|fix|other|perf|refactor|revert|style|test)\:\s(.+)/);
+  const invalid = !commit.message.match(/(breaking|build|ci|chore|docs|feat|fix|other|perf|refactor|revert|style|test):\s(.+)/);
   if (invalid) {
     // acc.push(`| ${commit.sha.substr(0, 7)} | ${commit.message} |\n`);
     acc.push([
@@ -62,4 +58,3 @@ const invalidCommits = commits.reduce((acc, commit) => {
 if (invalidCommits.length > 0) {
   warn(`There are invalid Commits: \n\n${mdTableGen(['sha', 'commit'], invalidCommits)}`);
 }
-
