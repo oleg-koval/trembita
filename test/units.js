@@ -26,13 +26,20 @@ describe('Units:', () => {
       expect(actual).to.be.equal(expected);
     });
   it(
-    'should fail with wrong input', () => {
+    'should pass even if options are not passed', () => {
       const res = {
         statusCode: 503,
         body: {
           key: 'value'
         }
       };
-      expect(() => {generateErrorMessage(res)}).to.throw('options object missing');
+
+      const actual = generateErrorMessage(res);
+      const expected =
+        `Unexpected status code: 503, Body: { key: \'value\' }, Options: undefined`;
+
+      expect(actual).to.be.equal(expected);
     });
+
+  it.only('should fail without response object', () => { expect(() => {generateErrorMessage()}).to.throw('response object missing'); });
 });

@@ -12,9 +12,6 @@ const generateErrorMessage = (res, options) => {
   if (!is(Object, res)) {
     throw new Error('response object missing')
   }
-  if (!is(Object, options)) {
-    throw new Error('options object missing')
-  }
   return `${`Unexpected status code: ${res.statusCode}, Body: ${util.inspect(res.body, { depth: 4 })}, Options: `}${util.inspect(options, { depth: 4 })}`
 }
 
