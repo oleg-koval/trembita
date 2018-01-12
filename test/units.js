@@ -41,5 +41,5 @@ describe('Units:', () => {
       expect(actual).to.be.equal(expected);
     });
 
-  it.only('should fail without response object', () => { expect(() => {generateErrorMessage()}).to.throw('response object missing'); });
+  it('should fail without response object', () => { expect(() => {generateErrorMessage()}).to.throw('response object missing'); });
 });
