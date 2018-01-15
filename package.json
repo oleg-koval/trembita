@@ -8,7 +8,7 @@
     "test": "mocha",
     "lint": "eslint *.js",
     "ci": "npm run lint && npm run test",
-    "release": "./node_modules/.bin/xyz --script scripts/update-example.sh --increment"
+    "release": "./node_modules/.bin/xyz --increment"
   },
   "author": "Oleg Koval <oleg@wearereasonablepeople.com> (http://wearereasonablepeople.com/)",
   "license": "MIT",
