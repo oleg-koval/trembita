@@ -28,6 +28,14 @@ describe('Trembita:', () => {
       expect(tbita).to.have.property('client');
     });
 
+  it('should fail if options are not provided', () => {
+    expect(() => new Trembita()).to.throw('missing options')
+  })
+
+  it('should fail if endpoint is not provided', () => {
+    expect(() => new Trembita({})).to.throw('missing endpoint')
+  })
+
   it('should return status code 200 and resourse', () => {
     scope
       .get('/users?page=2')
