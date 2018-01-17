@@ -1,6 +1,7 @@
 # trembita-js
 
 [![Build Status](https://travis-ci.com/wearereasonablepeople/trembita.svg?token=H11zxJynPszpg8G3VJzP&branch=master)](https://travis-ci.com/wearereasonablepeople/trembita)
+[![codecov](https://codecov.io/gh/wearereasonablepeople/trembita/branch/master/graph/badge.svg?token=XWv9pmS1Vm)](https://codecov.io/gh/wearereasonablepeople/trembita)
 
 > Request wrapper core for consuming third party services
 
