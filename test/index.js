@@ -36,6 +36,13 @@ describe('Trembita:', () => {
     expect(() => new Trembita({})).to.throw('missing endpoint')
   })
 
+  it('should provide default logger logger is not provided', () => {
+    const tbita = new Trembita({
+      endpoint: 'https://example.com/api',
+    })
+    expect(tbita).to.have.property('log');
+  })
+
   it('should return status code 200 and resourse', () => {
     scope
       .get('/users?page=2')
@@ -49,6 +56,45 @@ describe('Trembita:', () => {
           page: 2
         },
         expectedCodes: [200]
+      })
+      .then(res => {
+        expect(res).to.deep.equal({
+          page: 2,
+          per_page: 3,
+          total: 12,
+          total_pages: 4,
+          data: [{
+              id: 4,
+              first_name: 'fName',
+              last_name: 'lName'
+            },
+            {
+              id: 5,
+              first_name: 'fName',
+              last_name: 'lName'
+            },
+            {
+              id: 6,
+              first_name: 'fName',
+              last_name: 'lName'
+            }]
+        })
+      });
+  });
+
+  it('should return status code 200 and resourse if expectedCodes arent provided', () => {
+    scope
+      .get('/users?page=2')
+      .replyWithFile(200, __dirname +
+        '/responses/get-users-page-2.json')
+
+    return tbita
+      .request({
+        url: '/users',
+        qs: {
+          page: 2
+        },
+        // expectedCodes: [200]
       })
       .then(res => {
         expect(res).to.deep.equal({

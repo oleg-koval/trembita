@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const request = Promise.promisify(require('request'));
 
-const TrembitaError = require('./error');
+const { UnexpectedStatusCodeError, TrembitaError } = require('./error');
 
 const Trembita = class Trembita {
   constructor(options) {
@@ -10,7 +10,7 @@ const Trembita = class Trembita {
       return this.client(options)
       .then(res => {
         if (!expectedCodes.includes(res.statusCode)) {
-          const error = new TrembitaError.UnexpectedStatusCodeError({
+          const error = new UnexpectedStatusCodeError({
             options,
             httpStatusCode: res.statusCode,
             httpBody: res.body

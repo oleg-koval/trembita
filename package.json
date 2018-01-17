@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "nyc mocha",
     "lint": "eslint index.js",
     "ci": "npm run lint && npm run test"
   },
@@ -22,6 +22,7 @@
     "eslint": "^4.8.0",
     "eslint-config-warp": "^2.1.0",
     "mocha": "^4.1.0",
-    "nock": "^9.1.6"
+    "nock": "^9.1.6",
+    "nyc": "^11.4.1"
   }
 }
