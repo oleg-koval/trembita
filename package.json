@@ -7,7 +7,8 @@
   "scripts": {
     "test": "mocha",
     "lint": "eslint *.js",
-    "ci": "npm run lint && npm run test"
+    "ci": "npm run lint && npm run test",
+    "release": "./node_modules/.bin/xyz --increment"
   },
   "author": "Oleg Koval <oleg@wearereasonablepeople.com> (http://wearereasonablepeople.com/)",
   "license": "MIT",
@@ -22,6 +23,7 @@
     "eslint": "^4.8.0",
     "eslint-config-warp": "^2.1.0",
     "mocha": "^4.1.0",
-    "nock": "^9.1.6"
+    "nock": "^9.1.6",
+    "xyz": "^3.0.0"
   }
 }
