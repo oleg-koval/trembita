@@ -3,6 +3,7 @@ const nock = require('nock');
 const helpers = require('./helpers');
 
 const Trembita = require('../');
+const { UnexpectedStatusCodeError } = require('../error');
 
 describe('Trembita:', () => {
   let scope;
@@ -88,8 +89,10 @@ describe('Trembita:', () => {
         url: '/profiles/1',
         expectedCodes: [200]
       })
-      .catch(err => {
-        expect(err).to.throw
+      .catch(UnexpectedStatusCodeError, (err) => {
+        const message = `Unexpected status code: 404, Body: undefined, Options: { url: \'/profiles/1\', expectedCodes: [ 200 ] }`
+        expect(err.message).to.equal(message)
+        expect(err.toJSON()).to.deep.equal({ message })
       })
   });
 });
