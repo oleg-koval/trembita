@@ -1,34 +1,35 @@
 const Promise = require('bluebird');
-
-const {
-  generateErrorMessage
-} = require('./units');
 const request = Promise.promisify(require('request'));
 
-const RequestClient = class RequestClient {
+const { UnexpectedStatusCodeError, TrembitaError } = require('./error');
+
+const Trembita = class Trembita {
   constructor(options) {
     this.raw = options => {
       const expectedCodes = options.expectedCodes || [200];
       return this.client(options)
       .then(res => {
         if (!expectedCodes.includes(res.statusCode)) {
-          const msg = generateErrorMessage(res, options)
-          const error = new Error(msg);
-          error.httpStatusCode = res.statusCode;
-          error.httpBody = res.body;
-          throw new Error(error);
+          const error = new UnexpectedStatusCodeError({
+            options,
+            httpStatusCode: res.statusCode,
+            httpBody: res.body
+          });
+          return Promise.reject(error)
         }
         if (res.body === undefined) {
           res.body = null
         }
         return res.body;
       })
-      .catch(this.log.error)
     }
-    this.request = options => this.raw(options);
-    if (!options.endpoint) {
-      throw new Error('no endpoint');
-    }
+    this.request = options => {
+      this.log.trace({ options }, 'request')
+      return this.raw(options)
+    };
+
+    if (!options) { throw new TrembitaError('missing options'); }
+    if (!options.endpoint) { throw new TrembitaError('missing endpoint'); }
 
     this.endpoint = options.endpoint;
     this.log = options.log || console;
@@ -39,4 +40,4 @@ const RequestClient = class RequestClient {
   }
 };
 
-module.exports = RequestClient;
+module.exports = Trembita;
