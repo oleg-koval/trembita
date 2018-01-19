@@ -48,11 +48,11 @@ const Trembita = class Trembita {
    */
   static _validateOptions (options) {
     if (!options) { throw new TrembitaError('missing options'); }
-    if (!isObject(options)) throw new TrembitaError('options is not an object');
+    if (!isObject(options)) {throw new TrembitaError('options is not an object');}
 
     function isObject(value) {
       const type = typeof value
-      return value != null && (type == 'object' || type == 'function')
+      return value !== null && (type === 'object' || type === 'function')
     }
   }
 
@@ -66,9 +66,9 @@ const Trembita = class Trembita {
     if (!options.endpoint) { throw new TrembitaError('missing endpoint'); }
     if (typeof options.endpoint !== 'string') { throw new TrembitaError('endpoint is not string'); }
     if (!isURL(options.endpoint, {
-      protocols: ['http','https'],
-      require_protocol: true,
-      require_host: true,
+      protocols: ['http', 'https'],
+      require_protocol: true, // eslint-disable-line camelcase
+      require_host: true, // eslint-disable-line camelcase
     })) { throw new TrembitaError('endpoint is not valid url') }
   }
 };
