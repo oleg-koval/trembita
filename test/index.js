@@ -32,8 +32,42 @@ describe('Trembita:', () => {
     expect(() => new Trembita()).to.throw('missing options')
   })
 
+  it('should fail if options are not provided', () => {
+    expect(() => new Trembita(1)).to.throw('options is not an object')
+  })
+
   it('should fail if endpoint is not provided', () => {
     expect(() => new Trembita({})).to.throw('missing endpoint')
+  })
+
+  it('should fail if endpoint is not string', () => {
+    expect(() => new Trembita({
+      endpoint: 1
+    })).to.throw('endpoint is not string')
+  })
+
+  it('should fail if endpoint is not valid url', () => {
+    expect(() => new Trembita({
+      endpoint: '!url'
+    })).to.throw('endpoint is not valid url')
+  })
+
+  it('should fail if endpoint is not supported', () => {
+    expect(() => new Trembita({
+      endpoint: 'ftp://example.com'
+    })).to.throw('endpoint is not valid url')
+  })
+
+  it('should fail if protocol is missing', () => {
+    expect(() => new Trembita({
+      endpoint: 'example.com'
+    })).to.throw('endpoint is not valid url')
+  })
+
+  it('should fail if host is missing', () => {
+    expect(() => new Trembita({
+      endpoint: 'http://'
+    })).to.throw('endpoint is not valid url')
   })
 
   it('should provide default logger logger is not provided', () => {
