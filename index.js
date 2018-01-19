@@ -30,7 +30,7 @@ const Trembita = class Trembita {
     };
 
     Trembita._validateOptions(options);
-    Trembita._validateEndpoint(options);
+    Trembita._validateEndpoint(options.endpoint);
 
     this.endpoint = options.endpoint;
     this.log = options.log || console; // TODO: add more loggers
@@ -41,10 +41,10 @@ const Trembita = class Trembita {
   }
 
   /**
-   * [_validateOptions description]
+   * Options validator
    * @method _validateOptions
-   * @param  {[type]}         options [description]
-   * @return {[type]}                 [description]
+   * @param  {Object}         options object comes from plugin, includes required endpoint
+   * @return {TrembitaError}  errors: missing options, options is not an object
    */
   static _validateOptions (options) {
     if (!options) { throw new TrembitaError('missing options'); }
@@ -57,15 +57,15 @@ const Trembita = class Trembita {
   }
 
   /**
-   * [_validateEndpoint description]
+   * Endpoint validator
    * @method _validateEndpoint
-   * @param  {[type]}          options [description]
-   * @return {[type]}                  [description]
+   * @param  {String}          endpoint API
+   * @return {TrembitaError}  errors: missing endpoint, endpoint is not string, endpoint is not valid url
    */
-  static _validateEndpoint (options) {
-    if (!options.endpoint) { throw new TrembitaError('missing endpoint'); }
-    if (typeof options.endpoint !== 'string') { throw new TrembitaError('endpoint is not string'); }
-    if (!isURL(options.endpoint, {
+  static _validateEndpoint (endpoint) {
+    if (!endpoint) { throw new TrembitaError('missing endpoint'); }
+    if (typeof endpoint !== 'string') { throw new TrembitaError('endpoint is not string'); }
+    if (!isURL(endpoint, {
       protocols: ['http', 'https'],
       require_protocol: true, // eslint-disable-line camelcase
       require_host: true, // eslint-disable-line camelcase
