@@ -4,40 +4,18 @@ const { isURL } = require('validator');
 
 const { UnexpectedStatusCodeError, TrembitaError } = require('./error');
 
+
 const Trembita = class Trembita {
   constructor(options) {
-    this.raw = options => {
-      const expectedCodes = options.expectedCodes || [200];
-      return this.client(options)
-      .then(res => {
-        if (!expectedCodes.includes(res.statusCode)) {
-          const error = new UnexpectedStatusCodeError({
-            options,
-            httpStatusCode: res.statusCode,
-            httpBody: res.body
-          });
-          return Promise.reject(error)
-        }
-        if (res.body === undefined) {
-          res.body = null
-        }
-        return res.body;
-      })
-    }
-    this.request = options => {
-      this.log.trace({ options }, 'request')
-      return this.raw(options)
-    };
+    this.raw = options => this.client(options).then(Trembita._validateExpectedCodes.bind(options))
+    this.request = options => this.raw(options);
 
     Trembita._validateOptions(options);
     Trembita._validateEndpoint(options.endpoint);
 
     this.endpoint = options.endpoint;
-    this.log = options.log || console; // TODO: add more loggers
-    this.client = request.defaults({
-      baseUrl: this.endpoint,
-      json: true,
-    });
+    this.log = options.log || console;
+    this.client = request.defaults({ baseUrl: this.endpoint, json: true });
   }
 
   /**
@@ -70,6 +48,26 @@ const Trembita = class Trembita {
       require_protocol: true, // eslint-disable-line camelcase
       require_host: true, // eslint-disable-line camelcase
     })) { throw new TrembitaError('endpoint is not valid url') }
+  }
+
+  /**
+   * Status code validator
+   * @method _validateExpectedCodes
+   * @param  {Number}               statusCode res.statusCode
+   * @param  {Object}               body       res.body
+   * @return {Promise}
+   */
+  static _validateExpectedCodes ({statusCode, body}) {
+    const options = this;
+    const defaultStatusCodes = [200, 201];
+
+    const expectedCodes = options.expectedCodes || defaultStatusCodes;
+    if (!expectedCodes.includes(statusCode)) {
+      const error = new UnexpectedStatusCodeError({ options, httpStatusCode: statusCode, httpBody: body });
+      return Promise.reject(error)
+    }
+
+    return Promise.resolve(body)
   }
 };
 

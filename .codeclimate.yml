@@ -1,0 +1,18 @@
+---
+plugins:
+  fixme:
+    enabled: true
+  eslint:
+    enabled: true
+    config:
+      config: .eslintrc
+  nodesecurity:
+    enabled: true
+  requiresafe:
+    enabled: true
+exclude_patterns:
+- node_modules/**/*
+- test/**/*
+- error/**/*
+- danger*
+version: "2"

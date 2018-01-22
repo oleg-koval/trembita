@@ -1,6 +1,7 @@
 # Contributing
 
 ## Versions
+
 In order to contribute make sure that you add a version tag using the following logic:
 
 | Code Status | Stage | Rule | Example # |
@@ -18,7 +19,7 @@ Commits should follow the following format:
 Keyword is mandatory for **CHANGELOG**
 If keyword is skipped, commit will not appear in **CHANGELOG**
 
-### Keywords:
+### Keywords
 
 | Keyword | When to use |
 | --- | --- |
