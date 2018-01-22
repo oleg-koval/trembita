@@ -4,7 +4,6 @@ const { isURL } = require('validator');
 
 const { UnexpectedStatusCodeError, TrembitaError } = require('./error');
 
-
 const Trembita = class Trembita {
   constructor(options) {
     this.raw = options => this.client(options).then(Trembita._validateExpectedCodes.bind(options))
@@ -45,8 +44,8 @@ const Trembita = class Trembita {
     if (typeof endpoint !== 'string') { throw new TrembitaError('endpoint is not string'); }
     if (!isURL(endpoint, {
       protocols: ['http', 'https'],
-      require_protocol: true, // eslint-disable-line camelcase
-      require_host: true, // eslint-disable-line camelcase
+      require_protocol: true,
+      require_host: true,
     })) { throw new TrembitaError('endpoint is not valid url') }
   }
 
@@ -57,7 +56,7 @@ const Trembita = class Trembita {
    * @param  {Object}               body       res.body
    * @return {Promise}
    */
-  static _validateExpectedCodes ({statusCode, body}) {
+  static _validateExpectedCodes ({ statusCode, body }) {
     const options = this;
     const defaultStatusCodes = [200, 201];
 

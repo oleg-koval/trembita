@@ -20,6 +20,8 @@
     "no-console": "off",
     "max-len": "off",
     "no-debugger": "warn",
+    "consistent-this": "off",
+    "camelcase": "off",
     "complexity": "warn"
   }
 }
