@@ -2,7 +2,7 @@
   "name": "trembita",
   "version": "1.0.0",
   "private": true,
-  "description": "",
+  "description": "Request wrapper core for consuming third party services",
   "main": "index.js",
   "scripts": {
     "test": "nyc mocha",
