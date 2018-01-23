@@ -30,7 +30,6 @@ yarn add trembita
 
 ## Usage
 Trembita is not supposed to be used directly, rather than to develop plugins.
-Below you can find the suggested implementation of such plugin.
 
 ## Contribute
 
