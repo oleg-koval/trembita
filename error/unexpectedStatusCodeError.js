@@ -32,6 +32,7 @@ class UnexpectedStatusCodeError extends TrembitaError {
   }
 
   static _generateErrorMessage (instance) {
+    if (instance.httpBody === undefined) { instance.httpBody = null }
     return `${`Unexpected status code: ${instance.httpStatusCode}, Body: ${util.inspect(instance.httpBody, { depth: 4 })}, Options: `}${util.inspect(instance.options, { depth: 4 })}`
   }
 
