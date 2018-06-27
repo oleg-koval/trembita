@@ -6,10 +6,10 @@ services:
 language: node_js
 
 script:
-  - npm run ci
   - yarn danger ci
+  - npm run ci
 
 after_success: npm run coverage
 
 node_js:
-  - "8.4.0"
+  - "8.9.4"
