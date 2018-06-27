@@ -1,15 +1,32 @@
 {
   "name": "trembita",
-  "version": "1.0.0",
-  "private": true,
+  "version": "0.0.0",
+  "private": false,
   "description": "Request wrapper core for consuming third party services",
+  "repository": "wearereasonablepeople/trembita",
+  "bugs": "https://github.com/wearereasonablepeople/trembita/issues",
   "main": "index.js",
   "scripts": {
     "test": "nyc mocha",
     "lint": "eslint index.js",
     "ci": "npm run lint && npm run test",
-    "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
+    "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "xyz:increment": "xyz --increment",
+    "release:major": "changelog -M && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment major",
+    "release:minor": "changelog -m && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment minor",
+    "release:patch": "changelog -p && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment patch"
   },
+  "keywords": [
+    "API",
+    "API wrapper",
+    "Request wrapper",
+    "3d party API",
+    "third party API",
+    "API consumer",
+    "nodejs",
+    "javascript",
+    "npm"
+  ],
   "author": "Oleg Koval <oleg@wearereasonablepeople.com> (http://wearereasonablepeople.com/)",
   "license": "MIT",
   "dependencies": {
@@ -24,8 +41,10 @@
     "danger": "^3.0.3",
     "eslint": "^4.8.0",
     "eslint-config-warp": "^2.1.0",
+    "generate-changelog": "^1.7.1",
     "mocha": "^4.1.0",
     "nock": "^9.1.6",
-    "nyc": "^11.4.1"
+    "nyc": "^11.4.1",
+    "xyz": "2.1.0"
   }
 }
