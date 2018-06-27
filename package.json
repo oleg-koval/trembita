@@ -10,7 +10,7 @@
     "test": "nyc mocha",
     "lint": "eslint index.js",
     "ci": "npm run lint && npm run test",
-    "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "test:coverage": "npm run nyc | coveralls",
     "xyz:increment": "xyz --increment",
     "release:major": "changelog -M && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment major",
     "release:minor": "changelog -m && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment minor",
@@ -36,8 +36,7 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "codecov": "^3.0.0",
-    "coveralls": "^3.0.0",
+    "coveralls": "^3.0.1",
     "danger": "^3.0.3",
     "eslint": "^4.8.0",
     "eslint-config-warp": "^2.1.0",
