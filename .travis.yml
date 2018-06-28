@@ -6,7 +6,6 @@ services:
 language: node_js
 
 script:
-  - yarn danger ci
   - npm run ci
 
 after_success: npm run coverage
