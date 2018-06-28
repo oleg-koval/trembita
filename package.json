@@ -7,9 +7,9 @@
   "bugs": "https://github.com/wearereasonablepeople/trembita/issues",
   "main": "index.js",
   "scripts": {
-    "test": "nyc mocha",
+    "test": "mocha",
+    "nyc": "nyc npm test && nyc report --reporter=text-lcov",
     "lint": "eslint index.js",
-    "ci": "npm run lint && npm run test",
     "test:coverage": "npm run nyc | coveralls",
     "xyz:increment": "xyz --increment",
     "release:major": "changelog -M && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment major",
