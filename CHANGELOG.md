@@ -1,3 +1,9 @@
+#### 1.0.1 (2018-07-02)
+
+##### Chores
+
+*  Update dependencies (eccfce21)
+
 ## 1.0.0 (2018-07-02)
 
 ##### Continuous Integration
