@@ -31,18 +31,18 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.0.6",
-    "request": "^2.67.0",
-    "validator": "^9.2.0"
+    "request": "^2.87.0",
+    "validator": "^10.4.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "coveralls": "^3.0.1",
+    "coveralls": "^3.0.2",
     "eslint": "^4.8.0",
     "eslint-config-warp": "^2.1.0",
     "generate-changelog": "^1.7.1",
-    "mocha": "^4.1.0",
-    "nock": "^9.1.6",
-    "nyc": "^11.4.1",
-    "xyz": "2.1.0"
+    "mocha": "^5.2.0",
+    "nock": "^9.4.0",
+    "nyc": "^12.0.2",
+    "xyz": "^3.0.0"
   }
 }
