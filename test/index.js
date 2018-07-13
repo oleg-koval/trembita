@@ -185,7 +185,7 @@ describe('Trembita:', () => {
           expectedCodes: [200]
         })
         .catch(UnexpectedStatusCodeError, (err) => {
-          const message = `Unexpected status code: 404, Body: null, Options: { url: \'/profiles/1\', expectedCodes: [ 200 ] }`
+          const message = `Unexpected status code: 404, Body: undefined, Options: { url: \'/profiles/1\', expectedCodes: [ 200 ] }`
           expect(err.message).to.equal(message)
           expect(err.toJSON()).to.deep.equal({ message })
         })
