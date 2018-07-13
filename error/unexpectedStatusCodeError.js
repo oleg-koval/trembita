@@ -21,9 +21,7 @@ class UnexpectedStatusCodeError extends TrembitaError {
 
     this.message = '';
     if (instance.constructor.name === 'Object') {
-      this.message = `Unexpected status code: ${instance.httpStatusCode}, Body: ${instance.httpBody}, Options: ${util.inspect(instance.options, {
-        depth: 4
-      })}`
+      this.message = `Unexpected status code: ${instance.httpStatusCode}, Body: ${instance.httpBody}`
     } else {
       this.message = 'Unexpected Status Code Error';
     }
