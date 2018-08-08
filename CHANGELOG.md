@@ -1,3 +1,9 @@
+#### 1.0.5 (2018-08-08)
+
+##### New Features
+
+*  Add options to UnexpectedErrorCode error for better logging (49e74ffd)
+
 #### 1.0.4 (2018-07-13)
 
 ##### Bug Fixes
