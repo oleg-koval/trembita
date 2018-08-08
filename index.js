@@ -6,7 +6,11 @@ const { UnexpectedStatusCodeError, TrembitaError } = require('./error');
 
 const Trembita = class Trembita {
   constructor(options) {
-    this.raw = options => this.client(options).then(Trembita._validateExpectedCodes.bind(options))
+    this.raw = options => this.client(options)
+    .then(Trembita._validateExpectedCodes.bind({
+      ...options,
+      endpoint: this.endpoint
+    }))
     this.request = options => this.raw(options);
 
     Trembita._validateOptions(options);
@@ -14,7 +18,10 @@ const Trembita = class Trembita {
 
     this.endpoint = options.endpoint;
     this.log = options.log || console;
-    this.client = request.defaults({ baseUrl: this.endpoint, json: true });
+    this.client = request.defaults({
+      baseUrl: this.endpoint,
+      json: true
+    });
   }
 
   /**
@@ -23,9 +30,13 @@ const Trembita = class Trembita {
    * @param  {Object}         options object comes from plugin, includes required endpoint
    * @return {TrembitaError}  errors: missing options, options is not an object
    */
-  static _validateOptions (options) {
-    if (!options) { throw new TrembitaError('missing options'); }
-    if (!isObject(options)) {throw new TrembitaError('options is not an object');}
+  static _validateOptions(options) {
+    if (!options) {
+      throw new TrembitaError('missing options');
+    }
+    if (!isObject(options)) {
+      throw new TrembitaError('options is not an object');
+    }
 
     function isObject(value) {
       const type = typeof value
@@ -39,14 +50,20 @@ const Trembita = class Trembita {
    * @param  {String}          endpoint API
    * @return {TrembitaError}  errors: missing endpoint, endpoint is not string, endpoint is not valid url
    */
-  static _validateEndpoint (endpoint) {
-    if (!endpoint) { throw new TrembitaError('missing endpoint'); }
-    if (typeof endpoint !== 'string') { throw new TrembitaError('endpoint is not string'); }
+  static _validateEndpoint(endpoint) {
+    if (!endpoint) {
+      throw new TrembitaError('missing endpoint');
+    }
+    if (typeof endpoint !== 'string') {
+      throw new TrembitaError('endpoint is not string');
+    }
     if (!isURL(endpoint, {
       protocols: ['http', 'https'],
       require_protocol: true,
       require_host: true,
-    })) { throw new TrembitaError('endpoint is not valid url') }
+    })) {
+      throw new TrembitaError('endpoint is not valid url')
+    }
   }
 
   /**
@@ -56,13 +73,17 @@ const Trembita = class Trembita {
    * @param  {Object}               body       res.body
    * @return {Promise}
    */
-  static _validateExpectedCodes ({ statusCode, body }) {
+  static _validateExpectedCodes({ statusCode, body }) {
     const options = this;
     const defaultStatusCodes = [200, 201];
 
     const expectedCodes = options.expectedCodes || defaultStatusCodes;
     if (!expectedCodes.includes(statusCode)) {
-      const error = new UnexpectedStatusCodeError({ options, httpStatusCode: statusCode, httpBody: body });
+      const error = new UnexpectedStatusCodeError({
+        options,
+        httpStatusCode: statusCode,
+        httpBody: body
+      });
       return Promise.reject(error)
     }
 
