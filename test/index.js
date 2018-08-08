@@ -1,11 +1,9 @@
-const { should, expect } = require('chai');
+const { expect } = require('chai');
 const nock = require('nock');
 const helpers = require('./helpers');
 
 const Trembita = require('../');
 const { UnexpectedStatusCodeError } = require('../error');
-
-
 
 describe('Trembita:', () => {
   let scope, expectedBody, trembita;
@@ -21,26 +19,26 @@ describe('Trembita:', () => {
       total: 12,
       total_pages: 4,
       data: [{
-          id: 4,
-          first_name: 'fName',
-          last_name: 'lName'
-        },
-        {
-          id: 5,
-          first_name: 'fName',
-          last_name: 'lName'
-        },
-        {
-          id: 6,
-          first_name: 'fName',
-          last_name: 'lName'
-        }]
+        id: 4,
+        first_name: 'fName',
+        last_name: 'lName'
+      },
+      {
+        id: 5,
+        first_name: 'fName',
+        last_name: 'lName'
+      },
+      {
+        id: 6,
+        first_name: 'fName',
+        last_name: 'lName'
+      }]
     };
 
     trembita = new Trembita(clientOptions);
     scope = nock(clientOptions.endpoint);
   });
-  afterEach(() => { return scope.done(); });
+  afterEach(() => scope.done());
 
   describe('constructor', () => {
     it(
@@ -103,92 +101,89 @@ describe('Trembita:', () => {
   })
 
   describe('trembita.client', () => {
-    it('should return status code 200 and resourse', () => {
+    it('should return status code 200 and resource', () => {
       scope
-        .get('/users?page=2')
-        .replyWithFile(200, __dirname +
-          '/responses/get-users-page-2.json')
+      .get('/users?page=2')
+      .replyWithFile(200, `${__dirname}/responses/get-users-page-2.json`)
 
       return trembita
-        .client({
-          url: '/users',
-          qs: {
-            page: 2
-          },
-          expectedCodes: [200]
-        })
-        .then(res => {
-          expect(res.statusCode).to.be.equal(200)
-          expect(res.body).to.deep.equal(expectedBody)
-        });
+      .client({
+        url: '/users',
+        qs: {
+          page: 2
+        },
+        expectedCodes: [200]
+      })
+      .then(res => {
+        expect(res.statusCode).to.be.equal(200)
+        expect(res.body).to.deep.equal(expectedBody)
+      });
     });
   })
 
   describe('trembita.request', () => {
-    it('should return status code 200 and resourse', () => {
+    it('should return status code 200 and resource', () => {
       scope
-        .get('/users?page=2')
-        .replyWithFile(200, __dirname +
-          '/responses/get-users-page-2.json')
+      .get('/users?page=2')
+      .replyWithFile(200, `${__dirname}/responses/get-users-page-2.json`)
 
       return trembita
-        .request({
-          url: '/users',
-          qs: {
-            page: 2
-          },
-          expectedCodes: [200]
-        })
-        .then(res => {
-          expect(res).to.deep.equal(expectedBody)
-        });
+      .request({
+        url: '/users',
+        qs: {
+          page: 2
+        },
+        expectedCodes: [200]
+      })
+      .then(res => {
+        expect(res).to.deep.equal(expectedBody)
+      });
     });
 
-    it('should return status code 200 and resourse if expectedCodes arent provided', () => {
+    it('should return status code 200 and resource if expectedCodes aren\'t provided', () => {
       scope
-        .get('/users?page=2')
-        .replyWithFile(200, __dirname +
-          '/responses/get-users-page-2.json')
+      .get('/users?page=2')
+      .replyWithFile(200, `${__dirname}/responses/get-users-page-2.json`)
 
       return trembita
-        .request({
-          url: '/users',
-          qs: {
-            page: 2
-          }
-        })
-        .then(res => {
-          expect(res).to.deep.equal(expectedBody)
-        });
+      .request({
+        url: '/users',
+        qs: {
+          page: 2
+        }
+      })
+      .then(res => {
+        expect(res).to.deep.equal(expectedBody)
+      });
     });
 
     it('should return 404 status code', () => {
       scope
-        .get('/profiles')
-        .reply(404)
+      .get('/profiles')
+      .reply(404)
 
       return trembita
-        .request({
-          url: '/profiles',
-          expectedCodes: [404]
-        })
+      .request({
+        url: '/profiles',
+        expectedCodes: [404]
+      })
     });
 
     it('should return error related to unexpected status code', () => {
       scope
-        .get('/profiles/1')
-        .reply(404)
+      .get('/profiles/1')
+      .reply(404)
 
       return trembita
-        .request({
-          url: '/profiles/1',
-          expectedCodes: [200]
-        })
-        .catch(UnexpectedStatusCodeError, (err) => {
-          const message = `Unexpected status code: 404, Body: undefined`
-          expect(err.message).to.equal(message)
-          expect(err.toJSON()).to.deep.equal({ message })
-        })
+      .request({
+        url: '/profiles/1',
+        expectedCodes: [200]
+      })
+      .catch(UnexpectedStatusCodeError, err => {
+        const message = `Unexpected status code: 404, Body: undefined, Options: {"url":"/profiles/1","expectedCodes":[200],"endpoint":"https://example.com/api"}`
+        expect(err.message).to.equal(message)
+        expect(err.toJSON()).to.deep.equal({ message })
+      })
     });
   })
 });
