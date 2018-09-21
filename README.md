@@ -1,7 +1,7 @@
 # trembita-js
 
 [![Build Status](https://travis-ci.com/wearereasonablepeople/trembita.svg?token=H11zxJynPszpg8G3VJzP&branch=master)](https://travis-ci.com/wearereasonablepeople/trembita)
-[![Coverage Status](https://coveralls.io/repos/github/wearereasonablepeople/trembita/badge.svg?t=4hXlqB)](https://coveralls.io/github/wearereasonablepeople/trembita)
+[![Coverage Status](https://coveralls.io/repos/github/wearereasonablepeople/trembita/badge.svg?t=4hXlqB)](https://coveralls.io/github/wearereasonablepeople/trembita) [![Greenkeeper badge](https://badges.greenkeeper.io/wearereasonablepeople/trembita.svg)](https://greenkeeper.io/)
 
 > Request wrapper core for consuming third party services
 
