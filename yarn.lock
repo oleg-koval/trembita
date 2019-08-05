@@ -340,7 +340,7 @@ center-align@^0.1.1:
     align-text "^0.1.3"
     lazy-cache "^1.0.3"
 
-chai@^4.1.2:
+chai@4.1.2, chai@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/chai/-/chai-4.1.2.tgz#0f64584ba642f0f2ace2806279f4f06ca23ad73c"
   dependencies:
@@ -483,7 +483,7 @@ core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
 
-coveralls@^3.0.2:
+coveralls@3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/coveralls/-/coveralls-3.0.2.tgz#f5a0bcd90ca4e64e088b710fa8dda640aea4884f"
   dependencies:
@@ -620,7 +620,7 @@ escape-string-regexp@1.0.5, escape-string-regexp@^1.0.2, escape-string-regexp@^1
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
 
-eslint-config-warp@^2.1.0:
+eslint-config-warp@2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/eslint-config-warp/-/eslint-config-warp-2.1.1.tgz#188fa13d9ac76d5d7ccbb0cad61c2b92d725990b"
 
@@ -880,7 +880,7 @@ functional-red-black-tree@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
 
-generate-changelog@^1.7.1:
+generate-changelog@1.7.1:
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/generate-changelog/-/generate-changelog-1.7.1.tgz#c0b549de34177e6a5d6414af3d74daea9a3cdc0f"
   dependencies:
@@ -1518,7 +1518,7 @@ mkdirp@0.5.1, mkdirp@^0.5.0, mkdirp@^0.5.1:
   dependencies:
     minimist "0.0.8"
 
-mocha@^5.2.0:
+mocha@5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/mocha/-/mocha-5.2.0.tgz#6d8ae508f59167f940f2b5b3c4a612ae50c90ae6"
   dependencies:
@@ -1562,7 +1562,7 @@ natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
 
-nock@^9.4.0:
+nock@9.4.0:
   version "9.4.0"
   resolved "https://registry.yarnpkg.com/nock/-/nock-9.4.0.tgz#d151c0020c9c10fe2f139c4bc7498457959eddc8"
   dependencies:
@@ -1595,7 +1595,7 @@ number-is-nan@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/number-is-nan/-/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
 
-nyc@^12.0.2:
+nyc@12.0.2:
   version "12.0.2"
   resolved "https://registry.yarnpkg.com/nyc/-/nyc-12.0.2.tgz#8a4a4ed690966c11ec587ff87eea0c12c974ba99"
   dependencies:
@@ -2418,7 +2418,7 @@ write@^0.2.1:
   dependencies:
     mkdirp "^0.5.1"
 
-xyz@^3.0.0:
+xyz@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/xyz/-/xyz-3.0.0.tgz#50ac8f2b6c50f661062373cef8ab6b5c8c52a1fe"
 
