@@ -1561,9 +1561,9 @@ neo-async@^2.6.0:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.1.tgz#ac27ada66167fa8849a6addd837f6b189ad2081c"
 
-nock@9.4.0:
-  version "9.4.0"
-  resolved "https://registry.yarnpkg.com/nock/-/nock-9.4.0.tgz#d151c0020c9c10fe2f139c4bc7498457959eddc8"
+nock@9.6.1:
+  version "9.6.1"
+  resolved "https://registry.yarnpkg.com/nock/-/nock-9.6.1.tgz#d96e099be9bc1d0189a77f4490bbbb265c381b49"
   dependencies:
     chai "^4.1.2"
     debug "^3.1.0"
