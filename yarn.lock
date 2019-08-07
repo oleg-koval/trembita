@@ -883,9 +883,9 @@ functional-red-black-tree@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
 
-generate-changelog@1.7.1:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/generate-changelog/-/generate-changelog-1.7.1.tgz#c0b549de34177e6a5d6414af3d74daea9a3cdc0f"
+generate-changelog@1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/generate-changelog/-/generate-changelog-1.8.0.tgz#1d788cdef5a13a649da7eb2a1f3b02674850e4a8"
   dependencies:
     bluebird "^3.0.6"
     commander "^2.9.0"
