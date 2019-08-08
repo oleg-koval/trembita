@@ -3,8 +3,8 @@ sudo: required
 language: node_js
 
 cache:
-  directories:
-    - "node_modules"
+  npm: false
+  directories: false
 
 node_js:
   - "8.9.4"
