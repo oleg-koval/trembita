@@ -2,8 +2,8 @@
   "release": {
     "branch": "master",
     "repositoryUrl": "https://github.com/oleg-koval/trembita",
-    "dryRun": false,
-    "debug": false,
+    "dryRun": true,
+    "debug": true,
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
