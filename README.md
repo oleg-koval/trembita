@@ -1,7 +1,7 @@
 # trembita-js
 
-[![Build Status](https://travis-ci.com/wearereasonablepeople/trembita.svg?token=H11zxJynPszpg8G3VJzP&branch=master)](https://travis-ci.com/wearereasonablepeople/trembita)
-[![Coverage Status](https://coveralls.io/repos/github/wearereasonablepeople/trembita/badge.svg?t=4hXlqB)](https://coveralls.io/github/wearereasonablepeople/trembita)
+[![Build Status](https://travis-ci.com/oleg-koval/trembita.svg?branch=master)](https://travis-ci.com/oleg-koval/trembita)
+[![Coverage Status](https://coveralls.io/repos/github/oleg-koval/trembita/badge.svg?branch=master)](https://coveralls.io/github/oleg-koval/trembita?branch=master)
 
 > Request wrapper core for consuming third party services
 
@@ -43,9 +43,9 @@ In order you can use a third party service by implementing your plugin, make sur
 One example of usage would be:
 
 ```js
-const clientOptions = { 
-	headers: { 
-		header1: 'xxx', 
+const clientOptions = {
+	headers: {
+		header1: 'xxx',
 		header2: 'yyy'
 	},
 	endpoint: 'http://serviceapi.com'
@@ -54,7 +54,7 @@ const clientOptions = {
 const MyAPIClient = class MyAPIClient extends Trembita {
   constructor(options) {
     super(...arguments);
-    
+
     this.getData = paramsQueryString => {
       const params = {
         url: `api/path/`,
@@ -79,4 +79,4 @@ See [the contribute file](CONTRIBUTING.md)!
 
 ## License
 
-MIT © 2018 Wearereasonablepeople.com
+MIT © 2018
