@@ -1,10 +1,10 @@
 {
   "name": "trembita",
-  "version": "1.0.5",
+  "version": "0.0.0-development",
   "private": false,
   "description": "Request wrapper core for consuming third party services",
-  "repository": "wearereasonablepeople/trembita",
-  "bugs": "https://github.com/wearereasonablepeople/trembita/issues",
+  "repository": "oleg-koval/trembita",
+  "bugs": "https://github.com/oleg-koval/trembita/issues",
   "main": "index.js",
   "scripts": {
     "test": "mocha",
@@ -14,7 +14,8 @@
     "xyz:increment": "xyz --increment",
     "release:major": "changelog -M && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment major",
     "release:minor": "changelog -m && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment minor",
-    "release:patch": "changelog -p && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment patch"
+    "release:patch": "changelog -p && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment patch",
+    "semantic-release": "semantic-release"
   },
   "keywords": [
     "API",
@@ -27,7 +28,7 @@
     "javascript",
     "npm"
   ],
-  "author": "Oleg Koval <oleg@wearereasonablepeople.com> (http://wearereasonablepeople.com/)",
+  "author": "Oleg Koval <kvl.olg@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.0.6",
@@ -43,6 +44,7 @@
     "mocha": "6.2.0",
     "nock": "10.0.6",
     "nyc": "14.1.1",
-    "xyz": "3.0.0"
+    "xyz": "3.0.0",
+    "semantic-release": "^15.13.19"
   }
 }
