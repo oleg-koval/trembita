@@ -5,17 +5,23 @@ services:
 
 language: node_js
 
-script:
-  - npm run lint
-  - npm run test
-
-after_success:
-  - npm run test:coverage
-
-after_success: npm run test:coverage
-
 node_js:
   - "8.9.4"
   - "9"
   - "10"
   - "11"
+
+after_success:
+  - npm run test:coverage
+
+jobs:
+  include:
+    - stage: release
+      node_js: lts/*
+      deploy:
+        provider: script
+        skip_cleanup: true
+      script:
+        - npm run lint
+        - npm run test
+        - npx semantic-release
