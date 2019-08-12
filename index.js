@@ -5,7 +5,7 @@ const { isURL } = require('validator');
 const { UnexpectedStatusCodeError, TrembitaError } = require('./error');
 
 const Trembita = class Trembita {
-  constructor(options) {
+  constructor (options) {
     // eslint-disable-line space-before-function-paren
     this.raw = clientRequestOptions =>
       this.client(clientRequestOptions).then(
@@ -35,9 +35,9 @@ const Trembita = class Trembita {
    * @returns {TrembitaError}  errors: missing options,
    options is not an object.
    */
-  static _validateOptions(options) {
+  static _validateOptions (options) {
     // eslint-disable-line space-before-function-paren
-    function isObject(value) {
+    function isObject (value) {
       // eslint-disable-line space-before-function-paren
       const type = typeof value;
 
@@ -58,7 +58,7 @@ const Trembita = class Trembita {
    * @returns {TrembitaError}  errors: missing endpoint, endpoint is not string,
     endpoint is not valid url.
    */
-  static _validateEndpoint(endpoint) {
+  static _validateEndpoint (endpoint) {
     // eslint-disable-line space-before-function-paren
     if (!endpoint) {
       throw new TrembitaError('missing endpoint');
@@ -84,7 +84,7 @@ const Trembita = class Trembita {
    * @param  {Object}               body       res.body
    * @returns {Object}              error or body
    */
-  static _validateExpectedCodes({ statusCode, body }) {
+  static _validateExpectedCodes ({ statusCode, body }) {
     // eslint-disable-line space-before-function-paren
     const options = this;
     const defaultStatusCodes = [200, 201];
