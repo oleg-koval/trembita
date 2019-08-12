@@ -11,10 +11,6 @@
     "nyc": "nyc npm test && nyc report --reporter=text-lcov",
     "lint": "npx goodparts index.js",
     "test:coverage": "npm run nyc | coveralls",
-    "xyz:increment": "xyz --increment",
-    "release:major": "changelog -M && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment major",
-    "release:minor": "changelog -m && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment minor",
-    "release:patch": "changelog -p && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment patch",
     "semantic-release": "semantic-release",
     "format": "prettier --check \"**/*.{js,json,md,ts,yml,yaml}\"",
     "format:fix": "prettier --write \"**/*.{js,json,md,ts,yml,yaml}\""
@@ -55,7 +51,6 @@
     "nock": "10.0.6",
     "nyc": "14.1.1",
     "prettier": "^1.18.2",
-    "semantic-release": "15.13.19",
-    "xyz": "3.0.0"
+    "semantic-release": "15.13.19"
   }
 }
