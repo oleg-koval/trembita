@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.com/oleg-koval/trembita.svg?branch=master)](https://travis-ci.com/oleg-koval/trembita)
 [![Coverage Status](https://coveralls.io/repos/github/oleg-koval/trembita/badge.svg?branch=master)](https://coveralls.io/github/oleg-koval/trembita?branch=master)
+[![JavaScript Style Guide: Good Parts](https://img.shields.io/badge/code%20style-goodparts-brightgreen.svg?style=flat)](https://github.com/dwyl/goodparts "JavaScript The Good Parts")
 
 > Request wrapper core for consuming third party services
 
