@@ -16,10 +16,9 @@ class TrembitaError extends Error {
       this.stack = new Error().stack;
     }
     this.message = msg;
-    Object.defineProperty(this, 'name', { value: this.constructor.name })
+    Object.defineProperty(this, 'name', { value: this.constructor.name });
   }
 }
-
 
 /*!
  * Module exports.

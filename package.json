@@ -9,13 +9,15 @@
   "scripts": {
     "test": "mocha",
     "nyc": "nyc npm test && nyc report --reporter=text-lcov",
-    "lint": "eslint index.js",
+    "lint": "npx goodparts index.js",
     "test:coverage": "npm run nyc | coveralls",
     "xyz:increment": "xyz --increment",
     "release:major": "changelog -M && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment major",
     "release:minor": "changelog -m && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment minor",
     "release:patch": "changelog -p && git add CHANGELOG.md && git commit -m 'Updated CHANGELOG.md' && npm run xyz:increment patch",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "format": "prettier --check \"**/*.{js,json,md,ts,yml,yaml}\"",
+    "format:fix": "prettier --write \"**/*.{js,json,md,ts,yml,yaml}\""
   },
   "keywords": [
     "API",
@@ -41,14 +43,18 @@
     "@semantic-release/git": "7.0.16",
     "@semantic-release/npm": "5.1.13",
     "@semantic-release/release-notes-generator": "7.3.0",
+    "babel-eslint": "^10.0.2",
     "chai": "4.2.0",
     "coveralls": "3.0.6",
     "eslint": "4.19.1",
+    "eslint-config-goodparts": "0.0.1",
     "eslint-config-warp": "2.1.1",
     "generate-changelog": "1.8.0",
+    "goodparts": "^1.2.1",
     "mocha": "6.2.0",
     "nock": "10.0.6",
     "nyc": "14.1.1",
+    "prettier": "^1.18.2",
     "semantic-release": "15.13.19",
     "xyz": "3.0.0"
   }

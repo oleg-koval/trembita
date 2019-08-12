@@ -6,12 +6,15 @@ const { UnexpectedStatusCodeError, TrembitaError } = require('./error');
 
 const Trembita = class Trembita {
   constructor(options) {
-    this.raw = options => this.client(options)
-    .then(Trembita._validateExpectedCodes.bind({
-      ...options,
-      endpoint: this.endpoint
-    }))
-    this.request = options => this.raw(options);
+    // eslint-disable-line space-before-function-paren
+    this.raw = clientRequestOptions =>
+      this.client(clientRequestOptions).then(
+        Trembita._validateExpectedCodes.bind({
+          ...clientRequestOptions,
+          endpoint: this.endpoint
+        })
+      );
+    this.request = clientRequestOptions => this.raw(clientRequestOptions);
 
     Trembita._validateOptions(options);
     Trembita._validateEndpoint(options.endpoint);
@@ -25,69 +28,80 @@ const Trembita = class Trembita {
   }
 
   /**
-   * Options validator
-   * @method _validateOptions
-   * @param  {Object}         options object comes from plugin, includes required endpoint
-   * @return {TrembitaError}  errors: missing options, options is not an object
+   * Options validator.
+   * @method _validateOptions.
+   * @param  {Object}         options object comes from plugin,
+   includes required endpoint.
+   * @returns {TrembitaError}  errors: missing options,
+   options is not an object.
    */
   static _validateOptions(options) {
+    // eslint-disable-line space-before-function-paren
+    function isObject(value) {
+      // eslint-disable-line space-before-function-paren
+      const type = typeof value;
+
+      return value !== null && (type === 'object' || type === 'function');
+    }
     if (!options) {
       throw new TrembitaError('missing options');
     }
     if (!isObject(options)) {
       throw new TrembitaError('options is not an object');
     }
-
-    function isObject(value) {
-      const type = typeof value
-      return value !== null && (type === 'object' || type === 'function')
-    }
   }
 
   /**
-   * Endpoint validator
-   * @method _validateEndpoint
-   * @param  {String}          endpoint API
-   * @return {TrembitaError}  errors: missing endpoint, endpoint is not string, endpoint is not valid url
+   * Endpoint validator.
+   * @method _validateEndpoint.
+   * @param  {String}          endpoint API.
+   * @returns {TrembitaError}  errors: missing endpoint, endpoint is not string,
+    endpoint is not valid url.
    */
   static _validateEndpoint(endpoint) {
+    // eslint-disable-line space-before-function-paren
     if (!endpoint) {
       throw new TrembitaError('missing endpoint');
     }
     if (typeof endpoint !== 'string') {
       throw new TrembitaError('endpoint is not string');
     }
-    if (!isURL(endpoint, {
-      protocols: ['http', 'https'],
-      require_protocol: true,
-      require_host: true,
-    })) {
-      throw new TrembitaError('endpoint is not valid url')
+    if (
+      !isURL(endpoint, {
+        protocols: ['http', 'https'],
+        require_protocol: true,
+        require_host: true
+      })
+    ) {
+      throw new TrembitaError('endpoint is not valid url');
     }
   }
 
   /**
-   * Status code validator
-   * @method _validateExpectedCodes
+   * Status code validator.
+   * @method _validateExpectedCodes.
    * @param  {Number}               statusCode res.statusCode
    * @param  {Object}               body       res.body
-   * @return {Promise}
+   * @returns {Object}              error or body
    */
   static _validateExpectedCodes({ statusCode, body }) {
+    // eslint-disable-line space-before-function-paren
     const options = this;
     const defaultStatusCodes = [200, 201];
 
     const expectedCodes = options.expectedCodes || defaultStatusCodes;
+
     if (!expectedCodes.includes(statusCode)) {
       const error = new UnexpectedStatusCodeError({
         options,
         httpStatusCode: statusCode,
         httpBody: body
       });
-      return Promise.reject(error)
+
+      return Promise.reject(error);
     }
 
-    return Promise.resolve(body)
+    return Promise.resolve(body);
   }
 };
 
