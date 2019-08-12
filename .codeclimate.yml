@@ -5,13 +5,13 @@ plugins:
   eslint:
     enabled: true
     config:
-      config: .eslintrc
+      config: .eslintrc.yaml
   nodesecurity:
     enabled: true
   requiresafe:
     enabled: true
 exclude_patterns:
-- node_modules/**/*
-- test/**/*
-- error/**/*
-version: "2"
+  - node_modules/**/*
+  - test/**/*
+  - error/**/*
+version: '2'

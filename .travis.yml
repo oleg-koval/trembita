@@ -7,10 +7,10 @@ cache:
   directories: false
 
 node_js:
-  - "8.9.4"
-  - "9"
-  - "10"
-  - "11"
+  - '8.9.4'
+  - '9'
+  - '10'
+  - '11'
 
 after_success:
   - npm run test:coverage

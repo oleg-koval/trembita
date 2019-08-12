@@ -15,13 +15,16 @@ const TrembitaError = require('./trembitaError');
  */
 
 class UnexpectedStatusCodeError extends TrembitaError {
-
   constructor(instance) {
     super(...arguments); // eslint-disable-line prefer-rest-params
 
     this.message = '';
     if (instance.constructor.name === 'Object') {
-      this.message = `Unexpected status code: ${instance.httpStatusCode}, Body: ${instance.httpBody}, Options: ${JSON.stringify(instance.options)}`
+      this.message = `Unexpected status code: ${
+        instance.httpStatusCode
+      }, Body: ${instance.httpBody}, Options: ${JSON.stringify(
+        instance.options
+      )}`;
     } else {
       this.message = 'Unexpected Status Code Error';
     }
@@ -35,13 +38,11 @@ class UnexpectedStatusCodeError extends TrembitaError {
   inspect() {
     return Object.assign(new Error(this.message), this);
   }
-  ;
   toJSON() {
     return Object.assign({}, this, {
       message: this.message
     });
   }
-  ;
 }
 
 /*!

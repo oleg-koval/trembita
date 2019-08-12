@@ -1,0 +1,13 @@
+env:
+  es6: true
+  node: true
+parser: 'babel-eslint'
+extends: 'goodparts'
+overrides:
+  - rules:
+      space-before-function-paren: 'warn'
+parserOptions:
+  ecmaVersion: 2018
+  sourceType: module
+rules:
+  space-before-function-paren: 0
