@@ -39,18 +39,18 @@
     "@semantic-release/git": "7.0.16",
     "@semantic-release/npm": "5.1.13",
     "@semantic-release/release-notes-generator": "7.3.0",
-    "babel-eslint": "^10.0.2",
+    "babel-eslint": "10.0.2",
     "chai": "4.2.0",
     "coveralls": "3.0.6",
     "eslint": "6.1.0",
     "eslint-config-goodparts": "0.0.1",
     "eslint-config-warp": "2.1.1",
     "generate-changelog": "1.8.0",
-    "goodparts": "^1.2.1",
+    "goodparts": "1.2.1",
     "mocha": "6.2.0",
     "nock": "10.0.6",
     "nyc": "14.1.1",
-    "prettier": "^1.18.2",
+    "prettier": "1.18.2",
     "semantic-release": "15.13.19"
   }
 }
