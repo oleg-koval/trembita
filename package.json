@@ -1,38 +1,12 @@
 {
-  "name": "trembita",
-  "version": "0.0.0-development",
-  "private": false,
-  "description": "Request wrapper core for consuming third party services",
-  "repository": "oleg-koval/trembita",
-  "bugs": "https://github.com/oleg-koval/trembita/issues",
-  "main": "index.js",
-  "scripts": {
-    "test": "mocha",
-    "nyc": "nyc npm test && nyc report --reporter=text-lcov",
-    "lint": "npx goodparts index.js",
-    "test:coverage": "npm run nyc | coveralls",
-    "semantic-release": "semantic-release",
-    "format": "prettier --check \"**/*.{js,json,md,ts,yml,yaml}\"",
-    "format:fix": "prettier --write \"**/*.{js,json,md,ts,yml,yaml}\""
-  },
-  "keywords": [
-    "API",
-    "API wrapper",
-    "Request wrapper",
-    "3d party API",
-    "third party API",
-    "API consumer",
-    "nodejs",
-    "javascript",
-    "npm"
-  ],
   "author": "Oleg Koval <kvl.olg@gmail.com>",
-  "license": "MIT",
+  "bugs": "https://github.com/oleg-koval/trembita/issues",
   "dependencies": {
     "bluebird": "^3.0.6",
     "request": "^2.87.0",
     "validator": "^11.0.0"
   },
+  "description": "Request wrapper core for consuming third party services",
   "devDependencies": {
     "@semantic-release/changelog": "3.0.4",
     "@semantic-release/commit-analyzer": "6.3.0",
@@ -44,7 +18,6 @@
     "coveralls": "3.0.6",
     "eslint": "6.2.0",
     "eslint-config-goodparts": "0.0.1",
-    "eslint-config-warp": "2.1.1",
     "generate-changelog": "1.8.0",
     "goodparts": "1.2.1",
     "mocha": "6.2.0",
@@ -52,5 +25,34 @@
     "nyc": "14.1.1",
     "prettier": "1.18.2",
     "semantic-release": "15.13.21"
-  }
+  },
+  "engines": {
+    "node": ">=8.0.0 <11.0.0"
+  },
+  "keywords": [
+    "3d party API",
+    "API",
+    "API consumer",
+    "API wrapper",
+    "Request wrapper",
+    "javascript",
+    "nodejs",
+    "npm",
+    "third party API"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "trembita",
+  "private": false,
+  "repository": "oleg-koval/trembita",
+  "scripts": {
+    "format": "prettier --check \"**/*.{js,json,md,ts,yml,yaml}\"",
+    "format:fix": "prettier --write \"**/*.{js,json,md,ts,yml,yaml}\"",
+    "lint": "npx goodparts index.js",
+    "nyc": "nyc npm test && nyc report --reporter=text-lcov",
+    "semantic-release": "semantic-release",
+    "test": "mocha",
+    "test:coverage": "npm run nyc | coveralls"
+  },
+  "version": "0.0.0-development"
 }
