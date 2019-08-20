@@ -45,7 +45,7 @@
     "coveralls": "3.0.6",
     "eslint": "6.2.0",
     "eslint-config-goodparts": "0.0.1",
-    "eslint-config-warp": "2.1.1",
+    "eslint-config-warp": "3.0.0",
     "generate-changelog": "1.8.0",
     "goodparts": "1.2.1",
     "mocha": "6.2.0",
