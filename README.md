@@ -1,6 +1,6 @@
 # trembita-js
 
-[![Build Status](https://travis-ci.com/oleg-koval/trembita.svg?branch=master)](https://travis-ci.com/oleg-koval/trembita)
+[![Build Status](https://travis-ci.org/oleg-koval/trembita.svg?branch=master)](https://travis-ci.org/oleg-koval/trembita)
 [![Coverage Status](https://coveralls.io/repos/github/oleg-koval/trembita/badge.svg?branch=master)](https://coveralls.io/github/oleg-koval/trembita?branch=master)
 [![JavaScript Style Guide: Good Parts](https://img.shields.io/badge/code%20style-goodparts-brightgreen.svg?style=flat)](https://github.com/dwyl/goodparts 'JavaScript The Good Parts')
 
@@ -42,20 +42,20 @@ yarn add trembita
 
 ## Usage
 
-Trembita is not supposed to be used directly, rather than to develop plugins.
+Trembita is not supposed to be used directly, rather than to develop plugins/clients.
 
 In order you can use a third party service by implementing your plugin, make
-sure you fill the next requeriments:
+sure you fill the next requirements:
 
 - Extend Trembita module.
-- Construct the plugin by implementing the properties inherited from trembita
+- Construct the plugin by implementing the properties inherited from Trembita
   module.
 - Define the methods that contains the logic that expose third party library
   logic you want to use.
 
 One example of usage would be:
 
-```js
+```javascript
 const clientOptions = {
   headers: {
     header1: 'xxx',
