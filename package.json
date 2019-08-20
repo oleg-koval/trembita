@@ -34,6 +34,7 @@
     "validator": "^11.0.0"
   },
   "devDependencies": {
+    "@jedmao/semantic-release-npm-github-config": "^1.0.6",
     "@semantic-release/changelog": "3.0.4",
     "@semantic-release/commit-analyzer": "6.3.0",
     "@semantic-release/git": "7.0.16",
@@ -51,6 +52,6 @@
     "nock": "10.0.6",
     "nyc": "14.1.1",
     "prettier": "1.18.2",
-    "semantic-release": "15.13.21"
+    "semantic-release": "^15.13.21"
   }
 }
