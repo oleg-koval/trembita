@@ -8,6 +8,7 @@
   },
   "description": "Request wrapper core for consuming third party services",
   "devDependencies": {
+    "@jedmao/semantic-release-npm-github-config": "^1.0.6",
     "@semantic-release/changelog": "3.0.4",
     "@semantic-release/commit-analyzer": "6.3.0",
     "@semantic-release/git": "7.0.16",
