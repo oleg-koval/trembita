@@ -56,5 +56,4 @@
     "test:coverage": "npm run nyc | coveralls"
   },
   "version": "0.0.0-development"
-  }
 }
