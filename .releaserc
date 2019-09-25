@@ -1,8 +1,0 @@
-{
-  "release": {
-    "branch": "master",
-    "dryRun": true,
-    "extends": "@jedmao/semantic-release-npm-github-config",
-    "repositoryUrl": "https://github.com/oleg-koval/trembita"
-  }
-}
