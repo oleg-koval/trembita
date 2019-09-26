@@ -19,8 +19,7 @@ plugins:
           release: patch
   - '@semantic-release/release-notes-generator'
   - - '@semantic-release/changelog'
-    - changelogFile: 'CHANGELOG_v2.md'
-      changelogTitle: 'CHANGELOG'
+    - changelogFile: 'CHANGELOG.md'
   - - '@semantic-release/npm'
     - npmPublish: true
       tarballDir: 'dist'
