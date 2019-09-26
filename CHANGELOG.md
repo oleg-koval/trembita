@@ -1,3 +1,5 @@
+## [1.0.10](https://github.com/oleg-koval/trembita/compare/v1.0.9...v1.0.10) (2019-09-26)
+
 #### 1.0.5 (2018-08-08)
 
 ##### New Features
