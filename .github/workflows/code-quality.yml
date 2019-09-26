@@ -40,5 +40,6 @@ jobs:
           node-version: 12
       - env:
           CI: true
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: npm ci
       - run: npm test:coverage
