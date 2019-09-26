@@ -1,6 +1,6 @@
 # trembita-js
 
-[![Build Status](https://travis-ci.org/oleg-koval/trembita.svg?branch=master)](https://travis-ci.org/oleg-koval/trembita)
+[![GitHub Actions Status](https://github.com/oleg-koval/trembita/workflows/Code%20Quality/badge.svg?branch=master)](https://github.com/oleg-koval/trembita/actions)
 [![Coverage Status](https://coveralls.io/repos/github/oleg-koval/trembita/badge.svg?branch=master)](https://coveralls.io/github/oleg-koval/trembita?branch=master)
 [![JavaScript Style Guide: Good Parts](https://img.shields.io/badge/code%20style-goodparts-brightgreen.svg?style=flat)](https://github.com/dwyl/goodparts 'JavaScript The Good Parts')
 
