@@ -1,3 +1,10 @@
+## [1.2.9](https://github.com/oleg-koval/trembita/compare/v1.2.8...v1.2.9) (2019-09-26)
+
+
+### Bug Fixes
+
+* cleanup gitignore ([0f8b731](https://github.com/oleg-koval/trembita/commit/0f8b731))
+
 ## [1.2.8](https://github.com/oleg-koval/trembita/compare/v1.2.7...v1.2.8) (2019-09-26)
 
 ## [1.2.7](https://github.com/oleg-koval/trembita/compare/v1.2.6...v1.2.7) (2019-09-26)
