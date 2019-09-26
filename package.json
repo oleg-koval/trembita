@@ -63,5 +63,5 @@
     "test": "mocha",
     "test:coverage": "npm run nyc | coveralls"
   },
-  "version": "1.0.10"
+  "version": "1.0.9"
 }
