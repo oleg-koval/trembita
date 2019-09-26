@@ -23,6 +23,9 @@ plugins:
       changelogTitle: 'CHANGELOG'
   - - '@semantic-release/npm'
     - npmPublish: true
+      tarballDir: 'dist'
   - - '@semantic-release/git'
-    - message: 'chore(release): ${nextRelease.version} [skip ci]'
+    - assets:
+        - path: 'dist/*'
+      message: 'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
   - '@semantic-release/github'
