@@ -24,5 +24,5 @@ plugins:
   - - '@semantic-release/npm'
     - npmPublish: true
   - - '@semantic-release/git'
-    - message: 'chore(release): ${nextRelease.version} [skip ci]nn${nextRelease.notes}'
+    - message: 'chore(release): ${nextRelease.version} [skip ci]'
   - '@semantic-release/github'
