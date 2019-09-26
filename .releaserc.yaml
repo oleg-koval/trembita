@@ -18,8 +18,7 @@ plugins:
         - type: test
           release: patch
   - '@semantic-release/release-notes-generator'
-  - - '@semantic-release/changelog'
-    - changelogFile: 'CHANGELOG.md'
+  - '@semantic-release/changelog'
   - - '@semantic-release/npm'
     - npmPublish: true
       tarballDir: 'dist'
