@@ -1,4 +1,4 @@
-branch: master
+branch: 'oleg-koval/change-release-format'
 ci: false
 plugins:
   - - '@semantic-release/commit-analyzer'
