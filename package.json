@@ -9,9 +9,9 @@
   "description": "Request wrapper core for consuming third party services",
   "devDependencies": {
     "@jedmao/semantic-release-npm-github-config": "1.0.6",
-    "@semantic-release/changelog": "3.0.4",
+    "@semantic-release/changelog": "^3.0.4",
     "@semantic-release/commit-analyzer": "6.3.0",
-    "@semantic-release/git": "7.0.16",
+    "@semantic-release/git": "^7.0.16",
     "@semantic-release/npm": "5.1.13",
     "@semantic-release/release-notes-generator": "7.3.0",
     "babel-eslint": "10.0.2",
@@ -25,11 +25,18 @@
     "nock": "10.0.6",
     "nyc": "14.1.1",
     "prettier": "1.18.2",
-    "semantic-release": "15.13.21"
+    "semantic-release": "^16.0.0-beta.24"
   },
   "engines": {
     "node": ">=8.0.0 <11.0.0"
   },
+  "files": [
+    "index.js",
+    "error",
+    "package.json",
+    "package-lock.json",
+    "README.md"
+  ],
   "keywords": [
     "3d party API",
     "API",
@@ -45,8 +52,9 @@
   "main": "index.js",
   "name": "trembita",
   "private": false,
-  "repository": "oleg-koval/trembita",
+  "repository": "https://github.com/oleg-koval/trembita",
   "scripts": {
+    "clean": "rm -rf node_modules package-lock.json",
     "format": "prettier --check \"**/*.{js,json,md,ts,yml,yaml}\"",
     "format:fix": "prettier --write \"**/*.{js,json,md,ts,yml,yaml}\"",
     "lint": "npx goodparts index.js",
@@ -55,5 +63,5 @@
     "test": "mocha",
     "test:coverage": "npm run nyc | coveralls"
   },
-  "version": "0.0.0-development"
+  "version": "1.0.10"
 }
