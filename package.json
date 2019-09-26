@@ -8,11 +8,6 @@
   },
   "description": "Request wrapper core for consuming third party services",
   "devDependencies": {
-    "@semantic-release/changelog": "^3.0.4",
-    "@semantic-release/commit-analyzer": "6.3.0",
-    "@semantic-release/git": "^7.0.16",
-    "@semantic-release/npm": "5.1.13",
-    "@semantic-release/release-notes-generator": "7.3.0",
     "babel-eslint": "10.0.2",
     "chai": "4.2.0",
     "coveralls": "3.0.6",
@@ -23,7 +18,8 @@
     "nock": "10.0.6",
     "nyc": "14.1.1",
     "prettier": "1.18.2",
-    "semantic-release": "^15.13.24"
+    "semantic-release": "^15.13.24",
+    "semantic-release-npm-github-publish": "^1.0.0"
   },
   "engines": {
     "node": ">=8.0.0 <11.0.0"
