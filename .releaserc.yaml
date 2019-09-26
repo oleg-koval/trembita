@@ -18,9 +18,9 @@ plugins:
         - type: test
           release: patch
   - '@semantic-release/release-notes-generator'
-  - - '@semantic-release/changelog'
+  # - - '@semantic-release/changelog'
   - - '@semantic-release/npm'
-    - npmPublish: true
+    - npmPublish: false
       tarballDir: 'dist'
   - - '@semantic-release/github'
     - assets:
