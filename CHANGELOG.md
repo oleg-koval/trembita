@@ -1,3 +1,11 @@
+## [1.2.16](https://github.com/oleg-koval/trembita/compare/v1.2.15...v1.2.16) (2019-10-05)
+
+
+### Chores
+
+* **deps:** bump bluebird from 3.5.5 to 3.7.0 ([9cc757d0382b6bffd903db2bb474f8e12596e28b](https://github.com/oleg-koval/trembita/commit/9cc757d0382b6bffd903db2bb474f8e12596e28b))
+* **deps-dev:** bump eslint from 6.5.0 to 6.5.1 ([ead1cb1239f47d373a0301440cda9bad5dd9ff3f](https://github.com/oleg-koval/trembita/commit/ead1cb1239f47d373a0301440cda9bad5dd9ff3f))
+
 ## [1.2.15](https://github.com/oleg-koval/trembita/compare/v1.2.14...v1.2.15) (2019-10-05)
 
 
