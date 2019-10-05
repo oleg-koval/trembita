@@ -1,3 +1,10 @@
+## [1.2.15](https://github.com/oleg-koval/trembita/compare/v1.2.14...v1.2.15) (2019-10-05)
+
+
+### Chores
+
+* **deps:** update semantic-release npm plugin to 1.3.0 ([47185e836811bf7445672ee4a963aaa1a9a85d1c](https://github.com/oleg-koval/trembita/commit/47185e836811bf7445672ee4a963aaa1a9a85d1c))
+
 ## [1.2.14](https://github.com/oleg-koval/trembita/compare/v1.2.13...v1.2.14) (2019-10-05)
 
 ## [1.2.13](https://github.com/oleg-koval/trembita/compare/v1.2.12...v1.2.13) (2019-09-30)
