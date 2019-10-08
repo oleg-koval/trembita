@@ -1,3 +1,11 @@
+## [1.2.17](https://github.com/oleg-koval/trembita/compare/v1.2.16...v1.2.17) (2019-10-08)
+
+
+### Chores
+
+* **deps-dev:** bump nock from 11.3.5 to 11.4.0 ([25b147a006b52cb9b91d832f650649a547f9157c](https://github.com/oleg-koval/trembita/commit/25b147a006b52cb9b91d832f650649a547f9157c))
+* **deps-dev:** bump semantic-release-npm-github-publish ([f9883c7a2909744f95e20a71214afc2d79018524](https://github.com/oleg-koval/trembita/commit/f9883c7a2909744f95e20a71214afc2d79018524))
+
 ## [1.2.16](https://github.com/oleg-koval/trembita/compare/v1.2.15...v1.2.16) (2019-10-05)
 
 
