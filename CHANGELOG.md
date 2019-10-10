@@ -1,3 +1,10 @@
+## [1.2.18](https://github.com/oleg-koval/trembita/compare/v1.2.17...v1.2.18) (2019-10-10)
+
+
+### Chores
+
+* **deps-dev:** bump semantic-release-npm-github-publish ([350cec6e3220f9c6c7afd9c2b01a6e98072429b8](https://github.com/oleg-koval/trembita/commit/350cec6e3220f9c6c7afd9c2b01a6e98072429b8))
+
 ## [1.2.17](https://github.com/oleg-koval/trembita/compare/v1.2.16...v1.2.17) (2019-10-08)
 
 
