@@ -1,3 +1,10 @@
+## [1.2.20](https://github.com/oleg-koval/trembita/compare/v1.2.19...v1.2.20) (2019-10-12)
+
+
+### Code Refactoring
+
+* **deps:** use http-status-codes ([b787ca62ef01a8ba78c8d7010c159dce0ed0aa1d](https://github.com/oleg-koval/trembita/commit/b787ca62ef01a8ba78c8d7010c159dce0ed0aa1d)), closes [#52](https://github.com/oleg-koval/trembita/issues/52)
+
 ## [1.2.19](https://github.com/oleg-koval/trembita/compare/v1.2.18...v1.2.19) (2019-10-12)
 
 
