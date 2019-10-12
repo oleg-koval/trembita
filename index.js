@@ -1,6 +1,7 @@
+const { isURL } = require('validator');
+const { OK, CREATED } = require('http-status-codes');
 const Promise = require('bluebird');
 const request = Promise.promisify(require('request'));
-const { isURL } = require('validator');
 
 const { UnexpectedStatusCodeError, TrembitaError } = require('./error');
 
@@ -87,7 +88,7 @@ const Trembita = class Trembita {
   static _validateExpectedCodes ({ statusCode, body }) {
     // eslint-disable-line space-before-function-paren
     const options = this;
-    const defaultStatusCodes = [200, 201];
+    const defaultStatusCodes = [OK, CREATED];
 
     const expectedCodes = options.expectedCodes || defaultStatusCodes;
 

@@ -1,9 +1,10 @@
 const { expect } = require('chai');
+const { OK, NOT_FOUND } = require('http-status-codes');
 const nock = require('nock');
-const helpers = require('./helpers');
 
-const Trembita = require('../');
 const { UnexpectedStatusCodeError } = require('../error');
+const helpers = require('./helpers');
+const Trembita = require('../');
 
 describe('Trembita:', () => {
   let scope, expectedBody, trembita;
@@ -117,10 +118,10 @@ describe('Trembita:', () => {
   });
 
   describe('trembita.client', () => {
-    it('should return status code 200 and resource', () => {
+    it('should return status code OK and resource', () => {
       scope
         .get('/users?page=2')
-        .replyWithFile(200, `${__dirname}/responses/get-users-page-2.json`);
+        .replyWithFile(OK, `${__dirname}/responses/get-users-page-2.json`);
 
       return trembita
         .client({
@@ -128,20 +129,20 @@ describe('Trembita:', () => {
           qs: {
             page: 2
           },
-          expectedCodes: [200]
+          expectedCodes: [OK]
         })
         .then(res => {
-          expect(res.statusCode).to.be.equal(200);
+          expect(res.statusCode).to.be.equal(OK);
           expect(res.body).to.deep.equal(expectedBody);
         });
     });
   });
 
   describe('trembita.request', () => {
-    it('should return status code 200 and resource', () => {
+    it('should return status code OK and resource', () => {
       scope
         .get('/users?page=2')
-        .replyWithFile(200, `${__dirname}/responses/get-users-page-2.json`);
+        .replyWithFile(OK, `${__dirname}/responses/get-users-page-2.json`);
 
       return trembita
         .request({
@@ -149,17 +150,17 @@ describe('Trembita:', () => {
           qs: {
             page: 2
           },
-          expectedCodes: [200]
+          expectedCodes: [OK]
         })
         .then(res => {
           expect(res).to.deep.equal(expectedBody);
         });
     });
 
-    it("should return status code 200 and resource if expectedCodes aren't provided", () => {
+    it("should return status code OK and resource if expectedCodes aren't provided", () => {
       scope
         .get('/users?page=2')
-        .replyWithFile(200, `${__dirname}/responses/get-users-page-2.json`);
+        .replyWithFile(OK, `${__dirname}/responses/get-users-page-2.json`);
 
       return trembita
         .request({
@@ -173,22 +174,22 @@ describe('Trembita:', () => {
         });
     });
 
-    it('should return 404 status code', () => {
-      scope.get('/profiles').reply(404);
+    it('should return NOT_FOUND status code', () => {
+      scope.get('/profiles').reply(NOT_FOUND);
 
       return trembita.request({
         url: '/profiles',
-        expectedCodes: [404]
+        expectedCodes: [NOT_FOUND]
       });
     });
 
     it('should return error related to unexpected status code', () => {
-      scope.get('/profiles/1').reply(404);
+      scope.get('/profiles/1').reply(NOT_FOUND);
 
       return trembita
         .request({
           url: '/profiles/1',
-          expectedCodes: [200]
+          expectedCodes: [OK]
         })
         .catch(UnexpectedStatusCodeError, err => {
           const message = `Unexpected status code: 404, Body: undefined, Options: {"url":"/profiles/1","expectedCodes":[200],"endpoint":"https://example.com/api"}`;
