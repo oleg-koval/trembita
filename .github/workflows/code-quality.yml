@@ -16,17 +16,40 @@ jobs:
           CI: true
         run: npm ci
       - run: npm run lint
-  test:
-    runs-on: ubuntu-latest
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #       with:
+  #         fetch-depth: 1
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: 12
+  #     - env:
+  #         CI: true
+  #         # COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+  #       run: npm ci
+  #     - run: npm test
+test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [8, 10, 12]
     steps:
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
+
       - uses: actions/setup-node@v1
-        with:
-          node-version: 12
+
       - env:
           CI: true
-          # COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: npm ci
-      - run: npm test
+      - run: |
+          npm run nyc
+          npm run coverage
+      - name: Coveralls GitHub Action
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
