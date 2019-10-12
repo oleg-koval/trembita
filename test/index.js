@@ -192,7 +192,7 @@ describe('Trembita:', () => {
           expectedCodes: [OK]
         })
         .catch(UnexpectedStatusCodeError, err => {
-          const message = `Unexpected status code: NOT_FOUND, Body: undefined, Options: {"url":"/profiles/1","expectedCodes":[OK],"endpoint":"https://example.com/api"}`;
+          const message = `Unexpected status code: 404, Body: undefined, Options: {"url":"/profiles/1","expectedCodes":[200],"endpoint":"https://example.com/api"}`;
           expect(err.message).to.equal(message);
           expect(err.toJSON()).to.deep.equal({ message });
         });
