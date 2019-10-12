@@ -1,3 +1,10 @@
+## [1.2.19](https://github.com/oleg-koval/trembita/compare/v1.2.18...v1.2.19) (2019-10-12)
+
+
+### Continuous Integration
+
+* **coverage:** add coverage reports ([593c2920edbe1c4edeb11a27ae5bbec3cd6b1dc7](https://github.com/oleg-koval/trembita/commit/593c2920edbe1c4edeb11a27ae5bbec3cd6b1dc7)), closes [#10](https://github.com/oleg-koval/trembita/issues/10)
+
 ## [1.2.18](https://github.com/oleg-koval/trembita/compare/v1.2.17...v1.2.18) (2019-10-10)
 
 
