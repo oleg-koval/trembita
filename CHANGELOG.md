@@ -1,3 +1,11 @@
+## [1.2.21](https://github.com/oleg-koval/trembita/compare/v1.2.20...v1.2.21) (2019-10-16)
+
+
+### Chores
+
+* **deps:** bump bluebird from 3.7.0 to 3.7.1 ([7f5f460d916ef3bf7144acfaa78c1a426387fc01](https://github.com/oleg-koval/trembita/commit/7f5f460d916ef3bf7144acfaa78c1a426387fc01))
+* **deps-dev:** bump coveralls from 3.0.6 to 3.0.7 ([50ee66332134883817a0553a3854697ae4633975](https://github.com/oleg-koval/trembita/commit/50ee66332134883817a0553a3854697ae4633975))
+
 ## [1.2.20](https://github.com/oleg-koval/trembita/compare/v1.2.19...v1.2.20) (2019-10-12)
 
 
