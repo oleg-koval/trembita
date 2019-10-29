@@ -1,3 +1,24 @@
+## [1.2.22](https://github.com/oleg-koval/trembita/compare/v1.2.21...v1.2.22) (2019-10-29)
+
+
+### Chores
+
+* **deps:** bump http-status-codes from 1.3.2 to 1.4.0 ([262f04095f8ef3d43fdac06346fd1249148b60a2](https://github.com/oleg-koval/trembita/commit/262f04095f8ef3d43fdac06346fd1249148b60a2))
+* **deps:** bump validator from 11.1.0 to 12.0.0 ([fe220e0df645d0eff6d8ae9060d81f9ff1965694](https://github.com/oleg-koval/trembita/commit/fe220e0df645d0eff6d8ae9060d81f9ff1965694))
+* **deps-dev:** bump eslint from 6.5.1 to 6.6.0 ([fff21cc48e7f4dd042bb24299c3b661ad06e2d6d](https://github.com/oleg-koval/trembita/commit/fff21cc48e7f4dd042bb24299c3b661ad06e2d6d))
+* **deps-dev:** bump nock from 11.4.0 to 11.6.0 ([4fb67e0dfb163eef11b2b1615798d3d92dfc3aba](https://github.com/oleg-koval/trembita/commit/4fb67e0dfb163eef11b2b1615798d3d92dfc3aba))
+* **deps-dev:** bump semantic-release from 15.13.24 to 15.13.28 ([7fcc219307a3911adf7a6a08162d705de8abe2c3](https://github.com/oleg-koval/trembita/commit/7fcc219307a3911adf7a6a08162d705de8abe2c3))
+
+
+### Continuous Integration
+
+* **auto-merge:** add auto merge Dependabot updates ([6218ffc717db3b49238968eef81bf878508e88e8](https://github.com/oleg-koval/trembita/commit/6218ffc717db3b49238968eef81bf878508e88e8))
+
+
+### Documentation
+
+* **readme:** add more explanation ([870f5e978855fb781566f14c1947024224c75e5f](https://github.com/oleg-koval/trembita/commit/870f5e978855fb781566f14c1947024224c75e5f))
+
 ## [1.2.21](https://github.com/oleg-koval/trembita/compare/v1.2.20...v1.2.21) (2019-10-16)
 
 
