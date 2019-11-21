@@ -1,3 +1,26 @@
+## [1.2.23](https://github.com/oleg-koval/trembita/compare/v1.2.22...v1.2.23) (2019-11-21)
+
+
+### Chores
+
+* **deps:** bump validator from 12.0.0 to 12.1.0 ([7d4c122f307b599d6ef24fe85f1c2e6e8a40e302](https://github.com/oleg-koval/trembita/commit/7d4c122f307b599d6ef24fe85f1c2e6e8a40e302))
+* **deps-dev:** bump coveralls from 3.0.7 to 3.0.8 ([ddc5492f810242d04d9024d8250db1fe5c13cbf8](https://github.com/oleg-koval/trembita/commit/ddc5492f810242d04d9024d8250db1fe5c13cbf8))
+* **deps-dev:** bump mocha from 6.2.1 to 6.2.2 ([2d39e29ba11b4c65c773cbe72c401795d071d28a](https://github.com/oleg-koval/trembita/commit/2d39e29ba11b4c65c773cbe72c401795d071d28a))
+* **deps-dev:** bump nock from 11.6.0 to 11.7.0 ([a94b6855e5b6ca48e259dbc0a1b3f4aa94d6f0fc](https://github.com/oleg-koval/trembita/commit/a94b6855e5b6ca48e259dbc0a1b3f4aa94d6f0fc))
+* **deps-dev:** bump prettier from 1.18.2 to 1.19.0 ([45967cde1d1890a4406dec2fb5ad77820adeb19d](https://github.com/oleg-koval/trembita/commit/45967cde1d1890a4406dec2fb5ad77820adeb19d))
+* **deps-dev:** bump prettier from 1.19.0 to 1.19.1 ([79dfad6ce514c8f0dbd75d4872fa0b0f4a2768ce](https://github.com/oleg-koval/trembita/commit/79dfad6ce514c8f0dbd75d4872fa0b0f4a2768ce))
+* **deps-dev:** bump semantic-release from 15.13.28 to 15.13.29 ([f057bcdfdd1f734982343d4b3ac1f67417958f71](https://github.com/oleg-koval/trembita/commit/f057bcdfdd1f734982343d4b3ac1f67417958f71))
+* **deps-dev:** bump semantic-release from 15.13.29 to 15.13.30 ([d095173f34a0dd17384e9a017199c9ea65af6231](https://github.com/oleg-koval/trembita/commit/d095173f34a0dd17384e9a017199c9ea65af6231))
+* **deps-dev:** bump semantic-release from 15.13.30 to 15.13.31 ([40e5e420b1f992085e59bb209f343c67a4a0ee96](https://github.com/oleg-koval/trembita/commit/40e5e420b1f992085e59bb209f343c67a4a0ee96))
+* **deps-dev:** bump semantic-release-npm-github-publish from 1.3.4 to 1.3.5 ([1275ff30d1c988503a1e1d4ee0a5da8b914ff11f](https://github.com/oleg-koval/trembita/commit/1275ff30d1c988503a1e1d4ee0a5da8b914ff11f))
+* **deps-dev:** bump semantic-release-npm-github-publish from 1.3.5 to 1.3.6 ([810f2137be8fd7e805e799dc4a5e040fc3ff6382](https://github.com/oleg-koval/trembita/commit/810f2137be8fd7e805e799dc4a5e040fc3ff6382))
+* **deps-dev:** bump semantic-release-npm-github-publish from 1.3.6 to 1.3.7 ([37c62a00b626ced8c2cc86d61935b86b64762b82](https://github.com/oleg-koval/trembita/commit/37c62a00b626ced8c2cc86d61935b86b64762b82))
+
+
+### Continuous Integration
+
+* add auto-merge ([42de3fcc969e66603f78ebaa73bc40d871b204ae](https://github.com/oleg-koval/trembita/commit/42de3fcc969e66603f78ebaa73bc40d871b204ae))
+
 ## [1.2.22](https://github.com/oleg-koval/trembita/compare/v1.2.21...v1.2.22) (2019-10-29)
 
 
