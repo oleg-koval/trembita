@@ -20,7 +20,7 @@
     "nyc": "14.1.1",
     "prettier": "1.19.1",
     "semantic-release": "^15.13.31",
-    "semantic-release-npm-github-publish": "^1.3.7"
+    "semantic-release-npm-github-publish": "^1.4.0"
   },
   "engines": {
     "node": ">=8.0.0 <12.0.0"
