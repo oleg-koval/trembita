@@ -2,7 +2,7 @@
   "author": "Oleg Koval <kvl.olg@gmail.com>",
   "bugs": "https://github.com/oleg-koval/trembita/issues",
   "dependencies": {
-    "bluebird": "^3.7.1",
+    "bluebird": "^3.7.2",
     "http-status-codes": "^1.4.0",
     "request": "^2.87.0",
     "validator": "^12.1.0"
