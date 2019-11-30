@@ -12,7 +12,7 @@
     "babel-eslint": "10.0.3",
     "chai": "4.2.0",
     "coveralls": "3.0.9",
-    "eslint": "6.7.1",
+    "eslint": "6.7.2",
     "eslint-config-goodparts": "0.0.1",
     "goodparts": "1.2.1",
     "mocha": "6.2.2",
