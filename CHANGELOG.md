@@ -1,3 +1,18 @@
+## [1.2.24](https://github.com/oleg-koval/trembita/compare/v1.2.23...v1.2.24) (2019-12-22)
+
+
+### Chores
+
+* **deps:** bump bluebird from 3.7.1 to 3.7.2 ([398ef6370ed0e91b9593449bdfcc2a7b33002b19](https://github.com/oleg-koval/trembita/commit/398ef6370ed0e91b9593449bdfcc2a7b33002b19))
+* **deps:** bump npm from 6.11.3 to 6.13.4 ([dd91332bf99bf888ad6e0bb48df25a5bab6fda0a](https://github.com/oleg-koval/trembita/commit/dd91332bf99bf888ad6e0bb48df25a5bab6fda0a))
+* **deps-dev:** bump coveralls from 3.0.8 to 3.0.9 ([c881df3db31d9c225874d61ecef0bb54e296dd6c](https://github.com/oleg-koval/trembita/commit/c881df3db31d9c225874d61ecef0bb54e296dd6c))
+* **deps-dev:** bump eslint from 6.6.0 to 6.7.0 ([03649702e1cb29f619be91e1a50de4fa7f0fddfa](https://github.com/oleg-koval/trembita/commit/03649702e1cb29f619be91e1a50de4fa7f0fddfa))
+* **deps-dev:** bump eslint from 6.7.0 to 6.7.1 ([7d6f7dd9ec521acca47a4ab0dcfe64d0c9ab0536](https://github.com/oleg-koval/trembita/commit/7d6f7dd9ec521acca47a4ab0dcfe64d0c9ab0536))
+* **deps-dev:** bump eslint from 6.7.1 to 6.7.2 ([16a5095e197ad8117f868d9a5b076b2222f34737](https://github.com/oleg-koval/trembita/commit/16a5095e197ad8117f868d9a5b076b2222f34737))
+* **deps-dev:** bump eslint from 6.7.2 to 6.8.0 ([7f1964ad951d89af605e358cbff8e1556d5ed807](https://github.com/oleg-koval/trembita/commit/7f1964ad951d89af605e358cbff8e1556d5ed807))
+* **deps-dev:** bump semantic-release from 15.13.31 to 15.14.0 ([e9939369724e93216d69d739136448bbe3215d8d](https://github.com/oleg-koval/trembita/commit/e9939369724e93216d69d739136448bbe3215d8d))
+* **deps-dev:** bump semantic-release-npm-github-publish from 1.3.7 to 1.4.0 ([f207e1db6890b3dd9549529873822303edf72bdc](https://github.com/oleg-koval/trembita/commit/f207e1db6890b3dd9549529873822303edf72bdc))
+
 ## [1.2.23](https://github.com/oleg-koval/trembita/compare/v1.2.22...v1.2.23) (2019-11-21)
 
 
