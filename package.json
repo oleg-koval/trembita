@@ -16,7 +16,7 @@
     "eslint-config-goodparts": "0.0.1",
     "goodparts": "1.2.1",
     "mocha": "7.1.0",
-    "nock": "12.0.1",
+    "nock": "12.0.2",
     "nyc": "15.0.0",
     "prettier": "1.19.1",
     "semantic-release": "^15.14.0",
