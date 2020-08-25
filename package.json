@@ -18,7 +18,7 @@
     "mocha": "8.1.1",
     "nock": "13.0.4",
     "nyc": "15.1.0",
-    "prettier": "2.0.5",
+    "prettier": "2.1.0",
     "semantic-release": "^15.14.0",
     "semantic-release-npm-github-publish": "^1.4.0"
   },
