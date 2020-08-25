@@ -3,7 +3,7 @@
   "bugs": "https://github.com/oleg-koval/trembita/issues",
   "dependencies": {
     "bluebird": "^3.7.2",
-    "http-status-codes": "^2.1.1",
+    "http-status-codes": "^2.1.2",
     "request": "^2.88.2",
     "validator": "^13.1.1"
   },
