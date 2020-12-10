@@ -5,7 +5,7 @@
     "bluebird": "^3.7.2",
     "http-status-codes": "^2.1.4",
     "request": "^2.88.2",
-    "validator": "^13.5.1"
+    "validator": "^13.5.2"
   },
   "description": "Request wrapper core for consuming third party services",
   "devDependencies": {
