@@ -10,7 +10,7 @@
   "description": "Request wrapper core for consuming third party services",
   "devDependencies": {
     "babel-eslint": "10.1.0",
-    "chai": "4.3.0",
+    "chai": "4.3.3",
     "coveralls": "3.1.0",
     "eslint": "7.19.0",
     "eslint-config-goodparts": "0.0.1",
