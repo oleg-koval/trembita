@@ -1,0 +1,42 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  versioning-strategy: increase
+  allow:
+  - dependency-type: direct
+  ignore:
+  - dependency-name: eslint
+    versions:
+    - 7.20.0
+    - 7.21.0
+    - 7.22.0
+    - 7.23.0
+    - 7.24.0
+  - dependency-name: mocha
+    versions:
+    - 8.3.0
+    - 8.3.1
+  - dependency-name: semantic-release
+    versions:
+    - 17.3.8
+    - 17.3.9
+    - 17.4.0
+    - 17.4.1
+  - dependency-name: chai
+    versions:
+    - 4.3.1
+    - 4.3.2
+    - 4.3.3
+  - dependency-name: nock
+    versions:
+    - 13.0.10
+    - 13.0.8
+    - 13.0.9
+  commit-message:
+    prefix: chore
+    include: scope
