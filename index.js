@@ -1,7 +1,7 @@
 const { isURL } = require('validator');
 const { OK, CREATED } = require('http-status-codes');
-const Promise = require('bluebird');
-const request = Promise.promisify(require('request'));
+const Bluebird = require('bluebird');
+const request = Bluebird.promisify(require('request'));
 
 const { UnexpectedStatusCodeError, TrembitaError } = require('./error');
 
@@ -99,10 +99,10 @@ const Trembita = class Trembita {
         httpBody: body
       });
 
-      return Promise.reject(error);
+      return Bluebird.reject(error);
     }
 
-    return Promise.resolve(body);
+    return Bluebird.resolve(body);
   }
 };
 
