@@ -1,3 +1,10 @@
+## [1.2.26](https://github.com/oleg-koval/trembita/compare/v1.2.25...v1.2.26) (2021-09-23)
+
+
+### chore
+
+* add code scanning ([#299](https://github.com/oleg-koval/trembita/issues/299)) ([29e98df](https://github.com/oleg-koval/trembita/commit/29e98dff3da29efd257d2b6f9b3db3774e627e5c))
+
 ## [1.2.25](https://github.com/oleg-koval/trembita/compare/v1.2.24...v1.2.25) (2021-09-23)
 
 
