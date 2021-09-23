@@ -4,7 +4,9 @@ env:
 parser: 'babel-eslint'
 extends: 'goodparts'
 overrides:
-  - rules:
+  - files:
+      - index.js
+    rules:
       space-before-function-paren: 'warn'
 parserOptions:
   ecmaVersion: 2018
