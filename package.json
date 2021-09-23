@@ -19,11 +19,11 @@
     "nock": "13.0.7",
     "nyc": "15.1.0",
     "prettier": "2.2.1",
-    "semantic-release": "^17.3.8",
-    "semantic-release-npm-github-publish": "^1.4.0"
+    "semantic-release": "^18.0.0",
+    "semantic-release-npm-github-publish": "^1.5.1"
   },
   "engines": {
-    "node": ">=8.0.0 <12.0.0"
+    "node": ">=8.0.0 <14.0.0"
   },
   "files": [
     "index.js",
