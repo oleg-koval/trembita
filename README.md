@@ -25,7 +25,7 @@ the implementation of commonly used tools out of the box. This is a core module
 to reuse with plugins each for a different third-party service.
 
 Trembita API wrapper plugin lets you call itself instead of the API directly.
-Well what happens if you want to change from one API to another? Now you have 
+Well what happens if you want to change from one API to another? Now you have
 to rewrite ALL of your code. If you used a wrapper then all you have to do is
 change the wrapper and you are done.
 
@@ -65,7 +65,7 @@ sure you fill the next requirements:
 
 One example of usage would be:
 
-```javascript
+```js
 const clientOptions = {
   headers: {
     header1: 'xxx',
