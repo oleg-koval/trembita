@@ -9,7 +9,7 @@
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
 
-> Request wrapper core for consuming third party services
+> Request wrapper core for consuming third party services.
 
 Whenever you need to communicate with third party API to get or save data from
 own codebase, you would have to perform a set of common steps such as login,
