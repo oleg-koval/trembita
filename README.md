@@ -65,7 +65,7 @@ sure you fill the next requirements:
 
 One example of usage would be:
 
-```javascript
+```js
 const clientOptions = {
   headers: {
     header1: 'xxx',
