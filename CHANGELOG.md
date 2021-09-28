@@ -1,3 +1,10 @@
+## [1.2.27](https://github.com/oleg-koval/trembita/compare/v1.2.26...v1.2.27) (2021-09-28)
+
+
+### chore
+
+* update readme text ([#302](https://github.com/oleg-koval/trembita/issues/302)) ([ee385ba](https://github.com/oleg-koval/trembita/commit/ee385bab1648bdaea825ffdc8d5c4a26dd4ce4a1))
+
 ## [1.2.26](https://github.com/oleg-koval/trembita/compare/v1.2.25...v1.2.26) (2021-09-23)
 
 
