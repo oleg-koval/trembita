@@ -19,7 +19,7 @@
     "nock": "13.0.7",
     "nyc": "15.1.0",
     "prettier": "2.2.1",
-    "semantic-release": "^18.0.0",
+    "semantic-release": "^19.0.3",
     "semantic-release-npm-github-publish": "^1.5.1"
   },
   "engines": {
