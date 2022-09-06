@@ -1,3 +1,11 @@
+## [1.2.29](https://github.com/oleg-koval/trembita/compare/v1.2.28...v1.2.29) (2022-09-06)
+
+
+### chore
+
+* **deps:** bump validator from 13.5.2 to 13.7.0 ([3e78320](https://github.com/oleg-koval/trembita/commit/3e7832089329199075890a5f06e657a2c6a51eec))
+* update readme ([#301](https://github.com/oleg-koval/trembita/issues/301)) ([40516fa](https://github.com/oleg-koval/trembita/commit/40516faa957e4f2702294b7d262ea0fad6c9752b))
+
 ## [1.2.28](https://github.com/oleg-koval/trembita/compare/v1.2.27...v1.2.28) (2021-09-28)
 
 
