@@ -40,13 +40,13 @@ change the wrapper and you are done.
 
 Using npm:
 
-```
+```shell
 npm install trembita
 ```
 
 Using yarn:
 
-```
+```shell
 yarn add trembita
 ```
 
