@@ -3,25 +3,34 @@ name: Release to NPM
 on:
   push:
     branches:
-      - master
+      - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
   release:
-    name: Release to NPM and github
+    name: Release to NPM and GitHub
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-
-      - name: set Node.js 14
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
         with:
-          node-version: 14
-
-      - name: perform clean install
-        run: npm ci --unsafe-perm
-
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci --no-audit
+      - run: npm audit
+      - run: npm test
+      - run: npm run build
       - env:
           CI: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release

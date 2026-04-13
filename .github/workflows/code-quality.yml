@@ -1,52 +1,47 @@
 name: Code Quality
 
-on: push
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          fetch-depth: 1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 14
-      - env:
-          CI: true
-        run: npm ci
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit
+      - run: npm audit
+      - run: npm run typecheck
       - run: npm run lint
+      - run: npm run format
+
   test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node: [8, 10, 12, 14]
-    steps:
-      - uses: actions/checkout@v1
-        with:
-          fetch-depth: 1
-
-      - uses: actions/setup-node@v1
-
-      - env:
-          CI: true
-        run: npm ci
-      - run: |
-          npm run nyc
-          npm run coverage
-      - name: Coveralls GitHub Action
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.github_token }}
-  auto-merge:
-    name: Auto merge Dependabot updates
     runs-on: ubuntu-latest
-    needs:
-      - lint
-      - test
     steps:
-      - name: Auto merge
-        uses: ridedott/dependabot-auto-merge-action@master
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit
+      - run: npm audit
+      - run: npm test
+      - run: npm run build
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./coverage/lcov.info
