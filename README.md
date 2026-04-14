@@ -3,10 +3,23 @@
 [![Code Quality](https://github.com/oleg-koval/trembita/actions/workflows/code-quality.yml/badge.svg?branch=main)](https://github.com/oleg-koval/trembita/actions/workflows/code-quality.yml)
 [![Coverage Status](https://coveralls.io/repos/github/oleg-koval/trembita/badge.svg?branch=main)](https://coveralls.io/github/oleg-koval/trembita?branch=main)
 [![npm version](https://img.shields.io/npm/v/trembita/latest.svg)](https://www.npmjs.com/package/trembita)
+[![API docs](https://img.shields.io/badge/docs-GitHub%20Pages-24292e)](https://oleg-koval.github.io/trembita/)
 
 Small **TypeScript** helper for calling third-party **HTTP JSON** APIs:
 **`fetch`**, strict **`Result`** types, **no** legacy `request` / Bluebird
 stack.
+
+## Functional style
+
+The API is **functional-first**: `createTrembita` returns a **`Result`**, then
+plain **`client` / `request`** functions—no class instance. Expected failures
+use **tagged errors** (`error.kind`) so callers narrow with types instead of
+relying on **`try/catch`** for normal HTTP outcomes. Where it stays honest
+without I/O, helpers use **`Result`** too (options, URLs, JSON parsing).
+
+This is **not** pure FP end-to-end: **`fetch`**, the network, and logging are
+ordinary side effects. Think **FP-style errors and surface area**, not a fully
+pure program.
 
 ## Requirements
 

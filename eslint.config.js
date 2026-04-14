@@ -30,6 +30,7 @@ export default tseslint.config(
   {
     ignores: [
       'dist/**',
+      'site/**',
       'coverage/**',
       'node_modules/**',
       'eslint.config.js',

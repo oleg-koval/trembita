@@ -1,0 +1,9 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "site",
+  "readme": "README.md",
+  "name": "trembita",
+  "githubPages": true,
+  "hostedBaseUrl": "https://oleg-koval.github.io/trembita/"
+}
