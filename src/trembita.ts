@@ -40,6 +40,42 @@ export type TrembitaClient = Readonly<{
   ) => Promise<Result<unknown, TrembitaRequestError>>;
 }>;
 
+const SENSITIVE_HEADER_NAMES = new Set([
+  'authorization',
+  'cookie',
+  'set-cookie',
+  'x-api-key',
+  'proxy-authorization'
+]);
+
+const REDACTED_HEADER_VALUE = '[REDACTED]';
+
+const sanitizeHeaders = (
+  headers: HeadersInit | undefined
+): Readonly<Record<string, string>> => {
+  const sanitized: Record<string, string> = {};
+  const normalizedHeaders = new Headers(headers);
+  normalizedHeaders.forEach((value, key) => {
+    sanitized[key] = SENSITIVE_HEADER_NAMES.has(key)
+      ? REDACTED_HEADER_VALUE
+      : value;
+  });
+  return sanitized;
+};
+
+const callLog = (
+  logger: Logger,
+  level: keyof Logger,
+  event: string,
+  details: Readonly<Record<string, unknown>>
+): void => {
+  const fn = logger[level];
+  if (typeof fn !== 'function') {
+    return;
+  }
+  fn(event, details);
+};
+
 const resolvePath = (
   options: TrembitaFetchOptions
 ): Result<string, TrembitaSendError> => {
@@ -87,7 +123,7 @@ const parseJsonBody = (text: string): Result<unknown, TrembitaSendError> => {
 };
 
 const makeSend =
-  (endpoint: string, fetchImpl: typeof fetch) =>
+  (endpoint: string, fetchImpl: typeof fetch, log: Logger) =>
   async (
     options: TrembitaFetchOptions
   ): Promise<Result<TrembitaHttpResponse, TrembitaSendError>> => {
@@ -101,25 +137,51 @@ const makeSend =
       fullUrl = appendQuery(fullUrl, query);
     }
     const init = buildRequestInit(options);
+    const startedAtMs = Date.now();
+    callLog(log, 'debug', 'request:start', {
+      endpoint,
+      path: pathResult.value,
+      method: init.method ?? 'GET',
+      headers: sanitizeHeaders(init.headers)
+    });
     try {
       const response = await fetchImpl(fullUrl, init);
       const text = await response.text();
       const bodyResult = parseJsonBody(text);
       if (!bodyResult.ok) {
+        callLog(log, 'error', 'request:invalid_json', {
+          endpoint,
+          path: pathResult.value,
+          statusCode: response.status,
+          durationMs: Date.now() - startedAtMs,
+          errorKind: bodyResult.error.kind
+        });
         return bodyResult;
       }
+      callLog(log, 'info', 'request:success', {
+        endpoint,
+        path: pathResult.value,
+        statusCode: response.status,
+        durationMs: Date.now() - startedAtMs
+      });
       return ok({
         statusCode: response.status,
         body: bodyResult.value,
         path: pathResult.value
       });
     } catch (cause) {
+      callLog(log, 'error', 'request:fetch_failed', {
+        endpoint,
+        path: pathResult.value,
+        durationMs: Date.now() - startedAtMs,
+        errorKind: 'fetch_failed'
+      });
       return err({ kind: 'fetch_failed', cause });
     }
   };
 
 const makeRequest =
-  (endpoint: string, send: ReturnType<typeof makeSend>) =>
+  (endpoint: string, send: ReturnType<typeof makeSend>, log: Logger) =>
   async (
     options: TrembitaFetchOptions
   ): Promise<Result<unknown, TrembitaRequestError>> => {
@@ -130,6 +192,12 @@ const makeRequest =
     const expectedCodes = options.expectedCodes ?? DEFAULT_EXPECTED_CODES;
     const { statusCode, body, path } = sent.value;
     if (!expectedCodes.includes(statusCode)) {
+      callLog(log, 'warn', 'request:unexpected_status', {
+        endpoint,
+        path,
+        statusCode,
+        expectedCodes
+      });
       return err({
         kind: 'unexpected_status',
         statusCode,
@@ -150,10 +218,10 @@ export const createTrembita = (
   const {
     endpoint,
     fetchImpl = globalThis.fetch,
-    log = console
+    log = {}
   } = validated.value;
-  const send = makeSend(endpoint, fetchImpl);
-  const request = makeRequest(endpoint, send);
+  const send = makeSend(endpoint, fetchImpl, log);
+  const request = makeRequest(endpoint, send, log);
   return ok({
     endpoint,
     log,
