@@ -7,6 +7,8 @@ export type TrembitaInitError =
 
 export type TrembitaSendError =
   | Readonly<{ kind: 'fetch_failed'; cause: unknown }>
+  | Readonly<{ kind: 'timeout'; timeoutMs: number }>
+  | Readonly<{ kind: 'circuit_open'; retryAfterMs: number }>
   | Readonly<{ kind: 'invalid_json'; cause: unknown }>
   | Readonly<{
       kind: 'invalid_request_options';

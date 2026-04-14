@@ -6,7 +6,7 @@ import type {
 } from './errors.js';
 import { err, ok, type Result } from './result.js';
 import { appendQuery, joinEndpointPath } from './url.js';
-import type { Logger } from './validate.js';
+import type { CircuitBreakerOptions, Logger } from './validate.js';
 import { validateInitOptions } from './validate.js';
 
 export type TrembitaHttpResponse = Readonly<{
@@ -27,6 +27,8 @@ export type TrembitaFetchOptions = Readonly<{
   qs?: Readonly<Record<string, string | number | boolean | null | undefined>>;
   body?: unknown;
   expectedCodes?: readonly number[];
+  timeoutMs?: number;
+  signal?: AbortSignal;
 }>;
 
 export type TrembitaClient = Readonly<{
@@ -111,6 +113,84 @@ const buildRequestInit = (options: TrembitaFetchOptions): RequestInit => {
   return { method, headers, body };
 };
 
+type BuiltSignal = Readonly<{
+  signal: AbortSignal | undefined;
+  didTimeout: () => boolean;
+  cleanup: () => void;
+}>;
+
+const buildSignal = (
+  options: TrembitaFetchOptions,
+  defaultTimeoutMs: number | undefined
+): BuiltSignal => {
+  const timeoutMs = options.timeoutMs ?? defaultTimeoutMs;
+  const controller = new AbortController();
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+  let timedOut = false;
+
+  const onAbort = (): void => {
+    controller.abort();
+  };
+  options.signal?.addEventListener('abort', onAbort);
+  if (options.signal?.aborted) {
+    controller.abort();
+  }
+
+  if (timeoutMs !== undefined) {
+    timeoutHandle = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, timeoutMs);
+  }
+
+  const signal =
+    options.signal === undefined && timeoutMs === undefined
+      ? undefined
+      : controller.signal;
+
+  return {
+    signal,
+    didTimeout: () => timedOut,
+    cleanup: () => {
+      options.signal?.removeEventListener('abort', onAbort);
+      if (timeoutHandle !== undefined) {
+        clearTimeout(timeoutHandle);
+      }
+    }
+  };
+};
+
+type CircuitBreakerState = {
+  readonly options: CircuitBreakerOptions;
+  failures: number;
+  openedUntilMs: number | undefined;
+};
+
+const isCircuitOpen = (state: CircuitBreakerState): number | undefined => {
+  if (state.openedUntilMs === undefined) {
+    return undefined;
+  }
+  const remaining = state.openedUntilMs - Date.now();
+  if (remaining <= 0) {
+    state.openedUntilMs = undefined;
+    state.failures = 0;
+    return undefined;
+  }
+  return remaining;
+};
+
+const registerFailure = (state: CircuitBreakerState): void => {
+  state.failures += 1;
+  if (state.failures >= state.options.failureThreshold) {
+    state.openedUntilMs = Date.now() + state.options.cooldownMs;
+  }
+};
+
+const registerSuccess = (state: CircuitBreakerState): void => {
+  state.failures = 0;
+  state.openedUntilMs = undefined;
+};
+
 const parseJsonBody = (text: string): Result<unknown, TrembitaSendError> => {
   if (text.length === 0) {
     return ok(undefined);
@@ -123,7 +203,13 @@ const parseJsonBody = (text: string): Result<unknown, TrembitaSendError> => {
 };
 
 const makeSend =
-  (endpoint: string, fetchImpl: typeof fetch, log: Logger) =>
+  (
+    endpoint: string,
+    fetchImpl: typeof fetch,
+    log: Logger,
+    defaultTimeoutMs: number | undefined,
+    circuitBreaker: CircuitBreakerState | undefined
+  ) =>
   async (
     options: TrembitaFetchOptions
   ): Promise<Result<TrembitaHttpResponse, TrembitaSendError>> => {
@@ -131,12 +217,34 @@ const makeSend =
     if (!pathResult.ok) {
       return pathResult;
     }
+    if (circuitBreaker !== undefined) {
+      const retryAfterMs = isCircuitOpen(circuitBreaker);
+      if (retryAfterMs !== undefined) {
+        callLog(log, 'warn', 'request:circuit_open', {
+          endpoint,
+          path: pathResult.value,
+          retryAfterMs
+        });
+        return err({ kind: 'circuit_open', retryAfterMs });
+      }
+    }
+
     let fullUrl = joinEndpointPath(endpoint, pathResult.value);
     const query = resolveQuery(options);
     if (query) {
       fullUrl = appendQuery(fullUrl, query);
     }
+
     const init = buildRequestInit(options);
+    const { signal, didTimeout, cleanup } = buildSignal(
+      options,
+      defaultTimeoutMs
+    );
+    if (signal !== undefined) {
+      init.signal = signal;
+    }
+
+    const timeoutMs = options.timeoutMs ?? defaultTimeoutMs;
     const startedAtMs = Date.now();
     callLog(log, 'debug', 'request:start', {
       endpoint,
@@ -149,6 +257,9 @@ const makeSend =
       const text = await response.text();
       const bodyResult = parseJsonBody(text);
       if (!bodyResult.ok) {
+        if (circuitBreaker !== undefined) {
+          registerFailure(circuitBreaker);
+        }
         callLog(log, 'error', 'request:invalid_json', {
           endpoint,
           path: pathResult.value,
@@ -157,6 +268,10 @@ const makeSend =
           errorKind: bodyResult.error.kind
         });
         return bodyResult;
+      }
+
+      if (circuitBreaker !== undefined) {
+        registerSuccess(circuitBreaker);
       }
       callLog(log, 'info', 'request:success', {
         endpoint,
@@ -170,6 +285,21 @@ const makeSend =
         path: pathResult.value
       });
     } catch (cause) {
+      if (timeoutMs !== undefined && didTimeout()) {
+        if (circuitBreaker !== undefined) {
+          registerFailure(circuitBreaker);
+        }
+        callLog(log, 'error', 'request:timeout', {
+          endpoint,
+          path: pathResult.value,
+          durationMs: Date.now() - startedAtMs,
+          timeoutMs
+        });
+        return err({ kind: 'timeout', timeoutMs });
+      }
+      if (circuitBreaker !== undefined) {
+        registerFailure(circuitBreaker);
+      }
       callLog(log, 'error', 'request:fetch_failed', {
         endpoint,
         path: pathResult.value,
@@ -177,6 +307,8 @@ const makeSend =
         errorKind: 'fetch_failed'
       });
       return err({ kind: 'fetch_failed', cause });
+    } finally {
+      cleanup();
     }
   };
 
@@ -215,8 +347,25 @@ export const createTrembita = (
   if (!validated.ok) {
     return validated;
   }
-  const { endpoint, fetchImpl = globalThis.fetch, log = {} } = validated.value;
-  const send = makeSend(endpoint, fetchImpl, log);
+
+  const {
+    endpoint,
+    fetchImpl = globalThis.fetch,
+    log = {},
+    timeoutMs,
+    circuitBreaker
+  } = validated.value;
+
+  const circuitState =
+    circuitBreaker === undefined
+      ? undefined
+      : {
+          options: circuitBreaker,
+          failures: 0,
+          openedUntilMs: undefined
+        };
+
+  const send = makeSend(endpoint, fetchImpl = globalThis.fetch, log = {}, timeoutMs, circuitState);
   const request = makeRequest(endpoint, send, log);
   return ok({
     endpoint,

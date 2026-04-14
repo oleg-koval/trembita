@@ -12,10 +12,17 @@ export type Logger = Readonly<
   }>
 >;
 
+export type CircuitBreakerOptions = Readonly<{
+  failureThreshold: number;
+  cooldownMs: number;
+}>;
+
 export type TrembitaInitOptions = Readonly<{
   endpoint: string;
   log?: Logger;
   fetchImpl?: typeof fetch;
+  timeoutMs?: number;
+  circuitBreaker?: CircuitBreakerOptions;
 }>;
 
 export const isOptionsObject = (value: unknown): boolean => {
@@ -46,6 +53,31 @@ export const validateInitOptions = (
   if (!endpointResult.ok) {
     return endpointResult;
   }
+
+  const timeoutMs =
+    typeof o.timeoutMs === 'number' &&
+    Number.isFinite(o.timeoutMs) &&
+    o.timeoutMs > 0
+      ? o.timeoutMs
+      : undefined;
+
+  const circuitBreaker =
+    typeof o.circuitBreaker === 'object' && o.circuitBreaker !== null
+      ? (o.circuitBreaker as Record<string, unknown>)
+      : undefined;
+  const failureThreshold =
+    typeof circuitBreaker?.failureThreshold === 'number' &&
+    Number.isFinite(circuitBreaker.failureThreshold) &&
+    circuitBreaker.failureThreshold > 0
+      ? Math.floor(circuitBreaker.failureThreshold)
+      : undefined;
+  const cooldownMs =
+    typeof circuitBreaker?.cooldownMs === 'number' &&
+    Number.isFinite(circuitBreaker.cooldownMs) &&
+    circuitBreaker.cooldownMs > 0
+      ? circuitBreaker.cooldownMs
+      : undefined;
+
   return ok({
     endpoint: endpointResult.value,
     ...(typeof o.log === 'object' && o.log !== null
@@ -53,6 +85,15 @@ export const validateInitOptions = (
       : {}),
     ...(typeof o.fetchImpl === 'function'
       ? { fetchImpl: o.fetchImpl as typeof fetch }
+      : {}),
+    ...(timeoutMs !== undefined ? { timeoutMs } : {}),
+    ...(failureThreshold !== undefined && cooldownMs !== undefined
+      ? {
+          circuitBreaker: {
+            failureThreshold,
+            cooldownMs
+          }
+        }
       : {})
   });
 };
