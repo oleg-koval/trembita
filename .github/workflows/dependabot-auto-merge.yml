@@ -1,10 +1,7 @@
 name: Auto merge Dependabot updates
 
 on:
-  check_suite:
-    types:
-      - completed
-  pull_request:
+  pull_request_target:
     types:
       - labeled
       - unlabeled
@@ -15,8 +12,18 @@ on:
       - reopened
       - unlocked
 
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+  statuses: read
+
 jobs:
   auto-merge:
+    # Scope by PR author only: when github.actor is dependabot[bot], GITHUB_TOKEN
+    # is read-only for pull_request_target; maintainer-triggered runs (labels,
+    # etc.) keep write permissions while the PR remains Dependabot-authored.
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: auto-merge

@@ -149,17 +149,19 @@ Every operation returns a `Result<T, E>` — either `{ ok: true, value }` or
 `{ ok: false, error }`. Errors are tagged unions you can narrow with
 `error.kind`:
 
-| `error.kind`              | When                                           |
-| ------------------------- | ---------------------------------------------- |
-| `missing_options`         | No options passed to `createTrembita`          |
-| `options_not_object`      | Options is not an object                       |
-| `missing_endpoint`        | `endpoint` field is missing                    |
-| `endpoint_not_string`     | `endpoint` is not a string                     |
-| `endpoint_invalid_url`    | `endpoint` URL cannot be parsed or bad scheme  |
-| `invalid_request_options` | Missing or invalid `path`/`url` in request     |
-| `fetch_failed`            | Network error (DNS, timeout, connection reset) |
-| `invalid_json`            | Response body is not valid JSON                |
-| `unexpected_status`       | HTTP status not in `expectedCodes`             |
+| `error.kind`              | When                                             |
+| ------------------------- | ------------------------------------------------ |
+| `missing_options`         | No options passed to `createTrembita`            |
+| `options_not_object`      | Options is not an object                         |
+| `missing_endpoint`        | `endpoint` field is missing                      |
+| `endpoint_not_string`     | `endpoint` is not a string                       |
+| `endpoint_invalid_url`    | `endpoint` URL cannot be parsed or bad scheme    |
+| `invalid_request_options` | Missing or invalid `path`/`url` in request       |
+| `fetch_failed`            | Network error (DNS, timeout, connection reset)   |
+| `timeout`                 | Request exceeded configured timeout              |
+| `circuit_open`            | Circuit breaker is open; request short-circuited |
+| `invalid_json`            | Response body is not valid JSON                  |
+| `unexpected_status`       | HTTP status not in `expectedCodes`               |
 
 ## API reference
 
@@ -170,13 +172,28 @@ Full TypeDoc documentation is published at
 
 Creates a client bound to a base URL.
 
-| Option      | Type                | Default            | Description                  |
-| ----------- | ------------------- | ------------------ | ---------------------------- |
-| `endpoint`  | `string` (required) | —                  | Base URL for all requests    |
-| `fetchImpl` | `typeof fetch`      | `globalThis.fetch` | Custom fetch for testing     |
-| `log`       | `Logger`            | `console`          | Logger with `trace`..`error` |
+| Option           | Type                                               | Default            | Description                          |
+| ---------------- | -------------------------------------------------- | ------------------ | ------------------------------------ |
+| `endpoint`       | `string` (required)                                | —                  | Base URL for all requests            |
+| `fetchImpl`      | `typeof fetch`                                     | `globalThis.fetch` | Custom fetch for testing             |
+| `log`            | `Logger`                                           | no-op logger       | Logger with `trace`..`error`.        |
+| `timeoutMs`      | `number`                                           | —                  | Default timeout for requests         |
+| `circuitBreaker` | `{ failureThreshold: number; cooldownMs: number }` | —                  | Optional consecutive-failure breaker |
 
 Returns `Result<TrembitaClient, TrembitaInitError>`.
+
+### Logging contract
+
+- Logging is opt-in: no logger means no internal logs.
+- When `log` is provided, trembita emits lifecycle events:
+  - `request:start` (debug): endpoint, path, method, sanitized headers
+  - `request:success` (info): endpoint, path, statusCode, durationMs
+  - `request:unexpected_status` (warn): endpoint, path, statusCode,
+    expectedCodes
+  - `request:fetch_failed` / `request:invalid_json` (error): endpoint, path,
+    error kind
+- Sensitive request headers are redacted in logs (`authorization`, `cookie`,
+  `set-cookie`, `x-api-key`, `proxy-authorization`).
 
 ### `request(options)`
 
@@ -201,6 +218,8 @@ Returns `Promise<Result<TrembitaHttpResponse, TrembitaSendError>>`.
 | `query` or `qs` | `Record<string, string\|...>` | —                        |
 | `body`          | `unknown`                     | —                        |
 | `expectedCodes` | `number[]`                    | `[200, 201]`             |
+| `timeoutMs`     | `number`                      | init `timeoutMs`         |
+| `signal`        | `AbortSignal`                 | —                        |
 
 ## Requirements
 

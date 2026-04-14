@@ -152,13 +152,214 @@ describe('createTrembita', () => {
     });
   });
 
-  it('uses console as default log', () => {
+  it('uses no-op logger as default log', () => {
     const created = createTrembita({ endpoint: 'https://example.com/api' });
     expect(created.ok).toBe(true);
     if (!created.ok) {
       return;
     }
-    expect(created.value.log).toBe(console);
+    expect(created.value.log).toEqual({});
+  });
+
+  it('does not write to console when logger not provided', async () => {
+    const infoSpy = vi
+      .spyOn(console, 'info')
+      .mockImplementation(() => undefined);
+    const warnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => undefined);
+    const errorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(
+        new Response(JSON.stringify(expectedBody), { status: HTTP_OK })
+      )
+    );
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+
+    const res = await created.value.request({ path: '/users' });
+    expect(res.ok).toBe(true);
+    expect(infoSpy).not.toHaveBeenCalled();
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
+    infoSpy.mockRestore();
+    warnSpy.mockRestore();
+    errorSpy.mockRestore();
+  });
+
+  it('emits lifecycle logs when logger provided', async () => {
+    const logger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    };
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(
+        new Response(JSON.stringify(expectedBody), { status: HTTP_OK })
+      )
+    );
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl,
+      log: logger
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({ path: '/users' });
+    expect(res.ok).toBe(true);
+    expect(logger.debug).toHaveBeenCalledWith(
+      'request:start',
+      expect.objectContaining({
+        endpoint: 'https://example.com/api',
+        path: '/users',
+        method: 'GET'
+      })
+    );
+    expect(logger.info).toHaveBeenCalledWith(
+      'request:success',
+      expect.objectContaining({
+        endpoint: 'https://example.com/api',
+        path: '/users',
+        statusCode: HTTP_OK
+      })
+    );
+  });
+
+  it('does not reject when request:start logger throws', async () => {
+    const logger = {
+      debug: vi.fn(() => {
+        throw new Error('logger transport failed');
+      }),
+      info: vi.fn()
+    };
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(
+        new Response(JSON.stringify(expectedBody), { status: HTTP_OK })
+      )
+    );
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl,
+      log: logger
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({ path: '/users' });
+    expect(res.ok).toBe(true);
+    expect(logger.debug).toHaveBeenCalled();
+    expect(logger.info).toHaveBeenCalled();
+  });
+
+  it('redacts sensitive headers in request:start logs', async () => {
+    const logger = {
+      debug: vi.fn()
+    };
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(
+        new Response(JSON.stringify(expectedBody), { status: HTTP_OK })
+      )
+    );
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl,
+      log: logger
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({
+      path: '/users',
+      headers: {
+        Authorization: 'Bearer super-secret',
+        Cookie: 'session=abc',
+        'X-Api-Key': 'token',
+        'X-Request-Id': 'req-1'
+      }
+    });
+    expect(res.ok).toBe(true);
+    expect(logger.debug).toHaveBeenCalledWith(
+      'request:start',
+      expect.objectContaining({
+        headers: {
+          authorization: '[REDACTED]',
+          cookie: '[REDACTED]',
+          'x-api-key': '[REDACTED]',
+          'x-request-id': 'req-1'
+        }
+      })
+    );
+  });
+
+  it('emits warning on unexpected status', async () => {
+    const logger = {
+      warn: vi.fn()
+    };
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(new Response(undefined, { status: 404 }))
+    );
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl,
+      log: logger
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({
+      path: '/missing',
+      expectedCodes: [HTTP_OK]
+    });
+    expect(res.ok).toBe(false);
+    expect(logger.warn).toHaveBeenCalledWith(
+      'request:unexpected_status',
+      expect.objectContaining({
+        endpoint: 'https://example.com/api',
+        path: '/missing',
+        statusCode: 404,
+        expectedCodes: [HTTP_OK]
+      })
+    );
+  });
+
+  it('emits error on fetch failure', async () => {
+    const logger = {
+      error: vi.fn()
+    };
+    const fetchImpl = vi.fn(() => Promise.reject(new Error('network')));
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl,
+      log: logger
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({ path: '/fail' });
+    expect(res.ok).toBe(false);
+    expect(logger.error).toHaveBeenCalledWith(
+      'request:fetch_failed',
+      expect.objectContaining({
+        endpoint: 'https://example.com/api',
+        path: '/fail',
+        errorKind: 'fetch_failed'
+      })
+    );
   });
 
   it('client returns status and body', async () => {
@@ -459,6 +660,309 @@ describe('createTrembita', () => {
       return;
     }
     expect(res.error.kind).toBe('invalid_json');
+  });
+
+  it('request returns timeout when timeoutMs is exceeded', async () => {
+    const fetchImpl = vi.fn((_: RequestInfo | URL, init?: RequestInit) => {
+      return new Promise<Response>((_, reject) => {
+        init?.signal?.addEventListener('abort', () => {
+          reject(new Error('aborted'));
+        });
+      });
+    });
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({
+      path: '/slow',
+      timeoutMs: 10
+    });
+    expect(res.ok).toBe(false);
+    if (res.ok) {
+      return;
+    }
+    expect(res.error).toEqual({
+      kind: 'timeout',
+      timeoutMs: 10
+    });
+  });
+
+  it('request uses init-level timeout when request timeout not provided', async () => {
+    const fetchImpl = vi.fn((_: RequestInfo | URL, init?: RequestInit) => {
+      return new Promise<Response>((_, reject) => {
+        init?.signal?.addEventListener('abort', () => {
+          reject(new Error('aborted'));
+        });
+      });
+    });
+    const created = createTrembita({
+      ...clientOptions,
+      timeoutMs: 10,
+      fetchImpl
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({ path: '/slow' });
+    expect(res.ok).toBe(false);
+    if (res.ok) {
+      return;
+    }
+    expect(res.error).toEqual({
+      kind: 'timeout',
+      timeoutMs: 10
+    });
+  });
+
+  it('opens circuit breaker after consecutive failures', async () => {
+    const fetchImpl = vi.fn(() => Promise.reject(new Error('network')));
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl,
+      circuitBreaker: {
+        failureThreshold: 2,
+        cooldownMs: 1_000
+      }
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+
+    const first = await created.value.request({ path: '/unstable' });
+    expect(first.ok).toBe(false);
+    if (!first.ok) {
+      expect(first.error.kind).toBe('fetch_failed');
+    }
+
+    const second = await created.value.request({ path: '/unstable' });
+    expect(second.ok).toBe(false);
+    if (!second.ok) {
+      expect(second.error.kind).toBe('fetch_failed');
+    }
+
+    const third = await created.value.request({ path: '/unstable' });
+    expect(third.ok).toBe(false);
+    if (third.ok) {
+      return;
+    }
+    expect(third.error.kind).toBe('circuit_open');
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
+  it('counts invalid_json failures in circuit breaker', async () => {
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(new Response('{', { status: 200 }))
+    );
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl,
+      circuitBreaker: {
+        failureThreshold: 1,
+        cooldownMs: 1_000
+      }
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+
+    const first = await created.value.request({ path: '/broken-json' });
+    expect(first.ok).toBe(false);
+    if (!first.ok) {
+      expect(first.error.kind).toBe('invalid_json');
+    }
+
+    const second = await created.value.request({ path: '/broken-json' });
+    expect(second.ok).toBe(false);
+    if (second.ok) {
+      return;
+    }
+    expect(second.error.kind).toBe('circuit_open');
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
+  it('counts timeout failures in circuit breaker', async () => {
+    const fetchImpl = vi.fn((_: RequestInfo | URL, init?: RequestInit) => {
+      return new Promise<Response>((_, reject) => {
+        init?.signal?.addEventListener('abort', () => {
+          reject(new Error('aborted'));
+        });
+      });
+    });
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl,
+      circuitBreaker: {
+        failureThreshold: 1,
+        cooldownMs: 1_000
+      }
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const first = await created.value.request({
+      path: '/slow',
+      timeoutMs: 10
+    });
+    expect(first.ok).toBe(false);
+    if (!first.ok) {
+      expect(first.error.kind).toBe('timeout');
+    }
+
+    const second = await created.value.request({
+      path: '/slow',
+      timeoutMs: 10
+    });
+    expect(second.ok).toBe(false);
+    if (second.ok) {
+      return;
+    }
+    expect(second.error.kind).toBe('circuit_open');
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
+  it('resets circuit breaker failure count after success', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('network'))
+      .mockResolvedValueOnce(new Response('{}', { status: 200 }))
+      .mockRejectedValueOnce(new Error('network'))
+      .mockRejectedValueOnce(new Error('network'));
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl,
+      circuitBreaker: {
+        failureThreshold: 2,
+        cooldownMs: 1_000
+      }
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+
+    const r1 = await created.value.request({ path: '/unstable' });
+    expect(r1.ok).toBe(false);
+    const r2 = await created.value.request({ path: '/unstable' });
+    expect(r2.ok).toBe(true);
+    const r3 = await created.value.request({ path: '/unstable' });
+    expect(r3.ok).toBe(false);
+    if (!r3.ok) {
+      expect(r3.error.kind).toBe('fetch_failed');
+    }
+    const r4 = await created.value.request({ path: '/unstable' });
+    expect(r4.ok).toBe(false);
+    if (!r4.ok) {
+      expect(r4.error.kind).toBe('fetch_failed');
+    }
+  });
+
+  it('accepts external abort signal', async () => {
+    const fetchImpl = vi.fn((_: RequestInfo | URL, init?: RequestInit) => {
+      return new Promise<Response>((_, reject) => {
+        if (init?.signal?.aborted) {
+          reject(new Error('aborted'));
+          return;
+        }
+        init?.signal?.addEventListener('abort', () => {
+          reject(new Error('aborted'));
+        });
+      });
+    });
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const abortController = new AbortController();
+    const reqPromise = created.value.request({
+      path: '/signal',
+      signal: abortController.signal
+    });
+    abortController.abort();
+    const res = await reqPromise;
+    expect(res.ok).toBe(false);
+    if (res.ok) {
+      return;
+    }
+    expect(res.error.kind).toBe('fetch_failed');
+  });
+
+  it('handles already-aborted external signal', async () => {
+    const fetchImpl = vi.fn((_: RequestInfo | URL, init?: RequestInit) => {
+      return new Promise<Response>((_, reject) => {
+        if (init?.signal?.aborted) {
+          reject(new Error('aborted'));
+          return;
+        }
+        reject(new Error('expected aborted signal'));
+      });
+    });
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const abortController = new AbortController();
+    abortController.abort();
+    const res = await created.value.request({
+      path: '/signal-aborted',
+      signal: abortController.signal
+    });
+    expect(res.ok).toBe(false);
+    if (res.ok) {
+      return;
+    }
+    expect(res.error.kind).toBe('fetch_failed');
+  });
+
+  it('allows requests again after circuit breaker cooldown', async () => {
+    vi.useFakeTimers();
+    const fetchImpl = vi.fn(() => Promise.reject(new Error('network')));
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl,
+      circuitBreaker: {
+        failureThreshold: 1,
+        cooldownMs: 50
+      }
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      vi.useRealTimers();
+      return;
+    }
+    const first = await created.value.request({ path: '/unstable' });
+    expect(first.ok).toBe(false);
+    const second = await created.value.request({ path: '/unstable' });
+    expect(second.ok).toBe(false);
+    if (!second.ok) {
+      expect(second.error.kind).toBe('circuit_open');
+    }
+
+    vi.advanceTimersByTime(51);
+
+    const third = await created.value.request({ path: '/unstable' });
+    expect(third.ok).toBe(false);
+    if (!third.ok) {
+      expect(third.error.kind).toBe('fetch_failed');
+    }
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
   });
 
   it('parses empty response body as undefined', async () => {
