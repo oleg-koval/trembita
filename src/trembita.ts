@@ -75,7 +75,11 @@ const callLog = (
   if (typeof fn !== 'function') {
     return;
   }
-  fn(event, details);
+  try {
+    fn(event, details);
+  } catch {
+    /* user logger must not break Result/no-throw contract */
+  }
 };
 
 const resolvePath = (

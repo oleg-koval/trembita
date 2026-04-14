@@ -236,6 +236,33 @@ describe('createTrembita', () => {
     );
   });
 
+  it('does not reject when request:start logger throws', async () => {
+    const logger = {
+      debug: vi.fn(() => {
+        throw new Error('logger transport failed');
+      }),
+      info: vi.fn()
+    };
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(
+        new Response(JSON.stringify(expectedBody), { status: HTTP_OK })
+      )
+    );
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl,
+      log: logger
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({ path: '/users' });
+    expect(res.ok).toBe(true);
+    expect(logger.debug).toHaveBeenCalled();
+    expect(logger.info).toHaveBeenCalled();
+  });
+
   it('redacts sensitive headers in request:start logs', async () => {
     const logger = {
       debug: vi.fn()
