@@ -184,9 +184,12 @@ Returns `Result<TrembitaClient, TrembitaInitError>`.
 - When `log` is provided, trembita emits lifecycle events:
   - `request:start` (debug): endpoint, path, method, sanitized headers
   - `request:success` (info): endpoint, path, statusCode, durationMs
-  - `request:unexpected_status` (warn): endpoint, path, statusCode, expectedCodes
-  - `request:fetch_failed` / `request:invalid_json` (error): endpoint, path, error kind
-- Sensitive request headers are redacted in logs (`authorization`, `cookie`, `set-cookie`, `x-api-key`, `proxy-authorization`).
+  - `request:unexpected_status` (warn): endpoint, path, statusCode,
+    expectedCodes
+  - `request:fetch_failed` / `request:invalid_json` (error): endpoint, path,
+    error kind
+- Sensitive request headers are redacted in logs (`authorization`, `cookie`,
+  `set-cookie`, `x-api-key`, `proxy-authorization`).
 
 ### `request(options)`
 

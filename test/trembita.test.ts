@@ -162,15 +162,24 @@ describe('createTrembita', () => {
   });
 
   it('does not write to console when logger not provided', async () => {
-    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const infoSpy = vi
+      .spyOn(console, 'info')
+      .mockImplementation(() => undefined);
+    const warnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => undefined);
     const errorSpy = vi
       .spyOn(console, 'error')
       .mockImplementation(() => undefined);
     const fetchImpl = vi.fn(() =>
-      Promise.resolve(new Response(JSON.stringify(expectedBody), { status: HTTP_OK }))
+      Promise.resolve(
+        new Response(JSON.stringify(expectedBody), { status: HTTP_OK })
+      )
     );
-    const created = createTrembita({ endpoint: 'https://example.com/api', fetchImpl });
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl
+    });
     expect(created.ok).toBe(true);
     if (!created.ok) {
       return;
@@ -194,7 +203,9 @@ describe('createTrembita', () => {
       error: vi.fn()
     };
     const fetchImpl = vi.fn(() =>
-      Promise.resolve(new Response(JSON.stringify(expectedBody), { status: HTTP_OK }))
+      Promise.resolve(
+        new Response(JSON.stringify(expectedBody), { status: HTTP_OK })
+      )
     );
     const created = createTrembita({
       endpoint: 'https://example.com/api',
@@ -230,7 +241,9 @@ describe('createTrembita', () => {
       debug: vi.fn()
     };
     const fetchImpl = vi.fn(() =>
-      Promise.resolve(new Response(JSON.stringify(expectedBody), { status: HTTP_OK }))
+      Promise.resolve(
+        new Response(JSON.stringify(expectedBody), { status: HTTP_OK })
+      )
     );
     const created = createTrembita({
       endpoint: 'https://example.com/api',

@@ -215,11 +215,7 @@ export const createTrembita = (
   if (!validated.ok) {
     return validated;
   }
-  const {
-    endpoint,
-    fetchImpl = globalThis.fetch,
-    log = {}
-  } = validated.value;
+  const { endpoint, fetchImpl = globalThis.fetch, log = {} } = validated.value;
   const send = makeSend(endpoint, fetchImpl, log);
   const request = makeRequest(endpoint, send, log);
   return ok({
