@@ -365,7 +365,7 @@ export const createTrembita = (
           openedUntilMs: undefined
         };
 
-  const send = makeSend(endpoint, fetchImpl = globalThis.fetch, log = {}, timeoutMs, circuitState);
+  const send = makeSend(endpoint, fetchImpl, log, timeoutMs, circuitState);
   const request = makeRequest(endpoint, send, log);
   return ok({
     endpoint,
