@@ -410,9 +410,7 @@ describe('createTrembita', () => {
     }
     await created.value.client({ path: '/users' });
     const [usersUrl] = getFetchMockArgs(fetchImpl);
-    expect(fetchInputToString(usersUrl)).toBe(
-      'https://example.com/api/users'
-    );
+    expect(fetchInputToString(usersUrl)).toBe('https://example.com/api/users');
   });
 
   it('uses explicit method when body absent', async () => {
@@ -513,9 +511,7 @@ describe('createTrembita', () => {
       query: { a: null, b: undefined, c: '1' }
     });
     const [queryUrl] = getFetchMockArgs(fetchImpl);
-    expect(fetchInputToString(queryUrl)).toBe(
-      'https://example.com/api/x?c=1'
-    );
+    expect(fetchInputToString(queryUrl)).toBe('https://example.com/api/x?c=1');
   });
 
   it('allows string body without forcing json content-type when set', async () => {

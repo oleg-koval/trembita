@@ -2,7 +2,6 @@
 
 ## Locked decisions
 
-
 | Topic        | Decision                                                                                                                                                                                                                                                                                          |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Distribution | **npm library** (third-party HTTP wrapper).                                                                                                                                                                                                                                                       |
@@ -15,20 +14,19 @@
 | Runtimes     | **Node + browser**: same **ESM** surface; consumers use bundlers. Add **documented browser constraints** (global `fetch` / URL). Optional **prebuilt browser bundle** (e.g. **tsup** IIFE/ESM) only if we want script-tag usage — **start with ESM for bundlers**; add bundle artifact if needed. |
 | Release      | `**semantic-release`** with **[semantic-release-npm-github-publish](https://oleg-koval.github.io/semantic-release-npm-github-publish/)** for npm + GitHub releases and **semver** (including **breaking majors for this migration).                                                               |
 
-
 ---
 
 ## Assumptions (still true unless contradicted)
 
 1. **Effects vs purity** — Network I/O stays behind **injected `fetch`**
-  (default `globalThis.fetch`). **Pure** modules for validation, status checks,
+   (default `globalThis.fetch`). **Pure** modules for validation, status checks,
    and mapping request options → `Request`.
 2. **Typing** — TypeScript `**strict`**, no `any`; JSON parsed as
-  `**unknown\*\*` until caller narrows.
+   `**unknown\*\*` until caller narrows.
 3. **Coverage** — **100%** on published `src/`** with **no ignore** unless you
-  approve a **documented exception.
-4. **Security** — `**npm audit` in CI; no deprecated HTTP client; minimal
-  attack surface (stdlib-first).
+   approve a **documented exception.
+4. **Security** — `**npm audit` in CI; no deprecated HTTP client; minimal attack
+   surface (stdlib-first).
 
 ---
 
@@ -49,39 +47,40 @@ automated semver releases.
 
 - Published **ESM** (and types); optional **dual CJS** only if phase-2 triggers.
 - **No** `request`, **no** `bluebird`, **no** `validator` / `http-status-codes`
-unless an exception is explicitly approved later.
+  unless an exception is explicitly approved later.
 - **Vitest** + **100%** coverage gate on `src/`.
 - **README** migration section: **v1 class + exceptions** → **v2 factory +
-`Result` unions** (and browser notes).
+  `Result` unions** (and browser notes).
 - Releases via **semantic-release** + **semantic-release-npm-github-publish**
-(see
-[docs](https://oleg-koval.github.io/semantic-release-npm-github-publish/)).
+  (see
+  [docs](https://oleg-koval.github.io/semantic-release-npm-github-publish/)).
 
 ---
 
 ## Backwards compatibility
 
 - **Semver major** required: **intentional breaking** API (factory, `Result`
-errors, ESM-first, Node `engines` jump).
+  errors, ESM-first, Node `engines` jump).
 - **Compatibility note for consumers**: document **migration checklist** in
-README + CHANGELOG: replace `new Trembita(opts)` with
-`**createTrembita(opts)`**, replace `**catch (UnexpectedStatusCodeError)`**with`**result` narrowing** (`if (!result.ok) { ... }`or`match`), replace `**require('trembita')`** with `**import`** (or wait
-for dual-publish phase if adopted).
+  README + CHANGELOG: replace `new Trembita(opts)` with
+  `**createTrembita(opts)`**, replace `**catch
+  (UnexpectedStatusCodeError)`**with`**result` narrowing**
+  (`if (!result.ok) { ... }`or`match`), replace `**require('trembita')`** with
+  `**import`\*\* (or wait for dual-publish phase if adopted).
 - **Message strings** for failures are **not** a stability guarantee unless
-explicitly documented; prefer **stable `kind` / `code` fields** on union
-members for programmatic branching.
+  explicitly documented; prefer **stable `kind` / `code` fields** on union
+  members for programmatic branching.
 
 ---
 
 ## Tech stack (target)
-
 
 | Area         | Choice                                                                                |
 | ------------ | ------------------------------------------------------------------------------------- |
 | Language     | TypeScript `strict`                                                                   |
 | Node         | `engines` = **Active LTS** (update when LTS rotates)                                  |
 | HTTP         | `**fetch` (stdlib); injectable for tests                                              |
-| Validation   | `**URL`**, small pure helpers (no `validator` dep)                                    |
+| Validation   | `**URL`\*\*, small pure helpers (no `validator` dep)                                  |
 | Errors       | **Discriminated unions** + `**Result` for request outcomes                            |
 | Tests        | **Vitest** (node + `browser` / `jsdom` or `happy-dom` as needed for DOM-lite APIs)    |
 | HTTP mocking | **nock** or **MSW** / **undici** `MockAgent` — pick one compatible with `fetch` in CI |
@@ -89,18 +88,17 @@ members for programmatic branching.
 | Build        | **tsup** / **unbuild** / **tsc** — emit `**dist/`, `exports` map, `types`             |
 | Browser      | **ESM** for bundlers first; optional **bundled** output later                         |
 
-
 ---
 
 ## Release & versioning
 
-- Use `**semantic-release` so version bumps and changelog follow
-conventional commits.
+- Use `**semantic-release` so version bumps and changelog follow conventional
+  commits.
 - Use
-**[semantic-release-npm-github-publish](https://oleg-koval.github.io/semantic-release-npm-github-publish/)**
-(maintained publish plugin for **npm** + **GitHub** release assets).
+  **[semantic-release-npm-github-publish](https://oleg-koval.github.io/semantic-release-npm-github-publish/)**
+  (maintained publish plugin for **npm** + **GitHub** release assets).
 - **Breaking** migration ships as **next major** (e.g. **2.0.0**); document
-**BREAKING CHANGE** footer in commits per conventional commits.
+  **BREAKING CHANGE** footer in commits per conventional commits.
 
 ---
 
@@ -140,10 +138,10 @@ SPEC.md
 ## Code style
 
 - **FP-first**: `**const`**, **pure** helpers, **immutable options types
-(`readonly`).
+  (`readonly`).
 - **Operational errors** — `**Result<Success, FailureUnion>`** for HTTP layer;
-reserve `**throw`** for **programmer bugs / assert-level invariants if
-used at all (prefer total functions + `Result`).
+  reserve
+  `**throw`** for **programmer bugs / assert-level invariants if used at all (prefer total functions + `Result`).
 - **No `any`**; `**unknown**` at JSON boundaries.
 - **Imports**: static, top of file.
 
@@ -170,14 +168,14 @@ export type RequestResult<T> = Result<T, TrembitaRequestError>;
 ## Testing strategy
 
 - **Vitest** with `**coverage.thresholds`** = **100%
-lines/branches/functions/statements on `src/`.
+  lines/branches/functions/statements on `src/`.
 - **Unit**: pure `validate` / `status` / union narrowing.
 - **Integration**: `fetch` + HTTP mock library against real URLs from options.
 - **Browser**: at least one **Vitest `environment: 'node'` +
-`happy-dom`/`jsdom`** or `**@vitest/browser**` smoke for code paths that
-assume `URL`/`fetch` (choose minimal setup that matches shipped surface).
+  `happy-dom`/`jsdom`** or `**@vitest/browser**` smoke for code paths that
+  assume `URL`/`fetch` (choose minimal setup that matches shipped surface).
 - **Regression**: v1 behaviors re-encoded as v2 **Result** assertions; document
-intentional deltas in CHANGELOG.
+  intentional deltas in CHANGELOG.
 
 ---
 
@@ -208,10 +206,10 @@ intentional deltas in CHANGELOG.
 1. `strict` TS, **no `any`** in `src/`.
 2. Vitest **100%** coverage on `src/`.
 3. Zero runtime deps from deprecated list; **stdlib-first** per Locked
-  decisions.
+   decisions.
 4. **ESM** `exports` + types; README **Node + browser** + **migration from v1**.
 5. **semantic-release** + **semantic-release-npm-github-publish** configured and
-  documented for maintainers.
+   documented for maintainers.
 
 ---
 
