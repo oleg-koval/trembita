@@ -4,4 +4,10 @@ branches:
 ci: false
 dryRun: false
 debug: false
-extends: 'semantic-release-npm-github-publish'
+plugins:
+  - - '@semantic-release/commit-analyzer'
+    - preset: conventionalcommits
+  - - '@semantic-release/release-notes-generator'
+    - preset: conventionalcommits
+  - - '@semantic-release/npm'
+  - - '@semantic-release/github'

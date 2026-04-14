@@ -72,6 +72,8 @@ if (raw.ok) {
 
 ## Migration from v1.x
 
+This version line is a **breaking v2 migration** to the functional `Result` API.
+
 | v1                                                     | v2                                                                                                                      |
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
 | `const T = require('trembita')` / `new Trembita(opts)` | `import { createTrembita } from 'trembita'` then **`createTrembita(opts)`** → **`Result`**                              |
