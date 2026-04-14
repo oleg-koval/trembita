@@ -252,7 +252,6 @@ const makeSend =
       method: init.method ?? 'GET',
       headers: sanitizeHeaders(init.headers)
     });
-
     try {
       const response = await fetchImpl(fullUrl, init);
       const text = await response.text();
@@ -280,7 +279,6 @@ const makeSend =
         statusCode: response.status,
         durationMs: Date.now() - startedAtMs
       });
-
       return ok({
         statusCode: response.status,
         body: bodyResult.value,
@@ -367,7 +365,7 @@ export const createTrembita = (
           openedUntilMs: undefined
         };
 
-  const send = makeSend(endpoint, fetchImpl, log, timeoutMs, circuitState);
+  const send = makeSend(endpoint, fetchImpl = globalThis.fetch, log = {}, timeoutMs, circuitState);
   const request = makeRequest(endpoint, send, log);
   return ok({
     endpoint,

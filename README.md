@@ -176,11 +176,24 @@ Creates a client bound to a base URL.
 | ---------------- | -------------------------------------------------- | ------------------ | ------------------------------------ |
 | `endpoint`       | `string` (required)                                | —                  | Base URL for all requests            |
 | `fetchImpl`      | `typeof fetch`                                     | `globalThis.fetch` | Custom fetch for testing             |
-| `log`            | `Logger`                                           | `console`          | Logger with `trace`..`error`         |
+| `log`            | `Logger`                                           | no-op logger       | Logger with `trace`..`error`.        |
 | `timeoutMs`      | `number`                                           | —                  | Default timeout for requests         |
 | `circuitBreaker` | `{ failureThreshold: number; cooldownMs: number }` | —                  | Optional consecutive-failure breaker |
 
 Returns `Result<TrembitaClient, TrembitaInitError>`.
+
+### Logging contract
+
+- Logging is opt-in: no logger means no internal logs.
+- When `log` is provided, trembita emits lifecycle events:
+  - `request:start` (debug): endpoint, path, method, sanitized headers
+  - `request:success` (info): endpoint, path, statusCode, durationMs
+  - `request:unexpected_status` (warn): endpoint, path, statusCode,
+    expectedCodes
+  - `request:fetch_failed` / `request:invalid_json` (error): endpoint, path,
+    error kind
+- Sensitive request headers are redacted in logs (`authorization`, `cookie`,
+  `set-cookie`, `x-api-key`, `proxy-authorization`).
 
 ### `request(options)`
 

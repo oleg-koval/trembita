@@ -161,9 +161,20 @@ describe('createTrembita', () => {
     expect(created.value.log).toEqual({});
   });
 
-  it('works without logger methods', async () => {
+  it('does not write to console when logger not provided', async () => {
+    const infoSpy = vi
+      .spyOn(console, 'info')
+      .mockImplementation(() => undefined);
+    const warnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => undefined);
+    const errorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
     const fetchImpl = vi.fn(() =>
-      Promise.resolve(new Response(JSON.stringify(expectedBody), { status: HTTP_OK }))
+      Promise.resolve(
+        new Response(JSON.stringify(expectedBody), { status: HTTP_OK })
+      )
     );
     const created = createTrembita({
       endpoint: 'https://example.com/api',
@@ -173,16 +184,66 @@ describe('createTrembita', () => {
     if (!created.ok) {
       return;
     }
+
     const res = await created.value.request({ path: '/users' });
     expect(res.ok).toBe(true);
+    expect(infoSpy).not.toHaveBeenCalled();
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
+    infoSpy.mockRestore();
+    warnSpy.mockRestore();
+    errorSpy.mockRestore();
   });
 
-  it('redacts sensitive headers in start log event', async () => {
+  it('emits lifecycle logs when logger provided', async () => {
+    const logger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    };
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(
+        new Response(JSON.stringify(expectedBody), { status: HTTP_OK })
+      )
+    );
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl,
+      log: logger
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({ path: '/users' });
+    expect(res.ok).toBe(true);
+    expect(logger.debug).toHaveBeenCalledWith(
+      'request:start',
+      expect.objectContaining({
+        endpoint: 'https://example.com/api',
+        path: '/users',
+        method: 'GET'
+      })
+    );
+    expect(logger.info).toHaveBeenCalledWith(
+      'request:success',
+      expect.objectContaining({
+        endpoint: 'https://example.com/api',
+        path: '/users',
+        statusCode: HTTP_OK
+      })
+    );
+  });
+
+  it('redacts sensitive headers in request:start logs', async () => {
     const logger = {
       debug: vi.fn()
     };
     const fetchImpl = vi.fn(() =>
-      Promise.resolve(new Response(JSON.stringify(expectedBody), { status: HTTP_OK }))
+      Promise.resolve(
+        new Response(JSON.stringify(expectedBody), { status: HTTP_OK })
+      )
     );
     const created = createTrembita({
       endpoint: 'https://example.com/api',
@@ -197,6 +258,8 @@ describe('createTrembita', () => {
       path: '/users',
       headers: {
         Authorization: 'Bearer super-secret',
+        Cookie: 'session=abc',
+        'X-Api-Key': 'token',
         'X-Request-Id': 'req-1'
       }
     });
@@ -206,8 +269,68 @@ describe('createTrembita', () => {
       expect.objectContaining({
         headers: {
           authorization: '[REDACTED]',
+          cookie: '[REDACTED]',
+          'x-api-key': '[REDACTED]',
           'x-request-id': 'req-1'
         }
+      })
+    );
+  });
+
+  it('emits warning on unexpected status', async () => {
+    const logger = {
+      warn: vi.fn()
+    };
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(new Response(undefined, { status: 404 }))
+    );
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl,
+      log: logger
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({
+      path: '/missing',
+      expectedCodes: [HTTP_OK]
+    });
+    expect(res.ok).toBe(false);
+    expect(logger.warn).toHaveBeenCalledWith(
+      'request:unexpected_status',
+      expect.objectContaining({
+        endpoint: 'https://example.com/api',
+        path: '/missing',
+        statusCode: 404,
+        expectedCodes: [HTTP_OK]
+      })
+    );
+  });
+
+  it('emits error on fetch failure', async () => {
+    const logger = {
+      error: vi.fn()
+    };
+    const fetchImpl = vi.fn(() => Promise.reject(new Error('network')));
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl,
+      log: logger
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({ path: '/fail' });
+    expect(res.ok).toBe(false);
+    expect(logger.error).toHaveBeenCalledWith(
+      'request:fetch_failed',
+      expect.objectContaining({
+        endpoint: 'https://example.com/api',
+        path: '/fail',
+        errorKind: 'fetch_failed'
       })
     );
   });
