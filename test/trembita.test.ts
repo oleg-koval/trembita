@@ -152,13 +152,64 @@ describe('createTrembita', () => {
     });
   });
 
-  it('uses console as default log', () => {
+  it('uses no-op logger as default log', () => {
     const created = createTrembita({ endpoint: 'https://example.com/api' });
     expect(created.ok).toBe(true);
     if (!created.ok) {
       return;
     }
-    expect(created.value.log).toBe(console);
+    expect(created.value.log).toEqual({});
+  });
+
+  it('works without logger methods', async () => {
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(new Response(JSON.stringify(expectedBody), { status: HTTP_OK }))
+    );
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({ path: '/users' });
+    expect(res.ok).toBe(true);
+  });
+
+  it('redacts sensitive headers in start log event', async () => {
+    const logger = {
+      debug: vi.fn()
+    };
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(new Response(JSON.stringify(expectedBody), { status: HTTP_OK }))
+    );
+    const created = createTrembita({
+      endpoint: 'https://example.com/api',
+      fetchImpl,
+      log: logger
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+    const res = await created.value.request({
+      path: '/users',
+      headers: {
+        Authorization: 'Bearer super-secret',
+        'X-Request-Id': 'req-1'
+      }
+    });
+    expect(res.ok).toBe(true);
+    expect(logger.debug).toHaveBeenCalledWith(
+      'request:start',
+      expect.objectContaining({
+        headers: {
+          authorization: '[REDACTED]',
+          'x-request-id': 'req-1'
+        }
+      })
+    );
   });
 
   it('client returns status and body', async () => {

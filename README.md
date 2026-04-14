@@ -172,13 +172,13 @@ Full TypeDoc documentation is published at
 
 Creates a client bound to a base URL.
 
-| Option      | Type                | Default            | Description               |
-| ----------- | ------------------- | ------------------ | ------------------------- |
-| `endpoint`  | `string` (required) | —                  | Base URL for all requests |
-| `fetchImpl` | `typeof fetch`      | `globalThis.fetch` | Custom fetch for testing  |
-| `log`       | `Logger`            | `console`          | Logger with `trace`..`error` |
-| `timeoutMs` | `number`            | —                  | Default timeout for requests |
-| `circuitBreaker` | `{ failureThreshold: number; cooldownMs: number }` | — | Optional consecutive-failure breaker |
+| Option           | Type                                               | Default            | Description                          |
+| ---------------- | -------------------------------------------------- | ------------------ | ------------------------------------ |
+| `endpoint`       | `string` (required)                                | —                  | Base URL for all requests            |
+| `fetchImpl`      | `typeof fetch`                                     | `globalThis.fetch` | Custom fetch for testing             |
+| `log`            | `Logger`                                           | `console`          | Logger with `trace`..`error`         |
+| `timeoutMs`      | `number`                                           | —                  | Default timeout for requests         |
+| `circuitBreaker` | `{ failureThreshold: number; cooldownMs: number }` | —                  | Optional consecutive-failure breaker |
 
 Returns `Result<TrembitaClient, TrembitaInitError>`.
 
