@@ -14,6 +14,7 @@ export {
   validateInitOptions,
   isOptionsObject,
   type Logger,
+  type CircuitBreakerOptions,
   type TrembitaInitOptions
 } from './validate.js';
 export { HTTP_CREATED, HTTP_OK, DEFAULT_EXPECTED_CODES } from './constants.js';
