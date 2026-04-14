@@ -1,4 +1,6 @@
-branch: main
+branches:
+  - main
+  - master
 ci: false
 dryRun: false
 debug: false
