@@ -1,105 +1,92 @@
-# trembita-js
+# trembita
 
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-[![GitHub Actions Status](https://github.com/oleg-koval/trembita/workflows/Code%20Quality/badge.svg?branch=master)](https://github.com/oleg-koval/trembita/actions)
-[![Coverage Status](https://coveralls.io/repos/github/oleg-koval/trembita/badge.svg?branch=master)](https://coveralls.io/github/oleg-koval/trembita?branch=master)
-[![JavaScript Style Guide: Good Parts](https://img.shields.io/badge/code%20style-goodparts-brightgreen.svg?style=flat)](https://github.com/dwyl/goodparts 'JavaScript The Good Parts')
+[![Code Quality](https://github.com/oleg-koval/trembita/actions/workflows/code-quality.yml/badge.svg?branch=main)](https://github.com/oleg-koval/trembita/actions/workflows/code-quality.yml)
+[![Coverage Status](https://coveralls.io/repos/github/oleg-koval/trembita/badge.svg?branch=main)](https://coveralls.io/github/oleg-koval/trembita?branch=main)
 [![npm version](https://img.shields.io/npm/v/trembita/latest.svg)](https://www.npmjs.com/package/trembita)
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
+[![API docs](https://img.shields.io/badge/docs-GitHub%20Pages-24292e)](https://oleg-koval.github.io/trembita/)
 
-> Request wrapper core for consuming third party services.
+Small **TypeScript** helper for calling third-party **HTTP JSON** APIs:
+**`fetch`**, strict **`Result`** types, **no** legacy `request` / Bluebird
+stack.
 
-Whenever you need to communicate with third party API to get or save data from
-own codebase, you would have to perform a set of common steps such as login,
-query, etc. Trembita.js is doing the same by abstracting the innards of the
-actual REST calls to third-party API and exposing only the developer relevant
-details. Trembita.js supports plugins which are API connectors that are exposing
-methods for API communication. Each plugin is describing another third-party
-service. It performs these commonly used functions - creates requests, parses
-responses, handles errors etc.
+## Functional style
 
-The goal of this module is not only to provide you with a simple interface but
-the implementation of commonly used tools out of the box. This is a core module
-to reuse with plugins each for a different third-party service.
+The API is **functional-first**: `createTrembita` returns a **`Result`**, then
+plain **`client` / `request`** functions—no class instance. Expected failures
+use **tagged errors** (`error.kind`) so callers narrow with types instead of
+relying on **`try/catch`** for normal HTTP outcomes. Where it stays honest
+without I/O, helpers use **`Result`** too (options, URLs, JSON parsing).
 
-Trembita API wrapper plugin lets you call itself instead of the API directly.
-Well what happens if you want to change from one API to another? Now you have
-to rewrite ALL of your code. If you used a wrapper then all you have to do is
-change the wrapper and you are done.
+This is **not** pure FP end-to-end: **`fetch`**, the network, and logging are
+ordinary side effects. Think **FP-style errors and surface area**, not a fully
+pure program.
 
-## Table of Contents
+## Requirements
 
-- [Install](#install)
-- [Usage](#usage)
-- [Contribute](#contribute)
-- [License](#license)
+- **Node** >= 20.10 (Active LTS recommended).
+- **Browser**: bundler + global **`fetch`** and **`URL`** (same ESM entry).
 
 ## Install
-
-Using npm:
 
 ```shell
 npm install trembita
 ```
 
-Using yarn:
-
-```shell
-yarn add trembita
-```
-
 ## Usage
 
-Trembita is not supposed to be used directly, rather than to develop plugins/clients.
+```typescript
+import { createTrembita, HTTP_OK } from 'trembita';
 
-In order you can use a third party service by implementing your plugin, make
-sure you fill the next requirements:
+const created = createTrembita({
+  endpoint: 'https://api.example.com/v1'
+});
 
-- Extend Trembita module.
-- Construct the plugin by implementing the properties inherited from Trembita
-  module.
-- Define the methods that contains the logic that expose third party library
-  logic you want to use.
+if (!created.ok) {
+  console.error(created.error);
+  process.exit(1);
+}
 
-One example of usage would be:
+const { request, client } = created.value;
 
-```js
-const clientOptions = {
-  headers: {
-    header1: 'xxx',
-    header2: 'yyy'
-  },
-  endpoint: 'http://serviceapi.com'
-};
+const users = await request({
+  path: '/users',
+  query: { page: '2' },
+  expectedCodes: [HTTP_OK]
+});
 
-const MyAPIClient = class MyAPIClient extends Trembita {
-  constructor(options) {
-    super(...arguments);
-
-    this.getData = paramsQueryString => {
-      const params = {
-        url: `api/path/`,
-        qs: paramsQueryString,
-        expectedCodes: [200, 401, 403, 404],
-        headers: {
-          header1: this.header1,
-          header2: this.header2
-        }
-      };
-      return this.request(params);
-    };
+if (!users.ok) {
+  if (users.error.kind === 'unexpected_status') {
+    console.error(users.error.statusCode, users.error.body);
   }
-};
+  process.exit(1);
+}
 
-const client = new MyAPIClient(clientOptions);
+console.log(users.value);
+
+// Lower level: status + parsed JSON body
+const raw = await client({ url: '/health' });
+if (raw.ok) {
+  console.log(raw.value.statusCode, raw.value.body);
+}
 ```
+
+## Migration from v1.x
+
+| v1                                                     | v2                                                                                                                      |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `const T = require('trembita')` / `new Trembita(opts)` | `import { createTrembita } from 'trembita'` then **`createTrembita(opts)`** → **`Result`**                              |
+| `this.request({ url, qs, expectedCodes })` throwing    | `request({ path or url, query or qs, expectedCodes })` → **`Promise<Result<unknown, TrembitaRequestError>>`**           |
+| `catch (UnexpectedStatusCodeError)`                    | Narrow **`!result.ok`** and check **`result.error.kind === 'unexpected_status'`** (prefer **`kind`**, not message text) |
+| `request` / `bluebird` / `validator`                   | **`fetch`**, **`URL`**, optional **`fetchImpl`** for tests                                                              |
+
+See **`SPEC.md`** and **`CHANGELOG.md`** for design notes and release semantics
+(**semantic-release** +
+[semantic-release-npm-github-publish](https://oleg-koval.github.io/semantic-release-npm-github-publish/)).
 
 ## Contribute
 
-See [the contribute file](CONTRIBUTING.md)!
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-MIT © 2018
+MIT © 2018–2026

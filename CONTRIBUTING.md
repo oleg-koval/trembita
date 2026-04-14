@@ -1,5 +1,13 @@
 # Contributing
 
+## API documentation (GitHub Pages)
+
+TypeDoc output is published by **Deploy GitHub Pages**
+(`.github/workflows/pages.yml`) on pushes to `main` or `master`. In the
+repository **Settings → Pages**, set **Build and deployment** to **GitHub
+Actions** (not “Deploy from a branch”). After the first successful run, the site
+is at <https://oleg-koval.github.io/trembita/>.
+
 ## Versions
 
 In order to contribute make sure that you add a version tag using the following

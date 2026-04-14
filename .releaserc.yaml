@@ -1,5 +1,5 @@
-branch: master
+branch: main
 ci: false
 dryRun: false
 debug: false
-extends: "semantic-release-npm-github-publish"
+extends: 'semantic-release-npm-github-publish'
