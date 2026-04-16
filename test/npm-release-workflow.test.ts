@@ -143,10 +143,24 @@ describe('npm-release.yml workflow', () => {
       const registryUrlLine = workflowLines.find(
         (l) => l.includes('registry-url') && isYamlConfigLine(l)
       );
-      // registry-url value is on the next line; find the continuation line with the expression
-      const registryUrlValueLine = workflowLines.find(
-        (l) => l.includes("secrets.NPM_TOKEN != ''") && l.includes('registry.npmjs.org')
-      );
+      // registry-url value is on the next line; find the continuation line with the expression.
+      // Parse the quoted URL and verify its host explicitly to avoid brittle substring matching.
+      const registryUrlValueLine = workflowLines.find((l) => {
+        if (!l.includes("secrets.NPM_TOKEN != ''")) {
+          return false;
+        }
+
+        const quotedUrlMatch = l.match(/'([^']+)'/);
+        if (!quotedUrlMatch) {
+          return false;
+        }
+
+        try {
+          return new URL(quotedUrlMatch[1]).host === 'registry.npmjs.org';
+        } catch {
+          return false;
+        }
+      });
       const alwaysAuthLine = workflowLines.find(
         (l) => l.includes('always-auth') && isYamlConfigLine(l)
       );
