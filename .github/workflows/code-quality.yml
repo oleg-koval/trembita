@@ -27,6 +27,12 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run format
+      - name: OpenAPI fixture types match committed output
+        run: |
+          npm run gen:fixtures --workspace=@trembita/openapi
+          git diff --exit-code packages/openapi/fixtures/mini-api.paths.ts
+      - name: Check openapi-fetch upstream FetchResponse contract
+        run: npm run check:openapi-fetch-types
 
   test:
     runs-on: ubuntu-latest
@@ -40,6 +46,8 @@ jobs:
       - run: npm audit
       - run: npm test
       - run: npm run build
+      - name: Dogfood OpenAPI example (file-linked workspace packages)
+        run: npm run verify:openapi-dogfood
       - name: Coveralls
         uses: coverallsapp/github-action@v2
         with:

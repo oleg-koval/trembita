@@ -1,5 +1,6 @@
 /.envrc
 /dist/
+packages/openapi/dist/
 /site/
 .DS_Store
 coverage.lcov
@@ -17,6 +18,9 @@ yarn-error.log*
 
 # Dependency directories
 node_modules
+
+# Example installs (dogfood CI uses npm install without committing locks)
+examples/**/package-lock.json
 
 # Output of 'npm pack'
 *.tgz

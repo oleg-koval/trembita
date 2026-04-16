@@ -1,0 +1,53 @@
+{
+  "name": "@trembita/openapi",
+  "version": "0.0.0-development",
+  "description": "OpenAPI path helpers for trembita (spike workspace)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oleg-koval/trembita.git",
+    "directory": "packages/openapi"
+  },
+  "license": "MIT",
+  "type": "module",
+  "private": false,
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "files": ["dist"],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --sourcemap --clean --treeshake",
+    "gen:fixtures": "openapi-typescript fixtures/mini-api.openapi.yaml -o fixtures/mini-api.paths.ts",
+    "spike:bundle": "node ./scripts/spike-bundle-metrics.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "peerDependencies": {
+    "trembita": "^2.0.0"
+  },
+  "devDependencies": {
+    "trembita": "file:../..",
+    "@eslint/js": "^9.24.0",
+    "@vitest/coverage-v8": "^3.1.1",
+    "eslint": "^9.24.0",
+    "openapi-typescript": "^7.13.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.29.1",
+    "vitest": "^3.1.1"
+  }
+}

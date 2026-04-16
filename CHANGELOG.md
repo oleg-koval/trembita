@@ -1,5 +1,12 @@
 ## [2.0.0](https://github.com/oleg-koval/trembita) (unreleased)
 
+### Features
+
+- **`@trembita/openapi`** — published workspace package: `expandOpenapiPath`,
+  **`requestOpenapiPath`**, OpenAPI fixture + `openapi-typescript` types in CI,
+  optional **Standard Schema** / retry / trace re-exports (see package README).
+  Install: `npm install trembita @trembita/openapi` (peer **`trembita` ^2**).
+
 ### ⚠ BREAKING CHANGES
 
 - **ESM-only** published API (`import` from `trembita`). CommonJS `require()` is

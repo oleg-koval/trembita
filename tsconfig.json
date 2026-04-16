@@ -22,6 +22,7 @@
     "src/**/*.ts",
     "test/**/*.ts",
     "vitest.config.ts",
-    "eslint.config.js"
+    "eslint.config.js",
+    "packages/openapi/src/**/*.ts"
   ]
 }
