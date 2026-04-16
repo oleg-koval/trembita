@@ -21,10 +21,18 @@ config publishes **two** packages from one run:
 
 **Prerequisites**
 
-- **`NPM_TOKEN`** in repo secrets with permission to publish both the unscoped
-  **`trembita`** package and the scoped **`@trembita/openapi`** package.
+- **Trusted Publishing (recommended):** On npmjs.com, configure **Trusted
+  Publishers** (GitHub Actions OIDC) for **both** **`trembita`** and
+  **`@trembita/openapi`**. If only the root package is linked, the OpenAPI
+  publish step can fall back to **`NPM_TOKEN`** and fail with **EOTP** when your
+  npm account has 2FA (one-time password cannot be entered in CI).
+- **Optional `NPM_TOKEN`:** A repo secret used for bootstrap or when OIDC is
+  unavailable for a package. For CI without interactive 2FA, use an npm
+  **Granular access token** (type **Automation**) with publish rights to both
+  packages, or rely on OIDC only and **omit** `NPM_TOKEN` once both packages
+  have Trusted Publishers (see comments in `.github/workflows/npm-release.yml`).
 - Create the **npm org / scope** `@trembita` if it does not exist, and ensure
-  the token’s user is a member with publish rights.
+  maintainers can publish **`@trembita/openapi`**.
 - **`publishConfig.access: public`** is already set on **`@trembita/openapi`**
   so scoped packages are public on the registry.
 

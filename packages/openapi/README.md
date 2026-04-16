@@ -119,9 +119,10 @@ npm run spike:openapi
 
 **Published** alongside **`trembita`**: the same **semantic-release** workflow
 runs a second **`@semantic-release/npm`** step with
-**`pkgRoot: packages/openapi`**. Ensure your **npm** account can publish the
-**`@trembita`** scope and that **`NPM_TOKEN`** has access to both packages (see
-[CONTRIBUTING.md](../../CONTRIBUTING.md)).
+**`pkgRoot: packages/openapi`**. Configure **Trusted Publishing** for
+**`@trembita/openapi`** on npm (not only the root **`trembita`** package), or CI
+may fall back to **`NPM_TOKEN`** and return **EOTP** if your npm account uses
+2FA. Details: [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 **Peer dependency:** consumers should install **`trembita` ^2** next to
 **`@trembita/openapi`** (`peerDependencies` in published manifest; this repo
