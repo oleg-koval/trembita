@@ -227,8 +227,8 @@ Every operation returns a `Result<T, E>` — either `{ ok: true, value }` or
 
 Full TypeDoc documentation is published at
 [oleg-koval.github.io/trembita](https://oleg-koval.github.io/trembita/) (core
-**`trembita`** entry only). **`@trembita/openapi`** types are published with that
-package — see [packages/openapi/README.md](packages/openapi/README.md).
+**`trembita`** entry only). **`@trembita/openapi`** types are published with
+that package — see [packages/openapi/README.md](packages/openapi/README.md).
 
 ### `createTrembita(options)`
 
