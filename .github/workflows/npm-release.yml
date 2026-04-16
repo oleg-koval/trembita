@@ -30,8 +30,11 @@ jobs:
       - run: npm audit
       - run: npm run build
       - run: npm test
+      # Trusted publishing + provenance need npm CLI >= 11.5.1 (see npm trusted-publishers docs).
+      - run: npm install -g npm@latest
       - env:
           CI: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'
         run: npx semantic-release
