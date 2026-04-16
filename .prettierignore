@@ -2,3 +2,5 @@ package.json
 package-lock.json
 dist
 coverage
+# openapi-typescript output; must match CLI exactly for gen:fixtures CI drift check
+packages/openapi/fixtures/mini-api.paths.ts
