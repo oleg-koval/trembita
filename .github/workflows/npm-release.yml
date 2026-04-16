@@ -8,8 +8,8 @@ name: Release to NPM
 #   You must pass NODE_AUTH_TOKEN into that same step; otherwise setup-node falls
 #   back to a placeholder token and npm returns E401 / invalid token.
 # - After configuring Trusted Publisher on npmjs.com, remove NPM_TOKEN from repo
-#   secrets; the conditionals then omit registry-url/always-auth so npm uses OIDC
-#   only (per gist steps 12–14).
+#   secrets; the conditionals then omit registry-url/always-auth so npm uses OIDC only
+#   (per gist steps 12–14).
 
 on:
   push:
