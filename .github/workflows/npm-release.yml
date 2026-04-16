@@ -1,21 +1,29 @@
 name: Release to NPM
 
+# npm Trusted Publishing (OIDC) + first-time token bootstrap:
+# https://gist.github.com/kettanaito/debde3cabfae4f68d37cf0f8f3a6a666
+#
+# - Node 24+ is required for Trusted Publishing on the npm side.
+# - While the NPM_TOKEN secret is set, setup-node uses registry-url + always-auth
+#   so the first publish can authenticate. After configuring Trusted Publisher on
+#   npmjs.com, remove NPM_TOKEN from repo secrets; the conditionals below then
+#   omit registry-url/always-auth so npm uses OIDC only (per gist steps 12–14).
+
 on:
   push:
     branches:
       - main
       - beta
 
-permissions:
-  contents: write
-  issues: write
-  pull-requests: write
-  id-token: write
-
 jobs:
   release:
     name: Release to NPM and GitHub
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,9 +31,10 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: npm
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: ${{ secrets.NPM_TOKEN != '' && 'https://registry.npmjs.org' || '' }}
+          always-auth: ${{ secrets.NPM_TOKEN != '' }}
       - run: npm ci --no-audit
       - run: npm audit
       - run: npm run build
