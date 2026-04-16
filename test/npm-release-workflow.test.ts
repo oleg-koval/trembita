@@ -28,11 +28,11 @@ function findAllLineIndices(predicate: (line: string) => boolean): number[] {
 describe('npm-release.yml workflow', () => {
   describe('trigger configuration', () => {
     it('triggers on push to main branch', () => {
-      expect(workflowContent).toMatch(/branches:\s*\n(\s*-\s*\S+\s*\n)*\s*-\s*main/);
+      expect(workflowContent).toMatch(/^\s*-\s*main\s*$/m);
     });
 
     it('triggers on push to beta branch', () => {
-      expect(workflowContent).toMatch(/branches:\s*\n(\s*-\s*\S+\s*\n)*\s*-\s*beta/);
+      expect(workflowContent).toMatch(/^\s*-\s*beta\s*$/m);
     });
 
     it('does not trigger on pull_request events', () => {
