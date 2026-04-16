@@ -24,6 +24,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit
       - run: npm audit
+      - run: npm run build
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run format
@@ -44,8 +45,8 @@ jobs:
           cache: npm
       - run: npm ci --no-audit
       - run: npm audit
-      - run: npm test
       - run: npm run build
+      - run: npm test
       - name: Dogfood OpenAPI example (file-linked workspace packages)
         run: npm run verify:openapi-dogfood
       - name: Coveralls

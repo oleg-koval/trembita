@@ -44,7 +44,7 @@
     "coverage": "npm run test -- --coverage",
     "format": "prettier --check \"**/*.{ts,md,json,yml,yaml,js,mjs}\"",
     "format:fix": "prettier --write \"**/*.{ts,md,json,yml,yaml,js,mjs}\"",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && npm run typecheck --workspace=@trembita/openapi",
     "lint": "eslint . && npm run lint --workspace=@trembita/openapi",
     "lint:fix": "eslint . --fix && npm run lint:fix --workspace=@trembita/openapi",
     "test": "vitest run --coverage && npm run test --workspace=@trembita/openapi",
