@@ -24,6 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+          npm-version: '11'
           cache: npm
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci --no-audit
@@ -31,7 +32,6 @@ jobs:
       - run: npm run build
       - run: npm test
       # Trusted publishing + provenance need npm CLI >= 11.5.1 (see npm trusted-publishers docs).
-      - run: npm install -g npm@latest
       - env:
           CI: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
