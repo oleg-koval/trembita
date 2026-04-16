@@ -125,7 +125,7 @@ describe('npm-release.yml workflow', () => {
     });
 
     it('registry-url expression uses GitHub Actions expression syntax', () => {
-      expect(workflowContent).toMatch(/registry-url:\s*\$\{\{.*NPM_TOKEN/);
+      expect(workflowContent).toMatch(/registry-url:.*\$\{\{.*NPM_TOKEN/);
     });
   });
 
@@ -143,14 +143,14 @@ describe('npm-release.yml workflow', () => {
       const registryUrlLine = workflowLines.find(
         (l) => l.includes('registry-url') && isYamlConfigLine(l)
       );
-      // registry-url value is on the next line; find the continuation line with the expression.
-      // Parse the quoted URL and verify its host explicitly to avoid brittle substring matching.
+      // Find the line containing the registry-url expression (may be inline or on a continuation line).
+      // Use an https-specific pattern to avoid matching other single-quoted strings like '' or ' && '.
       const registryUrlValueLine = workflowLines.find((l) => {
         if (!l.includes("secrets.NPM_TOKEN != ''")) {
           return false;
         }
 
-        const quotedUrlMatch = l.match(/'([^']+)'/);
+        const quotedUrlMatch = l.match(/'(https?:\/\/[^']+)'/);
         if (!quotedUrlMatch) {
           return false;
         }
