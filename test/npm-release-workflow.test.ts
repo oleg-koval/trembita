@@ -151,12 +151,13 @@ describe('npm-release.yml workflow', () => {
         }
 
         const quotedUrlMatch = l.match(/'(https?:\/\/[^']+)'/);
-        if (!quotedUrlMatch) {
+        const capturedUrl = quotedUrlMatch?.[1];
+        if (!capturedUrl) {
           return false;
         }
 
         try {
-          return new URL(quotedUrlMatch[1]).host === 'registry.npmjs.org';
+          return new URL(capturedUrl).host === 'registry.npmjs.org';
         } catch {
           return false;
         }
