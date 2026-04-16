@@ -1,0 +1,13 @@
+{
+  "name": "trembita-openapi-dogfood",
+  "private": true,
+  "type": "module",
+  "description": "Minimal smoke: trembita + @trembita/openapi (CI dogfood)",
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "dependencies": {
+    "@trembita/openapi": "file:../../packages/openapi",
+    "trembita": "file:../.."
+  }
+}

@@ -1,0 +1,49 @@
+openapi: 3.1.0
+info:
+  title: Trembita spike — mini HTTP API
+  version: '1.0.0'
+paths:
+  /users/{userId}:
+    get:
+      operationId: getUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /repos/{owner}/{repo}/issues/{issue_number}:
+    get:
+      operationId: getIssue
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: issue_number
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true

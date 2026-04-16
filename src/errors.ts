@@ -15,6 +15,17 @@ export type TrembitaSendError =
       reason: 'missing_path' | 'path_not_string';
     }>;
 
+export type StandardSchemaIssue = Readonly<{
+  message: string;
+  path?: readonly PropertyKey[];
+}>;
+
+/** Emitted only by `validateStandardSchema` / `requestWithStandardSchema` helpers. */
+export type TrembitaValidationError = Readonly<{
+  kind: 'validation_failed';
+  issues: readonly StandardSchemaIssue[];
+}>;
+
 export type TrembitaRequestError =
   | TrembitaSendError
   | Readonly<{

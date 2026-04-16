@@ -38,18 +38,21 @@
   },
   "scripts": {
     "postinstall": "node scripts/patch-npm-vendored.mjs",
-    "build": "tsup src/index.ts --format esm --dts --sourcemap --clean --treeshake",
+    "build": "tsup src/index.ts --format esm --dts --sourcemap --clean --treeshake && npm run build --workspace=@trembita/openapi",
     "prepack": "npm run build",
     "clean": "rm -rf node_modules dist coverage",
     "coverage": "npm run test -- --coverage",
-    "format": "prettier --check \"**/*.{ts,md,json,yml,yaml,js}\"",
-    "format:fix": "prettier --write \"**/*.{ts,md,json,yml,yaml,js}\"",
+    "format": "prettier --check \"**/*.{ts,md,json,yml,yaml,js,mjs}\"",
+    "format:fix": "prettier --write \"**/*.{ts,md,json,yml,yaml,js,mjs}\"",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "test": "vitest run --coverage",
+    "lint": "eslint . && npm run lint --workspace=@trembita/openapi",
+    "lint:fix": "eslint . --fix && npm run lint:fix --workspace=@trembita/openapi",
+    "test": "vitest run --coverage && npm run test --workspace=@trembita/openapi",
     "test:watch": "vitest",
     "docs": "typedoc",
+    "spike:openapi": "npm run build && npm run spike:bundle --workspace=@trembita/openapi",
+    "check:openapi-fetch-types": "node scripts/check-openapi-fetch-types.mjs",
+    "verify:openapi-dogfood": "cd examples/openapi-dogfood && npm install && node main.mjs",
     "semantic-release": "semantic-release"
   },
   "devDependencies": {
@@ -70,5 +73,8 @@
     "typescript-eslint": "^8.29.1",
     "vitest": "^3.1.1"
   },
-  "private": false
+  "private": false,
+  "workspaces": [
+    "packages/openapi"
+  ]
 }

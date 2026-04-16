@@ -30,14 +30,12 @@ export default tseslint.config(
   {
     ignores: [
       'dist/**',
-      'site/**',
       'coverage/**',
       'node_modules/**',
       'eslint.config.js',
-      'package-lock.json',
-      'scripts/**',
-      'packages/**',
-      'examples/**'
+      'vitest.config.ts',
+      'fixtures/mini-api.paths.ts',
+      'scripts/**'
     ]
   }
 );

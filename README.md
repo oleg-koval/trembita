@@ -11,6 +11,56 @@ Lightweight **TypeScript HTTP client** for consuming third-party **JSON APIs**.
 Built on the platform **`fetch`** API with strict **`Result<T, E>`** error
 handling — zero legacy dependencies, no `request`, no Bluebird.
 
+_Named after the Carpathian **trembita** — a long signal horn. One small client,
+explicit success/failure at a distance._
+
+**Quick links:** [Install](#install) · [Minimal example](#minimal-example) ·
+[Why trembita](#why-trembita) · [Use cases](#use-cases) ·
+[@trembita/openapi](#trembitaopenapi-optional) ·
+[Error handling](#error-handling) · [API reference](#api-reference) ·
+[Migration from v1](#migration-from-v1)
+
+## Install
+
+```shell
+npm install trembita
+```
+
+Optional OpenAPI helpers (path expansion, `requestOpenapiPath`, Standard Schema
+re-exports) live in **`@trembita/openapi`**:
+
+```shell
+npm install trembita @trembita/openapi
+```
+
+See [packages/openapi/README.md](packages/openapi/README.md).
+
+## Requirements
+
+- **Node** >= 20.10 (Active LTS recommended).
+- **Browser**: bundler + global **`fetch`** and **`URL`** (same ESM entry).
+
+## Minimal example
+
+Uses `throw` on bad init so the same snippet works in **Node and browsers** (no
+`process.exit`).
+
+```typescript
+import { createTrembita, HTTP_OK } from 'trembita';
+
+const api = createTrembita({ endpoint: 'https://api.example.com/v1' });
+if (!api.ok) throw new Error('Invalid endpoint');
+
+const json = await api.value.request({
+  path: '/resource',
+  expectedCodes: [HTTP_OK]
+});
+
+if (!json.ok) {
+  console.error(json.error.kind);
+}
+```
+
 ## Why trembita
 
 - **Type-safe errors** — every failure is a tagged discriminated union
@@ -105,6 +155,16 @@ if (!api.ok) {
 }
 ```
 
+### @trembita/openapi (optional)
+
+Use **`openapi-typescript`** `paths` for templates, then **`expandOpenapiPath`**
+or **`requestOpenapiPath`** so path mistakes stay in **`Result`** before HTTP.
+The add-on package re-exports **`validateStandardSchema`**,
+**`requestWithStandardSchema`**, **`createRetryingFetch`**, and
+**`traceContextHeaders`** for one import line. Full notes, bundle spike, and
+**`openapi-fetch`** positioning:
+[packages/openapi/README.md](packages/openapi/README.md).
+
 ### Testing with injected fetch
 
 Pass a mock `fetchImpl` to test your integration layer without touching the
@@ -166,7 +226,9 @@ Every operation returns a `Result<T, E>` — either `{ ok: true, value }` or
 ## API reference
 
 Full TypeDoc documentation is published at
-[oleg-koval.github.io/trembita](https://oleg-koval.github.io/trembita/).
+[oleg-koval.github.io/trembita](https://oleg-koval.github.io/trembita/) (core
+**`trembita`** entry only). **`@trembita/openapi`** types are published with that
+package — see [packages/openapi/README.md](packages/openapi/README.md).
 
 ### `createTrembita(options)`
 
@@ -208,6 +270,18 @@ Sends a request and returns `{ statusCode, body, path }` regardless of status.
 
 Returns `Promise<Result<TrembitaHttpResponse, TrembitaSendError>>`.
 
+### Standard Schema, retries, tracing (core)
+
+These ship from **`trembita`** and are also re-exported from
+**`@trembita/openapi`** for OpenAPI-shaped call sites:
+
+| Export                          | Role                                                                                                                 |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **`validateStandardSchema`**    | Run a [Standard Schema](https://github.com/standard-schema/standard-schema) v1 `validate` → **`Result`** (no throw). |
+| **`requestWithStandardSchema`** | `request` + optional response body validation.                                                                       |
+| **`createRetryingFetch`**       | Wrap `fetch` with backoff retries for status / transport failures.                                                   |
+| **`traceContextHeaders`**       | Build `traceparent` / `tracestate` headers (W3C Trace Context).                                                      |
+
 ### Request options
 
 | Option          | Type                          | Default                  |
@@ -242,6 +316,14 @@ This version line is a **breaking v2 migration** to the functional `Result` API.
 | `this.request({ url, qs, expectedCodes })` throwing    | `request({ path or url, query or qs, expectedCodes })` → **`Promise<Result<unknown, TrembitaRequestError>>`**           |
 | `catch (UnexpectedStatusCodeError)`                    | Narrow **`!result.ok`** and check **`result.error.kind === 'unexpected_status'`** (prefer **`kind`**, not message text) |
 | `request` / `bluebird` / `validator`                   | **`fetch`**, **`URL`**, optional **`fetchImpl`** for tests                                                              |
+
+### @trembita/openapi (new in v2 line)
+
+| Topic       | Action                                                                                                                                                                                                           |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Install     | `npm install trembita @trembita/openapi` — **`trembita` is a peer dependency** (^2) of the OpenAPI package.                                                                                                      |
+| Path typing | Generate `paths` with **`openapi-typescript`**, keep templates aligned with `keyof paths`, expand with **`Result`**.                                                                                             |
+| Publishing  | Same **semantic-release** run publishes **`trembita`** (repo root) then **`@trembita/openapi`** (`packages/openapi`). Ensure **npm** scope **`@trembita`** exists and **`NPM_TOKEN`** can publish both packages. |
 
 ## Contribute
 
