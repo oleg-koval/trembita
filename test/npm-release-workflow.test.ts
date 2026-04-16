@@ -131,7 +131,9 @@ describe('npm-release.yml workflow', () => {
 
   describe('setup-node: always-auth conditional (NPM Trusted Publishing)', () => {
     it('always-auth is set conditionally based on NPM_TOKEN secret', () => {
-      expect(workflowContent).toContain("always-auth: ${{ secrets.NPM_TOKEN != '' }}");
+      expect(workflowContent).toContain(
+        "always-auth: ${{ secrets.NPM_TOKEN != '' }}"
+      );
     });
 
     it('always-auth and registry-url use the same NPM_TOKEN condition', () => {
@@ -294,7 +296,9 @@ describe('npm-release.yml workflow', () => {
 
     it('test step runs before semantic-release step', () => {
       const testIdx = findLineIndex((l) => /run: npm test/.test(l));
-      const releaseIdx = findLineIndex((l) => l.includes('npx semantic-release'));
+      const releaseIdx = findLineIndex((l) =>
+        l.includes('npx semantic-release')
+      );
       expect(testIdx).toBeGreaterThan(-1);
       expect(releaseIdx).toBeGreaterThan(-1);
       expect(releaseIdx).toBeGreaterThan(testIdx);

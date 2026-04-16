@@ -319,11 +319,11 @@ This version line is a **breaking v2 migration** to the functional `Result` API.
 
 ### @trembita/openapi (new in v2 line)
 
-| Topic       | Action                                                                                                                                                                                                           |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Install     | `npm install trembita @trembita/openapi` — **`trembita` is a peer dependency** (^2) of the OpenAPI package.                                                                                                      |
-| Path typing | Generate `paths` with **`openapi-typescript`**, keep templates aligned with `keyof paths`, expand with **`Result`**.                                                                                             |
-| Publishing  | Same **semantic-release** run publishes **`trembita`** (repo root) then **`@trembita/openapi`** (`packages/openapi`). Ensure **npm** scope **`@trembita`** exists and **`NPM_TOKEN`** can publish both packages. |
+| Topic       | Action                                                                                                                                                                                                                                                                                                                                                    |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Install     | `npm install trembita @trembita/openapi` — **`trembita` is a peer dependency** (^2) of the OpenAPI package.                                                                                                                                                                                                                                               |
+| Path typing | Generate `paths` with **`openapi-typescript`**, keep templates aligned with `keyof paths`, expand with **`Result`**.                                                                                                                                                                                                                                      |
+| Publishing  | Same **semantic-release** run publishes **`trembita`** then **`@trembita/openapi`**. Use **Trusted Publishing** for **both** packages on npm (or an **Automation** granular token); see [CONTRIBUTING.md](CONTRIBUTING.md). If only `trembita` has OIDC and **`NPM_TOKEN`** is set, OpenAPI may fall back to token auth and fail with **EOTP** under 2FA. |
 
 ## Contribute
 
