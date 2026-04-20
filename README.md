@@ -62,38 +62,32 @@ if (!json.ok) {
 }
 ```
 
-## Learning Guide
+## Learning Path
 
-**New to trembita?** Start here:
+**Choose your starting point based on available time:**
 
-- **[LEARNING_GUIDE.md](./LEARNING_GUIDE.md)** — Complete guide covering:
-  - Core concepts (functional API, `Result` pattern, zero dependencies)
-  - Building typed REST clients
-  - Error handling strategies
-  - Testing with mock fetch
-  - Advanced features (retries, circuit breaker, tracing)
-  - Common patterns and FAQs
+### ⚡ Super Quick (2 minutes)
+**[QUICK_START.md](./QUICK_START.md)** — Install, 3-step example, common patterns, error types, FAQ.
 
-- **[EXAMPLES.md](./EXAMPLES.md)** — Real-world use cases:
-  - GitHub API client
-  - Payment processing (Stripe-like)
-  - Microservice communication
-  - Health check monitoring
-  - Webhook delivery with retries
-  - Search service client
-  - Database backup integration
+### 🎓 Complete Learning (30 minutes)
+**[LEARNING_GUIDE.md](./LEARNING_GUIDE.md)** — Core concepts, building clients, error handling, testing, advanced features, patterns.
 
-## Examples
+### 🏗️ System Design (15 minutes)
+**[ARCHITECTURE.md](./ARCHITECTURE.md)** — Visual diagrams, request pipeline, error flow, feature matrix, integration patterns.
 
-Copy-paste-ready code examples:
+### 🤔 Right Tool for You? (10 minutes)
+**[DECISION_GUIDE.md](./DECISION_GUIDE.md)** — Compare with Axios/Got/Fetch, scenario-based recommendations, migration guides.
 
-| File | Purpose |
-|------|---------|
-| **[examples/rest-api-client.ts](./examples/rest-api-client.ts)** | Complete CRUD client for a TODO API |
-| **[examples/testing-with-mock-fetch.test.ts](./examples/testing-with-mock-fetch.test.ts)** | Unit test patterns without network calls |
-| **[examples/resilience-patterns.ts](./examples/resilience-patterns.ts)** | Retries, circuit breaker, failover, bulkheads |
+### 💡 Real-World Examples (varies)
+**[EXAMPLES.md](./EXAMPLES.md)** — 7+ use cases: GitHub API, payments, microservices, health checks, webhooks, search, backups.
 
-See [examples/README.md](./examples/README.md) for more.
+### 📝 Starter Code
+**[examples/](./examples/)** directory — Copy-paste ready:
+- `rest-api-client.ts` — Complete CRUD client
+- `testing-with-mock-fetch.test.ts` — Unit test patterns
+- `resilience-patterns.ts` — Retries, circuit breaker, failover
+
+**See [examples/README.md](./examples/README.md) for navigation.**
 
 ## Why trembita
 
