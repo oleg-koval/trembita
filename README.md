@@ -15,6 +15,7 @@ _Named after the Carpathian **trembita** — a long signal horn. One small clien
 explicit success/failure at a distance._
 
 **Quick links:** [Install](#install) · [Minimal example](#minimal-example) ·
+[Learning guide](#learning-guide) · [Examples](#examples) ·
 [Why trembita](#why-trembita) · [Use cases](#use-cases) ·
 [@trembita/openapi](#trembitaopenapi-optional) ·
 [Error handling](#error-handling) · [API reference](#api-reference) ·
@@ -60,6 +61,39 @@ if (!json.ok) {
   console.error(json.error.kind);
 }
 ```
+
+## Learning Guide
+
+**New to trembita?** Start here:
+
+- **[LEARNING_GUIDE.md](./LEARNING_GUIDE.md)** — Complete guide covering:
+  - Core concepts (functional API, `Result` pattern, zero dependencies)
+  - Building typed REST clients
+  - Error handling strategies
+  - Testing with mock fetch
+  - Advanced features (retries, circuit breaker, tracing)
+  - Common patterns and FAQs
+
+- **[EXAMPLES.md](./EXAMPLES.md)** — Real-world use cases:
+  - GitHub API client
+  - Payment processing (Stripe-like)
+  - Microservice communication
+  - Health check monitoring
+  - Webhook delivery with retries
+  - Search service client
+  - Database backup integration
+
+## Examples
+
+Copy-paste-ready code examples:
+
+| File | Purpose |
+|------|---------|
+| **[examples/rest-api-client.ts](./examples/rest-api-client.ts)** | Complete CRUD client for a TODO API |
+| **[examples/testing-with-mock-fetch.test.ts](./examples/testing-with-mock-fetch.test.ts)** | Unit test patterns without network calls |
+| **[examples/resilience-patterns.ts](./examples/resilience-patterns.ts)** | Retries, circuit breaker, failover, bulkheads |
+
+See [examples/README.md](./examples/README.md) for more.
 
 ## Why trembita
 
