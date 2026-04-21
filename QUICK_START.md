@@ -2,7 +2,9 @@
 
 ## What is Trembita?
 
-A **lightweight TypeScript HTTP client** that handles errors safely without exceptions:
+A **lightweight TypeScript HTTP client** that handles errors safely without
+exceptions:
+
 - ✅ `Result<T, E>` instead of try/catch
 - ✅ Zero dependencies (stdlib fetch only)
 - ✅ Type-safe error handling
@@ -49,6 +51,7 @@ if (result.ok) {
 ## Common Patterns
 
 ### POST request
+
 ```typescript
 await client.request({
   path: '/repos',
@@ -59,6 +62,7 @@ await client.request({
 ```
 
 ### With query params
+
 ```typescript
 await client.request({
   path: '/search',
@@ -67,14 +71,16 @@ await client.request({
 ```
 
 ### With headers
+
 ```typescript
 await client.request({
   path: '/me',
-  headers: { 'Authorization': `Bearer ${token}` }
+  headers: { Authorization: `Bearer ${token}` }
 });
 ```
 
 ### With retries
+
 ```typescript
 import { createRetryingFetch } from 'trembita';
 
@@ -91,6 +97,7 @@ const api = createTrembita({
 ```
 
 ### With circuit breaker
+
 ```typescript
 const api = createTrembita({
   endpoint: '...',
@@ -102,6 +109,7 @@ const api = createTrembita({
 ```
 
 ### Testing (no global mocks)
+
 ```typescript
 const mockFetch = vi.fn(() =>
   Promise.resolve(new Response(JSON.stringify({ id: 1 }), { status: 200 }))
@@ -115,28 +123,28 @@ const api = createTrembita({
 
 ## Error Types
 
-| Error | Meaning |
-|-------|---------|
-| `missing_endpoint` | No endpoint in options |
-| `endpoint_invalid_url` | Endpoint URL is malformed |
-| `fetch_failed` | Network error |
-| `timeout` | Request exceeded timeout |
-| `unexpected_status` | Status not in expectedCodes |
-| `invalid_json` | Response isn't JSON |
-| `circuit_open` | Circuit breaker triggered |
+| Error                  | Meaning                     |
+| ---------------------- | --------------------------- |
+| `missing_endpoint`     | No endpoint in options      |
+| `endpoint_invalid_url` | Endpoint URL is malformed   |
+| `fetch_failed`         | Network error               |
+| `timeout`              | Request exceeded timeout    |
+| `unexpected_status`    | Status not in expectedCodes |
+| `invalid_json`         | Response isn't JSON         |
+| `circuit_open`         | Circuit breaker triggered   |
 
 ## Key Differences from Other Clients
 
-| Feature | Trembita | Axios | Node-fetch | `fetch` |
-|---------|----------|-------|-----------|---------|
-| Zero deps | ✅ | ❌ | ❌ | ✅ |
-| Result<T,E> | ✅ | ❌ | ❌ | ❌ |
-| Retries built-in | ✅ | ❌ | ❌ | ❌ |
-| Circuit breaker | ✅ | ❌ | ❌ | ❌ |
-| Injectable fetch | ✅ | ❌ | N/A | N/A |
-| TypeScript first | ✅ | ❌ | ❌ | ✅ |
-| ESM only | ✅ | ❌ | ✅ | ✅ |
-| Tiny bundle | ✅ | ❌ | ❌ | ✅ |
+| Feature          | Trembita | Axios | Node-fetch | `fetch` |
+| ---------------- | -------- | ----- | ---------- | ------- |
+| Zero deps        | ✅       | ❌    | ❌         | ✅      |
+| Result<T,E>      | ✅       | ❌    | ❌         | ❌      |
+| Retries built-in | ✅       | ❌    | ❌         | ❌      |
+| Circuit breaker  | ✅       | ❌    | ❌         | ❌      |
+| Injectable fetch | ✅       | ❌    | N/A        | N/A     |
+| TypeScript first | ✅       | ❌    | ❌         | ✅      |
+| ESM only         | ✅       | ❌    | ✅         | ✅      |
+| Tiny bundle      | ✅       | ❌    | ❌         | ✅      |
 
 ## Learn More
 
@@ -148,7 +156,8 @@ const api = createTrembita({
 ## FAQ
 
 **Q: Why no exceptions?**  
-A: Exceptions hide error paths. `Result` forces you to handle both success and failure.
+A: Exceptions hide error paths. `Result` forces you to handle both success and
+failure.
 
 **Q: Can I use in the browser?**  
 A: Yes! ESM + bundler (Vite, webpack, esbuild) + global `fetch` and `URL`.
@@ -160,7 +169,8 @@ A: Pass a `log` option with trace/debug/info/warn/error methods.
 A: Yes! Wrap request options or inject custom `fetchImpl` for middleware.
 
 **Q: Does it do GraphQL?**  
-A: No, it's REST-focused. For GraphQL, use `@apollo/client` or `graphql-request`.
+A: No, it's REST-focused. For GraphQL, use `@apollo/client` or
+`graphql-request`.
 
 ---
 

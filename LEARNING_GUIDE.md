@@ -1,6 +1,7 @@
 # Trembita Learning Guide
 
-Learn to build type-safe, error-handling HTTP clients with **trembita** — from basics to advanced patterns.
+Learn to build type-safe, error-handling HTTP clients with **trembita** — from
+basics to advanced patterns.
 
 ## Table of Contents
 
@@ -20,13 +21,18 @@ Learn to build type-safe, error-handling HTTP clients with **trembita** — from
 Trembita enforces **three principles**:
 
 ### 1. **Functional API (no classes)**
+
 Instead of `new Client()`, you call factory functions:
+
 ```typescript
 const result = createTrembita({ endpoint: '...' });
 ```
 
 ### 2. **`Result<T, E>` for errors (no exceptions)**
-Every operation returns either `{ ok: true, value }` or `{ ok: false, error }`. No `try/catch` for normal HTTP outcomes:
+
+Every operation returns either `{ ok: true, value }` or `{ ok: false, error }`.
+No `try/catch` for normal HTTP outcomes:
+
 ```typescript
 const response = await client.request({ path: '/' });
 if (!response.ok) {
@@ -35,18 +41,22 @@ if (!response.ok) {
 ```
 
 ### 3. **Stdlib-first (zero dependencies)**
-Uses only `fetch` and `URL` from Node/browser. Inject your own `fetchImpl` for testing—no global mocking.
+
+Uses only `fetch` and `URL` from Node/browser. Inject your own `fetchImpl` for
+testing—no global mocking.
 
 ---
 
 ## Getting Started
 
 ### Install
+
 ```bash
 npm install trembita
 ```
 
 ### Minimal example (1 minute)
+
 ```typescript
 import { createTrembita, HTTP_OK } from 'trembita';
 
@@ -69,6 +79,7 @@ if (repos.ok) {
 ```
 
 **3 key steps:**
+
 1. `createTrembita()` → validates options, returns `Result`
 2. `.request()` → `Promise<Result<unknown, TrembitaRequestError>>`
 3. Check `.ok` to narrow the type
@@ -82,12 +93,11 @@ if (repos.ok) {
 A simple discriminated union that forces you to handle both success and failure:
 
 ```typescript
-type Result<T, E> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
+type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 ```
 
 **Why?** TypeScript narrows the type when you check `.ok`:
+
 ```typescript
 const r = await client.request({ path: '/' });
 
@@ -130,21 +140,22 @@ const data = result.value;
 
 ### Common Error Kinds
 
-| kind                 | Meaning                          | Example                        |
-| -------------------- | -------------------------------- | ------------------------------ |
-| `missing_endpoint`   | No endpoint in options           | `createTrembita({})`           |
-| `endpoint_invalid_url` | Endpoint URL is malformed        | `endpoint: 'not a url'`        |
-| `invalid_request_options` | Missing path or invalid query | `request({ query: 123 })`      |
-| `fetch_failed`       | Network error (DNS, timeout)     | Connection reset               |
-| `timeout`            | Request exceeded `timeoutMs`    | Exceeded 30s                   |
-| `invalid_json`       | Response body isn't JSON         | Response is HTML               |
-| `unexpected_status`  | Status not in `expectedCodes`    | Got 404, expected 200          |
+| kind                      | Meaning                       | Example                   |
+| ------------------------- | ----------------------------- | ------------------------- |
+| `missing_endpoint`        | No endpoint in options        | `createTrembita({})`      |
+| `endpoint_invalid_url`    | Endpoint URL is malformed     | `endpoint: 'not a url'`   |
+| `invalid_request_options` | Missing path or invalid query | `request({ query: 123 })` |
+| `fetch_failed`            | Network error (DNS, timeout)  | Connection reset          |
+| `timeout`                 | Request exceeded `timeoutMs`  | Exceeded 30s              |
+| `invalid_json`            | Response body isn't JSON      | Response is HTML          |
+| `unexpected_status`       | Status not in `expectedCodes` | Got 404, expected 200     |
 
 ---
 
 ## Building a Client
 
 ### Step 1: Create and validate
+
 ```typescript
 import { createTrembita, HTTP_OK, HTTP_CREATED } from 'trembita';
 
@@ -160,6 +171,7 @@ const client = githubApi.value; // now safe to use
 ```
 
 ### Step 2: Define request helpers
+
 ```typescript
 // Encapsulate common patterns
 async function getUser(username: string) {
@@ -173,7 +185,7 @@ async function createIssue(repo: string, title: string, body: string) {
   return client.request({
     path: `/repos/octocat/${repo}/issues`,
     method: 'POST',
-    headers: { 'Authorization': `Bearer ${process.env.GH_TOKEN}` },
+    headers: { Authorization: `Bearer ${process.env.GH_TOKEN}` },
     body: { title, body },
     expectedCodes: [HTTP_CREATED]
   });
@@ -181,12 +193,16 @@ async function createIssue(repo: string, title: string, body: string) {
 ```
 
 ### Step 3: Call and handle
+
 ```typescript
 const user = await getUser('octocat');
 
 if (user.ok) {
   console.log('Login:', user.value.login);
-} else if (user.error.kind === 'unexpected_status' && user.error.statusCode === 404) {
+} else if (
+  user.error.kind === 'unexpected_status' &&
+  user.error.statusCode === 404
+) {
   console.log('User not found');
 } else {
   console.error('Request failed:', user.error.kind);
@@ -194,10 +210,13 @@ if (user.ok) {
 ```
 
 ### Step 4: Type the response (optional)
+
 ```typescript
 type GitHubUser = { login: string; id: number };
 
-async function getUser(username: string): Promise<Result<GitHubUser, TrembitaRequestError>> {
+async function getUser(
+  username: string
+): Promise<Result<GitHubUser, TrembitaRequestError>> {
   const result = await client.request({
     path: `/users/${username}`,
     expectedCodes: [HTTP_OK]
@@ -213,6 +232,7 @@ async function getUser(username: string): Promise<Result<GitHubUser, TrembitaReq
 ## Error Handling
 
 ### Health checks and monitoring
+
 When you need raw status codes:
 
 ```typescript
@@ -231,6 +251,7 @@ if (health.ok) {
 ```
 
 ### Retry logic
+
 Use `createRetryingFetch` to wrap fetch with exponential backoff:
 
 ```typescript
@@ -249,14 +270,15 @@ const api = createTrembita({
 ```
 
 ### Circuit breaker pattern
+
 Prevent cascading failures:
 
 ```typescript
 const api = createTrembita({
   endpoint: 'https://api.example.com',
   circuitBreaker: {
-    failureThreshold: 5,    // open after 5 failures
-    cooldownMs: 30_000      // retry after 30s
+    failureThreshold: 5, // open after 5 failures
+    cooldownMs: 30_000 // retry after 30s
   }
 });
 
@@ -269,6 +291,7 @@ if (!response.ok && response.error.kind === 'circuit_open') {
 ```
 
 ### Logging
+
 Enable structured logging:
 
 ```typescript
@@ -315,7 +338,7 @@ if (result.ok) {
   // result.value is typed as Zod schema type
   console.log(result.value.email);
 } else if (result.error.kind === 'validation_failed') {
-  console.error('Invalid response:', result.error.cause);
+  console.error('Invalid response:', result.error.issues);
 }
 ```
 
@@ -387,15 +410,16 @@ const result = await api.value.request({
 });
 
 expect(result.ok).toBe(true);
-expect(mockFetch).toHaveBeenCalledWith('https://api.test.com/items', expect.any(Object));
+expect(mockFetch).toHaveBeenCalledWith(
+  'https://api.test.com/items',
+  expect.any(Object)
+);
 ```
 
 ### Test error paths
 
 ```typescript
-const mockFetch = vi.fn(() =>
-  Promise.reject(new Error('DNS failure'))
-);
+const mockFetch = vi.fn(() => Promise.reject(new Error('DNS failure')));
 
 const api = createTrembita({
   endpoint: 'https://api.test.com',
@@ -487,14 +511,11 @@ async function fetchWithFallback() {
 ### Pattern 3: Request middleware
 
 ```typescript
-async function withAuth(
-  path: string,
-  token: string
-) {
+async function withAuth(path: string, token: string) {
   return client.request({
     path,
     headers: {
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`
     }
   });
 }
@@ -508,18 +529,18 @@ const data = await withAuth('/protected', process.env.API_TOKEN);
 ```typescript
 async function fetchUsers(ids: number[]) {
   const results = await Promise.all(
-    ids.map(id => client.request({
-      path: `/users/${id}`,
-      expectedCodes: [HTTP_OK, 404]
-    }))
+    ids.map((id) =>
+      client.request({
+        path: `/users/${id}`,
+        expectedCodes: [HTTP_OK, 404]
+      })
+    )
   );
 
-  const users = results
-    .filter(r => r.ok)
-    .map(r => r.value);
+  const users = results.filter((r) => r.ok).map((r) => r.value);
 
   const notFound = results
-    .filter(r => !r.ok && r.error.kind === 'unexpected_status')
+    .filter((r) => !r.ok && r.error.kind === 'unexpected_status')
     .map((r, i) => ids[i]);
 
   return { users, notFound };
@@ -530,26 +551,32 @@ async function fetchUsers(ids: number[]) {
 
 ## Next Steps
 
-- **Browse [examples/](../examples/)** for real-world use cases
-- **Check [API docs](https://oleg-koval.github.io/trembita/)** for full type signatures
-- **Read [CONTRIBUTING.md](../CONTRIBUTING.md)** if you want to contribute
-- **See [SPEC.md](../SPEC.md)** for design decisions
+- **Browse [examples/](./examples/)** for real-world use cases
+- **Check [API docs](https://oleg-koval.github.io/trembita/)** for full type
+  signatures
+- **Read [CONTRIBUTING.md](./CONTRIBUTING.md)** if you want to contribute
+- **See [SPEC.md](./SPEC.md)** for design decisions
 
 ---
 
 ## FAQ
 
 **Q: Why `Result` instead of exceptions?**  
-A: Exceptions hide error cases. `Result` forces you to handle both paths at compile time, making bugs rarer.
+A: Exceptions hide error cases. `Result` forces you to handle both paths at
+compile time, making bugs rarer.
 
 **Q: Can I use this in the browser?**  
-A: Yes—it's ESM and works with any bundler (Vite, webpack, esbuild). Global `fetch` and `URL` required.
+A: Yes—it's ESM and works with any bundler (Vite, webpack, esbuild). Global
+`fetch` and `URL` required.
 
 **Q: Why no middleware?**  
-A: Simple functions are more composable. Wrap `fetchImpl` for retries, or compose request helpers for auth.
+A: Simple functions are more composable. Wrap `fetchImpl` for retries, or
+compose request helpers for auth.
 
 **Q: Can I use this with REST frameworks?**  
-A: Yes. trembita is a **client**, not a server. Use with Next.js, Express, Fastify, etc. to consume APIs.
+A: Yes. trembita is a **client**, not a server. Use with Next.js, Express,
+Fastify, etc. to consume APIs.
 
 **Q: How do I add custom logic between requests?**  
-A: Inject a custom `fetchImpl` that wraps the real fetch, or compose request helpers with shared logic.
+A: Inject a custom `fetchImpl` that wraps the real fetch, or compose request
+helpers with shared logic.

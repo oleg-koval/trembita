@@ -15,9 +15,9 @@ _Named after the Carpathian **trembita** — a long signal horn. One small clien
 explicit success/failure at a distance._
 
 **Quick links:** [Install](#install) · [Minimal example](#minimal-example) ·
-[Learning guide](#learning-guide) · [Examples](#examples) ·
-[Why trembita](#why-trembita) · [Use cases](#use-cases) ·
-[@trembita/openapi](#trembitaopenapi-optional) ·
+[Learning guide](./LEARNING_GUIDE.md) · [Examples](./EXAMPLES.md) ·
+[Agent skill](./SKILL.md) · [Why trembita](#why-trembita) ·
+[Use cases](#use-cases) · [@trembita/openapi](#trembitaopenapi-optional) ·
 [Error handling](#error-handling) · [API reference](#api-reference) ·
 [Migration from v1](#migration-from-v1)
 
@@ -67,22 +67,34 @@ if (!json.ok) {
 **Choose your starting point based on available time:**
 
 ### ⚡ Super Quick (2 minutes)
-**[QUICK_START.md](./QUICK_START.md)** — Install, 3-step example, common patterns, error types, FAQ.
+
+**[QUICK_START.md](./QUICK_START.md)** — Install, 3-step example, common
+patterns, error types, FAQ.
 
 ### 🎓 Complete Learning (30 minutes)
-**[LEARNING_GUIDE.md](./LEARNING_GUIDE.md)** — Core concepts, building clients, error handling, testing, advanced features, patterns.
+
+**[LEARNING_GUIDE.md](./LEARNING_GUIDE.md)** — Core concepts, building clients,
+error handling, testing, advanced features, patterns.
 
 ### 🏗️ System Design (15 minutes)
-**[ARCHITECTURE.md](./ARCHITECTURE.md)** — Visual diagrams, request pipeline, error flow, feature matrix, integration patterns.
+
+**[ARCHITECTURE.md](./ARCHITECTURE.md)** — Visual diagrams, request pipeline,
+error flow, feature matrix, integration patterns.
 
 ### 🤔 Right Tool for You? (10 minutes)
-**[DECISION_GUIDE.md](./DECISION_GUIDE.md)** — Compare with Axios/Got/Fetch, scenario-based recommendations, migration guides.
+
+**[DECISION_GUIDE.md](./DECISION_GUIDE.md)** — Compare with Axios/Got/Fetch,
+scenario-based recommendations, migration guides.
 
 ### 💡 Real-World Examples (varies)
-**[EXAMPLES.md](./EXAMPLES.md)** — 7+ use cases: GitHub API, payments, microservices, health checks, webhooks, search, backups.
+
+**[EXAMPLES.md](./EXAMPLES.md)** — 7+ use cases: GitHub API, payments,
+microservices, health checks, webhooks, search, backups.
 
 ### 📝 Starter Code
+
 **[examples/](./examples/)** directory — Copy-paste ready:
+
 - `rest-api-client.ts` — Complete CRUD client
 - `testing-with-mock-fetch.test.ts` — Unit test patterns
 - `resilience-patterns.ts` — Retries, circuit breaker, failover

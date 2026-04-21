@@ -5,7 +5,15 @@
  * Copy this pattern for your own APIs.
  */
 
-import { createTrembita, HTTP_OK, HTTP_CREATED, HTTP_NO_CONTENT, TrembitaRequestError } from 'trembita';
+import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
+import {
+  createTrembita,
+  HTTP_OK,
+  HTTP_CREATED,
+  HTTP_NO_CONTENT,
+  TrembitaRequestError
+} from 'trembita';
 
 // ============================================================================
 // Domain Types
@@ -67,7 +75,7 @@ async function listTodos(): ApiResult<TodoItem[]> {
 }
 
 async function getTodo(id: number): ApiResult<TodoItem> {
-  const result = await client.request({
+  const result = await client.client({
     path: `/todos/${id}`,
     expectedCodes: [HTTP_OK, 404]
   });
@@ -107,8 +115,11 @@ async function createTodo(payload: CreateTodoPayload): ApiResult<TodoItem> {
   return { data: result.value as TodoItem, error: null };
 }
 
-async function updateTodo(id: number, payload: UpdateTodoPayload): ApiResult<TodoItem> {
-  const result = await client.request({
+async function updateTodo(
+  id: number,
+  payload: UpdateTodoPayload
+): ApiResult<TodoItem> {
+  const result = await client.client({
     path: `/todos/${id}`,
     method: 'PATCH',
     body: payload,
@@ -129,7 +140,7 @@ async function updateTodo(id: number, payload: UpdateTodoPayload): ApiResult<Tod
 }
 
 async function deleteTodo(id: number): ApiResult<null> {
-  const result = await client.request({
+  const result = await client.client({
     path: `/todos/${id}`,
     method: 'DELETE',
     expectedCodes: [HTTP_NO_CONTENT, HTTP_OK, 404]
@@ -195,7 +206,10 @@ async function main() {
 }
 
 // Run if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (
+  process.argv[1] &&
+  fileURLToPath(import.meta.url) === resolve(process.argv[1])
+) {
   main().catch(console.error);
 }
 

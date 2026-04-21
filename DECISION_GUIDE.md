@@ -4,7 +4,7 @@ Helps you decide if trembita is the best HTTP client for your use case.
 
 ## Quick Yes/No Decision Tree
 
-```
+````text
 Start Here
 │
 ├─ Building a TypeScript project? ─────────┐
@@ -27,7 +27,7 @@ Start Here
 │                                      (Perfect fit!)
 │
 └─────────────────────────────────────────────────┘
-```
+```text
 
 ---
 
@@ -69,7 +69,7 @@ Start Here
 
 | Aspect | Trembita | Axios |
 |--------|----------|-------|
-| **Dependencies** | 0 | 4 | 
+| **Dependencies** | 0 | 4 |
 | **Bundle size** | ~3KB | ~60KB |
 | **Error handling** | Result<T,E> | Exceptions |
 | **TypeScript** | First-class | After-thought |
@@ -80,7 +80,7 @@ Start Here
 | **Built-in validation** | ✅ Standard Schema | ❌ Manual |
 | **Testing** | Inject fetch | Mock globals |
 
-**Choose Axios if:** You want a mature ecosystem or class-based API.  
+**Choose Axios if:** You want a mature ecosystem or class-based API.
 **Choose Trembita if:** You want small, type-safe, zero-dependency.
 
 ### vs. Node-Fetch
@@ -96,7 +96,7 @@ Start Here
 | **Learning curve** | Moderate | Shallow |
 | **Used for** | Consuming APIs | Polyfilling |
 
-**Choose Node-fetch if:** You just want a fetch polyfill.  
+**Choose Node-fetch if:** You just want a fetch polyfill.
 **Choose Trembita if:** You want a full HTTP client with batteries.
 
 ### vs. Native Fetch
@@ -111,7 +111,7 @@ Start Here
 | **Bundle** | ~3KB | 0 |
 | **Learning curve** | Shallow | Shallow |
 
-**Choose Fetch if:** You want zero abstractions and minimal dependencies (rarely happens in production).  
+**Choose Fetch if:** You want zero abstractions and minimal dependencies (rarely happens in production).
 **Choose Trembita if:** You want production-grade features without a heavy framework.
 
 ### vs. Got (Node.js only)
@@ -126,7 +126,7 @@ Start Here
 | **Timeout** | Built-in | Built-in |
 | **Streams** | ❌ | ✅ (NodeJS) |
 
-**Choose Got if:** You need Node-only advanced features (streams).  
+**Choose Got if:** You need Node-only advanced features (streams).
 **Choose Trembita if:** You want isomorphic (Node + browser).
 
 ### vs. OpenAPI-Fetch (OpenAPI-only)
@@ -139,7 +139,7 @@ Start Here
 | **Error handling** | Result<T,E> | Try/catch |
 | **Retries** | Built-in | Manual |
 
-**Choose OpenAPI-Fetch if:** You have an OpenAPI spec and want auto-typed paths.  
+**Choose OpenAPI-Fetch if:** You have an OpenAPI spec and want auto-typed paths.
 **Choose Trembita if:** You want general REST + `@trembita/openapi` gives you OpenAPI typing.
 
 ---
@@ -150,7 +150,7 @@ Start Here
 
 **Requirements:** Consuming multiple third-party APIs (Stripe, SendGrid, Slack)
 
-```
+```text
 Trembita score: 9/10
   ✅ Zero deps (no version conflicts)
   ✅ Retries built-in (API flakiness)
@@ -163,13 +163,13 @@ Alternatives:
   - Axios: 7/10 (heavier, exceptions)
   - Got: 8/10 (Node-only, similar feature set)
   - Fetch: 6/10 (manual retry/circuit logic)
-```
+```text
 
 ### Scenario 2: Full-Stack Web App (Node + Browser)
 
 **Requirements:** Frontend + backend both make API calls
 
-```
+```text
 Trembita score: 10/10
   ✅ Works in both Node and browser
   ✅ Same API for frontend and backend
@@ -182,13 +182,13 @@ Alternatives:
   - Got: 0/10 (Node-only)
   - Fetch: 6/10 (no shared utilities)
   - OpenAPI-Fetch: 8/10 (if you have spec)
-```
+```text
 
 ### Scenario 3: Small Script (Node)
 
 **Requirements:** Quick script to call an API once
 
-```
+```text
 Trembita score: 6/10
   ✅ Lightweight
   ✅ Zero deps
@@ -199,7 +199,7 @@ Alternatives:
   - Native fetch: 8/10 (simplest)
   - Axios: 5/10 (overkill)
   - Got: 7/10 (simpler setup)
-```
+````
 
 ### Scenario 4: GraphQL Frontend
 
@@ -364,6 +364,7 @@ const data = result.ok ? result.value : null;
    → Yes? → Trembita
 
 **If you answer:**
+
 - ✅ TypeScript + REST + Isomorphic + Type-safe errors + Small = **Trembita**
 - ❌ Something else → Consult comparison matrix above
 
@@ -389,7 +390,8 @@ npx ts-node examples/rest-api-client.ts
 - [LEARNING_GUIDE.md](./LEARNING_GUIDE.md) (30 min)
 - [EXAMPLES.md](./EXAMPLES.md) (copy-paste)
 
-**Decision:** If it feels good, stick with it. If not, no hard feelings — use what works for you!
+**Decision:** If it feels good, stick with it. If not, no hard feelings — use
+what works for you!
 
 ---
 
@@ -399,4 +401,5 @@ npx ts-node examples/rest-api-client.ts
 - 💡 [EXAMPLES.md](./EXAMPLES.md) — Real-world use cases
 - 🏗️ [ARCHITECTURE.md](./ARCHITECTURE.md) — How it works
 - 🔗 [API Docs](https://oleg-koval.github.io/trembita/) — Full reference
-- 🐛 [GitHub Issues](https://github.com/oleg-koval/trembita/issues) — Ask community
+- 🐛 [GitHub Issues](https://github.com/oleg-koval/trembita/issues) — Ask
+  community

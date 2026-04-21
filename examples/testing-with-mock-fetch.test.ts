@@ -6,7 +6,14 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { createTrembita, HTTP_OK, HTTP_CREATED, HTTP_NOT_FOUND } from 'trembita';
+import {
+  createTrembita,
+  HTTP_OK,
+  HTTP_CREATED,
+  type TrembitaClient
+} from 'trembita';
+
+const HTTP_NOT_FOUND = 404;
 
 // ============================================================================
 // Example: User API Service
@@ -18,10 +25,9 @@ interface User {
   email: string;
 }
 
-async function getUser(client: any, id: number) {
-  const result = await client.request({
-    path: `/users/${id}`,
-    expectedCodes: [HTTP_OK, HTTP_NOT_FOUND]
+async function getUser(client: TrembitaClient, id: number) {
+  const result = await client.client({
+    path: `/users/${id}`
   });
 
   if (!result.ok) {
@@ -83,7 +89,11 @@ describe('API Client Tests', () => {
 
     it('returns null when user not found', async () => {
       const mockFetch = vi.fn(() =>
-        Promise.resolve(new Response('Not found', { status: 404 }))
+        Promise.resolve(
+          new Response(JSON.stringify({ error: 'Not found' }), {
+            status: HTTP_NOT_FOUND
+          })
+        )
       );
 
       const api = createTrembita({
@@ -110,14 +120,14 @@ describe('API Client Tests', () => {
 
       if (!api.ok) throw api.error;
 
-      await expect(getUser(api.value, 1)).rejects.toThrow('Request failed: fetch_failed');
+      await expect(getUser(api.value, 1)).rejects.toThrow(
+        'Request failed: fetch_failed'
+      );
     });
 
     it('throws on invalid JSON response', async () => {
       const mockFetch = vi.fn(() =>
-        Promise.resolve(
-          new Response('Invalid JSON {', { status: 200 })
-        )
+        Promise.resolve(new Response('Invalid JSON {', { status: 200 }))
       );
 
       const api = createTrembita({
@@ -127,7 +137,9 @@ describe('API Client Tests', () => {
 
       if (!api.ok) throw api.error;
 
-      await expect(getUser(api.value, 1)).rejects.toThrow('Request failed: invalid_json');
+      await expect(getUser(api.value, 1)).rejects.toThrow(
+        'Request failed: invalid_json'
+      );
     });
   });
 
@@ -208,7 +220,7 @@ describe('API Client Tests', () => {
       await api.value.request({
         path: '/secure',
         headers: {
-          'Authorization': 'Bearer token123'
+          Authorization: 'Bearer token123'
         },
         expectedCodes: [HTTP_OK]
       });
@@ -216,16 +228,14 @@ describe('API Client Tests', () => {
       const callArgs = mockFetch.mock.calls[0];
       const requestInit = callArgs[1];
 
-      expect(requestInit.headers['Authorization']).toBe('Bearer token123');
+      expect(requestInit.headers.get('Authorization')).toBe('Bearer token123');
     });
   });
 
   describe('Query parameters', () => {
     it('encodes query params', async () => {
       const mockFetch = vi.fn(() =>
-        Promise.resolve(
-          new Response(JSON.stringify([]), { status: 200 })
-        )
+        Promise.resolve(new Response(JSON.stringify([]), { status: 200 }))
       );
 
       const api = createTrembita({
@@ -255,10 +265,7 @@ describe('API Client Tests', () => {
     it('sends JSON body', async () => {
       const mockFetch = vi.fn(() =>
         Promise.resolve(
-          new Response(
-            JSON.stringify({ id: 1, name: 'Bob' }),
-            { status: 201 }
-          )
+          new Response(JSON.stringify({ id: 1, name: 'Bob' }), { status: 201 })
         )
       );
 

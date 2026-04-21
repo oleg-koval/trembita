@@ -12,7 +12,8 @@ import {
   createTrembita,
   createRetryingFetch,
   HTTP_OK,
-  HTTP_SERVICE_UNAVAILABLE
+  type TrembitaClient,
+  type TrembitaFetchOptions
 } from 'trembita';
 
 // ============================================================================
@@ -25,8 +26,8 @@ import {
  */
 export function createResilientClient(endpoint: string) {
   const retryingFetch = createRetryingFetch({
-    initialDelayMs: 100,    // Start with 100ms
-    maxAttempts: 5,         // Try up to 5 times
+    initialDelayMs: 100, // Start with 100ms
+    maxAttempts: 5, // Try up to 5 times
     shouldRetry: (statusCode) => {
       // Retry on server errors and timeout-like conditions
       return statusCode >= 500 || statusCode === 408 || statusCode === 429;
@@ -59,8 +60,8 @@ export function createCircuitBreakerClient(endpoint: string) {
   return createTrembita({
     endpoint,
     circuitBreaker: {
-      failureThreshold: 5,   // Open after 5 failures
-      cooldownMs: 60_000     // Try again after 60s
+      failureThreshold: 5, // Open after 5 failures
+      cooldownMs: 60_000 // Try again after 60s
     },
     timeoutMs: 5_000
   });
@@ -82,8 +83,8 @@ export function createCircuitBreakerClient(endpoint: string) {
 // ============================================================================
 
 interface FallbackConfig {
-  primary: { endpoint: string; weight: number };
-  secondary: { endpoint: string; weight: number };
+  primary: { endpoint: string };
+  secondary: { endpoint: string };
   cache?: Map<string, unknown>;
 }
 
@@ -93,7 +94,10 @@ interface FallbackConfig {
 export async function requestWithFallback(
   config: FallbackConfig,
   path: string
-): Promise<{ data: unknown; source: 'primary' | 'secondary' | 'cache' } | null> {
+): Promise<{
+  data: unknown;
+  source: 'primary' | 'secondary' | 'cache';
+} | null> {
   // Try primary endpoint
   const primary = createTrembita({
     endpoint: config.primary.endpoint,
@@ -147,8 +151,8 @@ export async function requestWithFallback(
 
 // Usage:
 // const config: FallbackConfig = {
-//   primary: { endpoint: 'https://api.example.com', weight: 1 },
-//   secondary: { endpoint: 'https://api-backup.example.com', weight: 1 },
+//   primary: { endpoint: 'https://api.example.com' },
+//   secondary: { endpoint: 'https://api-backup.example.com' },
 //   cache: new Map()
 // };
 // const result = await requestWithFallback(config, '/data');
@@ -166,13 +170,13 @@ export class BulkheadClient {
   private readonly queue: Array<() => Promise<void>> = [];
 
   constructor(
-    private client: any,
+    private client: TrembitaClient,
     maxConcurrent = 10
   ) {
     this.maxConcurrent = maxConcurrent;
   }
 
-  async request(options: any) {
+  async request(options: TrembitaFetchOptions) {
     return new Promise<any>((resolve, reject) => {
       const task = async () => {
         try {
@@ -230,7 +234,7 @@ export class BulkheadClient {
  * Handle various timeout scenarios.
  */
 export async function requestWithAdaptiveTimeout(
-  client: any,
+  client: TrembitaClient,
   path: string,
   options: {
     initialTimeoutMs?: number;
@@ -245,7 +249,7 @@ export async function requestWithAdaptiveTimeout(
   } = options;
 
   let timeoutMs = initialTimeoutMs;
-  let lastError: any;
+  let lastError: unknown;
 
   for (let attempt = 1; attempt <= retryCount; attempt++) {
     console.log(`Attempt ${attempt} with timeout ${timeoutMs}ms`);
@@ -275,7 +279,9 @@ export async function requestWithAdaptiveTimeout(
     }
   }
 
-  throw new Error(`Request failed after ${retryCount} attempts: ${lastError.kind}`);
+  throw new Error(
+    `Request failed after ${retryCount} attempts: ${String((lastError as { kind?: string })?.kind ?? 'unknown')}`
+  );
 }
 
 // Usage:
@@ -340,7 +346,7 @@ export function createFullStackResilientClient(endpoint: string) {
 
 interface HealthyClient {
   endpoint: string;
-  client: any;
+  client: TrembitaClient;
   lastSuccess: number;
   failureCount: number;
 }
@@ -353,16 +359,26 @@ export class HealthAwareClientPool {
   private readonly failureThreshold = 3;
 
   constructor(endpoints: string[]) {
-    this.clients = endpoints.map(endpoint => ({
-      endpoint,
-      client: createTrembita({ endpoint, timeoutMs: 5_000 }).value!,
-      lastSuccess: Date.now(),
-      failureCount: 0
-    }));
+    this.clients = endpoints.map((endpoint) => {
+      const result = createTrembita({ endpoint, timeoutMs: 5_000 });
+      if (!result.ok) {
+        throw new Error(
+          `Failed to init client for ${endpoint}: ${result.error.kind}`
+        );
+      }
+      return {
+        endpoint,
+        client: result.value,
+        lastSuccess: Date.now(),
+        failureCount: 0
+      };
+    });
   }
 
-  async request(options: any) {
-    const healthyClients = this.clients.filter(c => c.failureCount < this.failureThreshold);
+  async request(options: TrembitaFetchOptions) {
+    const healthyClients = this.clients.filter(
+      (c) => c.failureCount < this.failureThreshold
+    );
 
     if (healthyClients.length === 0) {
       throw new Error('No healthy clients available');
@@ -391,7 +407,7 @@ export class HealthAwareClientPool {
   }
 
   get stats() {
-    return this.clients.map(c => ({
+    return this.clients.map((c) => ({
       endpoint: c.endpoint,
       healthy: c.failureCount < this.failureThreshold,
       failureCount: c.failureCount,

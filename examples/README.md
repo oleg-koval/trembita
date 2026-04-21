@@ -1,14 +1,15 @@
 # Trembita Examples
 
-Copy-paste-ready code examples for common use cases. Each file is a self-contained, runnable example.
+Copy-paste-ready code examples for common use cases. Each file is a
+self-contained, runnable example.
 
 ## Quick Navigation
 
-| File | Purpose | Level |
-|------|---------|-------|
-| **[rest-api-client.ts](./rest-api-client.ts)** | Complete CRUD client for a REST API | Beginner |
-| **[testing-with-mock-fetch.test.ts](./testing-with-mock-fetch.test.ts)** | Unit test patterns without network mocking | Beginner |
-| **[resilience-patterns.ts](./resilience-patterns.ts)** | Retries, circuit breaker, fallbacks, bulkheads | Intermediate |
+| File                                                                     | Purpose                                        | Level        |
+| ------------------------------------------------------------------------ | ---------------------------------------------- | ------------ |
+| **[rest-api-client.ts](./rest-api-client.ts)**                           | Complete CRUD client for a REST API            | Beginner     |
+| **[testing-with-mock-fetch.test.ts](./testing-with-mock-fetch.test.ts)** | Unit test patterns without network mocking     | Beginner     |
+| **[resilience-patterns.ts](./resilience-patterns.ts)**                   | Retries, circuit breaker, fallbacks, bulkheads | Intermediate |
 
 ---
 
@@ -19,6 +20,7 @@ Copy-paste-ready code examples for common use cases. Each file is a self-contain
 A complete, typed client for a TODO API with CRUD operations.
 
 **Covers:**
+
 - Creating a client with options validation
 - GET requests with response handling
 - POST requests with body serialization
@@ -27,6 +29,7 @@ A complete, typed client for a TODO API with CRUD operations.
 - Status code branching (404 vs network errors)
 
 **Key patterns:**
+
 ```typescript
 // Create client once
 const api = createTrembita({ endpoint: '...' });
@@ -43,6 +46,7 @@ async function listTodos(): ApiResult<TodoItem[]> {
 ```
 
 **Run it:**
+
 ```bash
 npx ts-node examples/rest-api-client.ts
 ```
@@ -56,6 +60,7 @@ npx ts-node examples/rest-api-client.ts
 Comprehensive vitest examples showing how to test your API integrations.
 
 **Covers:**
+
 - Mock fetch for success/failure scenarios
 - Testing request validation
 - Verifying headers and body encoding
@@ -63,6 +68,7 @@ Comprehensive vitest examples showing how to test your API integrations.
 - Query parameter encoding
 
 **Key patterns:**
+
 ```typescript
 // No global mocking — inject via options
 const mockFetch = vi.fn(() =>
@@ -71,7 +77,7 @@ const mockFetch = vi.fn(() =>
 
 const api = createTrembita({
   endpoint: 'https://api.example.com',
-  fetchImpl: mockFetch  // ← Inject here
+  fetchImpl: mockFetch // ← Inject here
 });
 
 // Verify behavior
@@ -82,6 +88,7 @@ expect(mockFetch).toHaveBeenCalledWith(
 ```
 
 **Run tests:**
+
 ```bash
 npm test examples/testing-with-mock-fetch.test.ts
 ```
@@ -97,6 +104,7 @@ Advanced patterns for building robust clients that handle failures gracefully.
 **Covers:**
 
 ### 3.1 Exponential Backoff Retries
+
 Automatically retry transient failures (5xx, timeouts) with increasing delays.
 
 ```typescript
@@ -108,6 +116,7 @@ const retryingFetch = createRetryingFetch({
 ```
 
 ### 3.2 Circuit Breaker
+
 Stop hammering a failing service — return errors quickly after N failures.
 
 ```typescript
@@ -120,6 +129,7 @@ createTrembita({
 ```
 
 ### 3.3 Fallback Chain
+
 Try primary API, then secondary, then cache.
 
 ```typescript
@@ -128,6 +138,7 @@ const result = await requestWithFallback(config, '/data');
 ```
 
 ### 3.4 Bulkhead Isolation
+
 Limit concurrent requests to prevent overwhelming upstream.
 
 ```typescript
@@ -136,6 +147,7 @@ await bulkhead.request({ path: '/data' });
 ```
 
 ### 3.5 Adaptive Timeouts
+
 Increase timeout on retry to handle slow responses.
 
 ```typescript
@@ -147,6 +159,7 @@ const data = await requestWithAdaptiveTimeout(client, '/endpoint', {
 ```
 
 ### 3.6 Full Stack
+
 Combine retries + circuit breaker + timeout + logging.
 
 ```typescript
@@ -155,6 +168,7 @@ const api = createFullStackResilientClient('https://api.example.com');
 ```
 
 ### 3.7 Health-Aware Client Pool
+
 Select the healthiest endpoint from multiple options.
 
 ```typescript
@@ -170,16 +184,20 @@ const result = await pool.request({ path: '/data' });
 ## How to Use These Examples
 
 ### Option 1: Copy and adapt
+
 1. Copy the file that matches your use case
 2. Replace `endpoint`, API paths, and types with your own
 3. Run with `npx ts-node file.ts`
 
 ### Option 2: Reference for patterns
+
 1. Skim the examples to understand patterns
 2. Refer back when building your own client
 
 ### Option 3: Test against real APIs
+
 Most examples use public APIs (GitHub, JSONPlaceholder) or mock fetch:
+
 ```bash
 # Requires no credentials
 npx ts-node examples/rest-api-client.ts
@@ -190,16 +208,20 @@ npx ts-node examples/rest-api-client.ts
 ## Common Questions
 
 **Q: Should I copy these files into my project?**  
-A: No. Use them as reference and write your own. Your API likely has different endpoints and response shapes.
+A: No. Use them as reference and write your own. Your API likely has different
+endpoints and response shapes.
 
 **Q: Can I combine patterns?**  
-A: Yes! See `createFullStackResilientClient` which combines retries + circuit breaker + timeout + logging.
+A: Yes! See `createFullStackResilientClient` which combines retries + circuit
+breaker + timeout + logging.
 
 **Q: Do I need all these patterns?**  
-A: Start simple. Add resilience patterns only when you hit issues (retries for flaky APIs, circuit breaker for dependent services, etc.).
+A: Start simple. Add resilience patterns only when you hit issues (retries for
+flaky APIs, circuit breaker for dependent services, etc.).
 
 **Q: How do I test my client?**  
-A: See `testing-with-mock-fetch.test.ts` — inject `fetchImpl` to avoid network calls in tests.
+A: See `testing-with-mock-fetch.test.ts` — inject `fetchImpl` to avoid network
+calls in tests.
 
 ---
 

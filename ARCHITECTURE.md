@@ -4,7 +4,7 @@ A visual guide to how trembita works and how to integrate it.
 
 ## System Architecture
 
-```
+````text
 ┌─────────────────────────────────────────────────────────────────┐
 │                         Your Application                        │
 └────────────────────────┬────────────────────────────────────────┘
@@ -54,7 +54,7 @@ A visual guide to how trembita works and how to integrate it.
                          - (others)
         │
         └─────────────────────────────► Application handles both paths
-```
+```text
 
 ---
 
@@ -62,7 +62,7 @@ A visual guide to how trembita works and how to integrate it.
 
 ### From Request to Response
 
-```
+```text
 Request Options
     │
     ├─ path: '/users/123'
@@ -133,7 +133,7 @@ Response Received                 │
                     ┌─────────────────────────────────────────┐
                     │  { ok: false, error: { kind, ... } }   │
                     └─────────────────────────────────────────┘
-```
+````
 
 ---
 
@@ -148,17 +148,18 @@ Promise<Result<unknown, TrembitaRequestError>>
                         │  └─ cause: Error (DNS, connection reset, etc.)
                         │
                         ├─ timeout
-                        │  └─ requestedMs: number
+                        │  └─ timeoutMs: number
                         │
                         ├─ circuit_open
-                        │  └─ failureCount: number
+                        │  └─ retryAfterMs: number
                         │
                         ├─ invalid_json
                         │  └─ cause: Error (JSON.parse failed)
                         │
                         ├─ unexpected_status
                         │  ├─ statusCode: number
-                        │  └─ expectedCodes: number[]
+                        │  ├─ body: unknown
+                        │  └─ request.expectedCodes: number[]
                         │
                         └─ invalid_request_options
                            └─ (path missing, etc.)
@@ -191,15 +192,15 @@ if (result.ok) {
 
 ## Feature Matrix
 
-| Feature | Default | Optional | Notes |
-|---------|---------|----------|-------|
-| **Fetch implementation** | `globalThis.fetch` | Custom `fetchImpl` | Inject for testing or retries |
-| **Retries** | None | `createRetryingFetch()` | Exponential backoff on 5xx |
-| **Circuit breaker** | Disabled | `circuitBreaker: {...}` | Fail fast after N failures |
-| **Timeout** | Infinite | `timeoutMs: 5000` | Per-request override possible |
-| **Logging** | Silent | `log: {...}` | trace/debug/info/warn/error |
-| **Tracing** | None | `traceContextHeaders()` | W3C traceparent injection |
-| **Validation** | Standard Schema | `requestWithStandardSchema()` | Zod, Valibot, etc. |
+| Feature                  | Default            | Optional                      | Notes                                              |
+| ------------------------ | ------------------ | ----------------------------- | -------------------------------------------------- |
+| **Fetch implementation** | `globalThis.fetch` | Custom `fetchImpl`            | Inject for testing or retries                      |
+| **Retries**              | None               | `createRetryingFetch()`       | Exponential backoff on 5xx                         |
+| **Circuit breaker**      | Disabled           | `circuitBreaker: {...}`       | Fail fast after N failures                         |
+| **Timeout**              | Infinite           | `timeoutMs: 5000`             | Per-request override possible                      |
+| **Logging**              | Silent             | `log: {...}`                  | trace/debug/info/warn/error                        |
+| **Tracing**              | None               | `traceContextHeaders()`       | W3C traceparent injection                          |
+| **Validation**           | JSON parsing only  | `requestWithStandardSchema()` | Standard Schema validators like Zod, Valibot, etc. |
 
 ---
 
@@ -207,38 +208,38 @@ if (result.ok) {
 
 ### Pattern 1: Simple REST Client
 
-```
+````text
 createTrembita()
     │
     └─ client.request() ──► Result
                              │
                              └─ if (!result.ok) { /* handle */ }
-```
+```text
 
 ### Pattern 2: With Retries
 
-```
+```text
 createRetryingFetch() ──┐
                         │
 createTrembita()◄───────┘
     │
     └─ client.request() ──► Result (auto-retried on 5xx)
-```
+```text
 
 ### Pattern 3: With Circuit Breaker
 
-```
+```text
 createTrembita({ circuitBreaker: {...} })
     │
     └─ client.request() ──► Result
                              │
                              └─ error.kind === 'circuit_open'
                                 (fail fast after N failures)
-```
+```text
 
 ### Pattern 4: Full Stack
 
-```
+```text
 createRetryingFetch()
         │
         ├─ Retries on 5xx
@@ -251,7 +252,7 @@ createTrembita({
 })
     │
     └─ client.request() ──► Production-ready
-```
+````
 
 ### Pattern 5: Testing
 
@@ -332,26 +333,31 @@ src/
 ## Design Principles
 
 ### 1. **Functional API**
+
 - Factory functions (`createTrembita`) not classes
 - Pure helpers for validation and building
 - No method chaining
 
 ### 2. **Result<T, E> Everywhere**
+
 - No exceptions for operational errors
 - Errors are data (discriminated unions)
 - Callers must handle both paths
 
 ### 3. **Zero Dependencies**
+
 - Only `fetch` and `URL` from platform
 - All validation inline
 - No version conflicts
 
 ### 4. **Testability**
+
 - Inject `fetchImpl` to swap fetch
 - No global state to mock
 - Deterministic and composable
 
 ### 5. **Type Safety**
+
 - `strict` TypeScript
 - No `any`
 - `unknown` at JSON boundaries
@@ -360,15 +366,15 @@ src/
 
 ## When to Use Each Feature
 
-| Feature | When | Example |
-|---------|------|---------|
-| **Basic request** | Simple API calls | `client.request({ path: '/' })` |
-| **Retries** | Flaky or overloaded API | Payment processors, search engines |
-| **Circuit breaker** | Dependent services | Microservice-to-microservice |
-| **Timeout** | Unresponsive upstream | External APIs, batch jobs |
-| **Logging** | Debugging or ops | Production logging for tracing |
-| **Tracing** | Distributed systems | OpenTelemetry integration |
-| **Validation** | Untrusted responses | Third-party APIs |
+| Feature             | When                    | Example                            |
+| ------------------- | ----------------------- | ---------------------------------- |
+| **Basic request**   | Simple API calls        | `client.request({ path: '/' })`    |
+| **Retries**         | Flaky or overloaded API | Payment processors, search engines |
+| **Circuit breaker** | Dependent services      | Microservice-to-microservice       |
+| **Timeout**         | Unresponsive upstream   | External APIs, batch jobs          |
+| **Logging**         | Debugging or ops        | Production logging for tracing     |
+| **Tracing**         | Distributed systems     | OpenTelemetry integration          |
+| **Validation**      | Untrusted responses     | Third-party APIs                   |
 
 ---
 
@@ -392,7 +398,7 @@ const client = api.value;
 const result = await client.request({
   path: '/charges',
   method: 'POST',
-  headers: { 'Authorization': `Bearer ${STRIPE_KEY}` },
+  headers: { Authorization: `Bearer ${STRIPE_KEY}` },
   body: { amount: 2000, currency: 'usd' },
   expectedCodes: [200]
 });

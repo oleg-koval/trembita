@@ -38,8 +38,11 @@ async function listUserRepos(username: string) {
   });
 
   if (!result.ok) {
-    if (result.error.kind === 'unexpected_status' && result.error.statusCode === 404) {
-      return { users: [], error: 'User not found' };
+    if (
+      result.error.kind === 'unexpected_status' &&
+      result.error.statusCode === 404
+    ) {
+      return { repos: [], error: 'User not found' };
     }
     return { repos: [], error: result.error.kind };
   }
@@ -53,8 +56,8 @@ async function createIssue(repo: string, title: string, body: string) {
     path: `/repos/${repo}/issues`,
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
-      'Accept': 'application/vnd.github.v3+json'
+      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+      Accept: 'application/vnd.github.v3+json'
     },
     body: { title, body, labels: ['bug'] },
     expectedCodes: [HTTP_CREATED]
@@ -64,7 +67,10 @@ async function createIssue(repo: string, title: string, body: string) {
     return { issue: result.value, error: null };
   }
 
-  if (result.error.kind === 'unexpected_status' && result.error.statusCode === 422) {
+  if (
+    result.error.kind === 'unexpected_status' &&
+    result.error.statusCode === 422
+  ) {
     return { issue: null, error: 'Validation failed' };
   }
 
@@ -75,7 +81,11 @@ async function createIssue(repo: string, title: string, body: string) {
 const repos = await listUserRepos('torvalds');
 console.log(`Repos:`, repos);
 
-const issue = await createIssue('torvalds/linux', 'Bug report', 'Description here');
+const issue = await createIssue(
+  'torvalds/linux',
+  'Bug report',
+  'Description here'
+);
 console.log(`Created:`, issue);
 ```
 
@@ -121,7 +131,7 @@ async function createCharge(payload: CreateChargePayload) {
     path: '/charges',
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`
+      Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`
     },
     body: payload,
     expectedCodes: [HTTP_OK]
@@ -143,7 +153,10 @@ async function createCharge(payload: CreateChargePayload) {
   }
 
   if (error.kind === 'timeout') {
-    return { charge: null, error: 'Request timeout; transaction may still be pending' };
+    return {
+      charge: null,
+      error: 'Request timeout; transaction may still be pending'
+    };
   }
 
   if (error.kind === 'fetch_failed') {
@@ -181,10 +194,10 @@ import { createTrembita, HTTP_OK } from 'trembita';
 const userService = createTrembita({
   endpoint: 'http://user-service.internal:3000',
   circuitBreaker: {
-    failureThreshold: 5,   // open after 5 consecutive failures
-    cooldownMs: 30_000     // retry after 30 seconds
+    failureThreshold: 5, // open after 5 consecutive failures
+    cooldownMs: 30_000 // retry after 30 seconds
   },
-  timeoutMs: 5_000         // 5 second timeout
+  timeoutMs: 5_000 // 5 second timeout
 });
 
 if (!userService.ok) throw new Error('User service config invalid');
@@ -198,9 +211,9 @@ interface User {
 }
 
 async function getUser(userId: string): Promise<User | null> {
-  const result = await client.request({
+  const result = await client.client({
     path: `/users/${userId}`,
-    expectedCodes: [HTTP_OK, 404] // Accept both success and not found
+    expectedCodes: [HTTP_OK, 404]
   });
 
   if (!result.ok) {
@@ -219,7 +232,6 @@ async function getUser(userId: string): Promise<User | null> {
     return null;
   }
 
-  // Check status from successful response
   const { statusCode, body } = result.value;
   if (statusCode === 404) {
     return null; // User not found
@@ -230,17 +242,16 @@ async function getUser(userId: string): Promise<User | null> {
 
 // Batch fetch with error recovery
 async function getUsersBatch(userIds: string[]) {
-  const results = await Promise.allSettled(
-    userIds.map(id => getUser(id))
-  );
+  const results = await Promise.allSettled(userIds.map((id) => getUser(id)));
 
   const users = results
-    .filter((r): r is PromiseFulfilledResult<User | null> => r.status === 'fulfilled' && r.value !== null)
-    .map(r => r.value);
+    .filter(
+      (r): r is PromiseFulfilledResult<User | null> =>
+        r.status === 'fulfilled' && r.value !== null
+    )
+    .map((r) => r.value);
 
-  const failed = results
-    .filter(r => r.status === 'rejected')
-    .length;
+  const failed = results.filter((r) => r.status === 'rejected').length;
 
   console.log(`Fetched ${users.length} users, ${failed} failed`);
   return users;
@@ -268,7 +279,10 @@ interface HealthStatus {
   error?: string;
 }
 
-async function checkHealth(name: string, endpoint: string): Promise<HealthStatus> {
+async function checkHealth(
+  name: string,
+  endpoint: string
+): Promise<HealthStatus> {
   const start = performance.now();
 
   const api = createTrembita({
@@ -309,19 +323,22 @@ async function checkHealth(name: string, endpoint: string): Promise<HealthStatus
 }
 
 // Monitor dashboard
-async function healthDashboard(services: Array<{ name: string; endpoint: string }>) {
+async function healthDashboard(
+  services: Array<{ name: string; endpoint: string }>
+) {
   const statuses = await Promise.all(
     services.map(({ name, endpoint }) => checkHealth(name, endpoint))
   );
 
-  const allHealthy = statuses.every(s => s.healthy);
-  const avgLatency = statuses.reduce((sum, s) => sum + s.latencyMs, 0) / statuses.length;
+  const allHealthy = statuses.every((s) => s.healthy);
+  const avgLatency =
+    statuses.reduce((sum, s) => sum + s.latencyMs, 0) / statuses.length;
 
   console.log(`Overall: ${allHealthy ? '✓ Healthy' : '✗ Degraded'}`);
   console.log(`Avg latency: ${avgLatency.toFixed(0)}ms`);
   console.log('---');
 
-  statuses.forEach(status => {
+  statuses.forEach((status) => {
     const indicator = status.healthy ? '✓' : '✗';
     console.log(
       `${indicator} ${status.name} (${status.statusCode || '?'}): ${status.latencyMs.toFixed(0)}ms`
@@ -367,9 +384,13 @@ interface WebhookPayload {
   data: Record<string, unknown>;
 }
 
-async function deliverWebhook(webhookUrl: string, payload: WebhookPayload): Promise<boolean> {
+async function deliverWebhook(
+  webhookUrl: string,
+  payload: WebhookPayload
+): Promise<boolean> {
+  const url = new URL(webhookUrl);
   const api = createTrembita({
-    endpoint: webhookUrl.split('/api/')[0], // extract domain
+    endpoint: url.origin,
     fetchImpl: retryingFetch,
     timeoutMs: 10_000
   });
@@ -379,8 +400,7 @@ async function deliverWebhook(webhookUrl: string, payload: WebhookPayload): Prom
     return false;
   }
 
-  // Construct the path from full URL
-  const path = webhookUrl.substring(api.value.config.endpoint.length) || '/';
+  const path = `${url.pathname}${url.search}` || '/';
 
   const result = await api.value.request({
     path,
@@ -399,11 +419,15 @@ async function deliverWebhook(webhookUrl: string, payload: WebhookPayload): Prom
   }
 
   if (result.error.kind === 'unexpected_status') {
-    console.error(`Webhook rejected (${result.error.statusCode}): ${webhookUrl}`);
+    console.error(
+      `Webhook rejected (${result.error.statusCode}): ${webhookUrl}`
+    );
     return false; // Don't retry 4xx
   }
 
-  console.error(`Webhook delivery failed (${result.error.kind}): ${webhookUrl}`);
+  console.error(
+    `Webhook delivery failed (${result.error.kind}): ${webhookUrl}`
+  );
   return false; // Retries already handled by createRetryingFetch
 }
 
@@ -413,11 +437,15 @@ async function deliverWebhooks(
   payload: WebhookPayload
 ): Promise<{ succeeded: string[]; failed: string[] }> {
   const results = await Promise.allSettled(
-    webhookUrls.map(url => deliverWebhook(url, payload))
+    webhookUrls.map((url) => deliverWebhook(url, payload))
   );
 
-  const succeeded = webhookUrls.filter((_, i) => results[i].status === 'fulfilled' && results[i].value === true);
-  const failed = webhookUrls.filter((_, i) => !succeeded.includes(webhookUrls[i]));
+  const succeeded = webhookUrls.filter(
+    (_, i) => results[i].status === 'fulfilled' && results[i].value === true
+  );
+  const failed = webhookUrls.filter(
+    (_, i) => !succeeded.includes(webhookUrls[i])
+  );
 
   console.log(`Delivered to ${succeeded.length}/${webhookUrls.length}`);
   return { succeeded, failed };
@@ -429,7 +457,10 @@ function generateSignature(payload: WebhookPayload): string {
 }
 
 // Usage
-const webhooks = ['https://hook1.example.com/api/events', 'https://hook2.example.com/api/events'];
+const webhooks = [
+  'https://hook1.example.com/api/events',
+  'https://hook2.example.com/api/events'
+];
 const payload: WebhookPayload = {
   event: 'order.created',
   timestamp: Date.now(),
@@ -469,16 +500,18 @@ interface SearchResponse {
   hasMore: boolean;
 }
 
-const search = createTrembita({
+const searchApi = createTrembita({
   endpoint: 'https://search.example.com',
   timeoutMs: 5_000
 });
 
-if (!search.ok) throw new Error('Search service config invalid');
+if (!searchApi.ok) throw new Error('Search service config invalid');
 
-const client = search.value;
+const client = searchApi.value;
 
-async function searchDocuments(query: SearchQuery): Promise<SearchResponse | null> {
+async function searchDocuments(
+  query: SearchQuery
+): Promise<SearchResponse | null> {
   const queryParams: Record<string, string> = {
     q: query.q,
     page: String(query.page || 1),
@@ -488,10 +521,9 @@ async function searchDocuments(query: SearchQuery): Promise<SearchResponse | nul
     )
   };
 
-  const result = await client.request({
+  const result = await client.client({
     path: '/search',
-    query: queryParams,
-    expectedCodes: [HTTP_OK, 400] // Accept bad request for invalid queries
+    query: queryParams
   });
 
   if (!result.ok) {
@@ -517,7 +549,7 @@ async function searchDocuments(query: SearchQuery): Promise<SearchResponse | nul
 }
 
 // Convenience function for simple searches
-async function search(q: string) {
+async function searchArticles(q: string) {
   return searchDocuments({
     q,
     limit: 10,
@@ -526,7 +558,7 @@ async function search(q: string) {
 }
 
 // Pagination helper
-async function *searchPages(q: string, pageSize = 20) {
+async function* searchPages(q: string, pageSize = 20) {
   let page = 1;
   let hasMore = true;
 
@@ -547,7 +579,7 @@ async function *searchPages(q: string, pageSize = 20) {
 }
 
 // Usage
-const results = await search('typescript http client');
+const results = await searchArticles('typescript http client');
 console.log(`Found ${results?.total || 0} results`);
 
 // Stream large result sets
@@ -564,7 +596,9 @@ for await (const batch of searchPages('trembita')) {
 Trigger and monitor a backup job.
 
 ```typescript
-import { createTrembita, HTTP_OK, HTTP_CREATED, HTTP_ACCEPTED } from 'trembita';
+import { createTrembita, HTTP_OK, HTTP_CREATED } from 'trembita';
+
+const HTTP_ACCEPTED = 202;
 
 interface BackupJob {
   id: string;
@@ -592,7 +626,7 @@ async function startBackup(): Promise<string | null> {
     path: '/backups',
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${process.env.BACKUP_API_KEY}`
+      Authorization: `Bearer ${process.env.BACKUP_API_KEY}`
     },
     body: {
       type: 'full',
@@ -612,7 +646,7 @@ async function startBackup(): Promise<string | null> {
 }
 
 async function getBackupStatus(jobId: string): Promise<BackupJob | null> {
-  const result = await client.request({
+  const result = await client.client({
     path: `/backups/${jobId}`,
     expectedCodes: [HTTP_OK, 404]
   });
@@ -633,7 +667,11 @@ async function getBackupStatus(jobId: string): Promise<BackupJob | null> {
 }
 
 // Monitor a backup until completion
-async function waitForBackup(jobId: string, pollIntervalMs = 5000, maxWaitMs = 3600000): Promise<boolean> {
+async function waitForBackup(
+  jobId: string,
+  pollIntervalMs = 5000,
+  maxWaitMs = 3600000
+): Promise<boolean> {
   const startTime = Date.now();
 
   while (Date.now() - startTime < maxWaitMs) {
@@ -646,7 +684,9 @@ async function waitForBackup(jobId: string, pollIntervalMs = 5000, maxWaitMs = 3
     console.log(`Job ${jobId}: ${job.status} (${job.progress}%)`);
 
     if (job.status === 'completed') {
-      console.log(`Backup complete! Size: ${(job.size! / 1024 / 1024).toFixed(2)} MB`);
+      console.log(
+        `Backup complete! Size: ${(job.size! / 1024 / 1024).toFixed(2)} MB`
+      );
       return true;
     }
 
@@ -655,7 +695,7 @@ async function waitForBackup(jobId: string, pollIntervalMs = 5000, maxWaitMs = 3
       return false;
     }
 
-    await new Promise(resolve => setTimeout(resolve, pollIntervalMs));
+    await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
   }
 
   console.error(`Backup timeout: ${jobId}`);
@@ -676,7 +716,8 @@ if (jobId) {
 
 - **Type your responses**: Use TypeScript interfaces for JSON responses
 - **Narrow errors safely**: Check `error.kind` for specific failure modes
-- **Inject fetch for testing**: Pass `fetchImpl` in unit tests to avoid network calls
+- **Inject fetch for testing**: Pass `fetchImpl` in unit tests to avoid network
+  calls
 - **Compose helpers**: Don't repeat `request` calls; wrap common patterns
 - **Handle both paths**: Always handle `!result.ok` to prevent runtime errors
 
