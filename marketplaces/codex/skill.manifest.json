@@ -1,0 +1,9 @@
+{
+  "name": "trembita-http-client",
+  "version": "1.0.0",
+  "description": "Codex adapter metadata for the trembita skill package.",
+  "entry": "./SKILL.md",
+  "publisher": "oleg-koval",
+  "repository": "https://github.com/oleg-koval/trembita",
+  "keywords": ["codex", "skill", "typescript", "http-client"]
+}

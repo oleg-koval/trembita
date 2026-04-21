@@ -1,0 +1,13 @@
+{
+  "name": "trembita-http-client",
+  "displayName": "Trembita HTTP Client",
+  "version": "1.0.0",
+  "description": "Skill for building resilient HTTP clients with trembita and Result<T,E> workflows.",
+  "entry": "./SKILL.md",
+  "publisher": "oleg-koval",
+  "links": {
+    "repo": "https://github.com/oleg-koval/trembita",
+    "docs": "https://github.com/oleg-koval/trembita/blob/main/README.md"
+  },
+  "tags": ["typescript", "api-client", "resilience", "agent-skill"]
+}

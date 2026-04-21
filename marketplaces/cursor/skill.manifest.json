@@ -1,0 +1,19 @@
+{
+  "name": "trembita-http-client",
+  "displayName": "Trembita HTTP Client Skill",
+  "version": "1.0.0",
+  "description": "Build resilient, type-safe HTTP integrations with trembita.",
+  "author": "Oleg Koval",
+  "license": "MIT",
+  "homepage": "https://github.com/oleg-koval/trembita",
+  "repository": "https://github.com/oleg-koval/trembita",
+  "keywords": [
+    "trembita",
+    "http",
+    "typescript",
+    "result pattern",
+    "agent skill"
+  ],
+  "entry": "./SKILL.md",
+  "category": "development"
+}
