@@ -2,6 +2,7 @@ name: Merge me!
 
 # After CI on the PR succeeds, approve and merge Dependabot PRs. Uses
 # workflow_run so checks stay on pull_request (see merge-me-action README).
+# If there's a merge conflict, automatically requests rebase from dependabot.
 on:
   workflow_run:
     workflows:
@@ -25,3 +26,51 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_LOGIN: 'dependabot[bot]'
           ENABLE_GITHUB_API_PREVIEW: true
+
+  handle-merge-conflict:
+    name: Handle merge conflict
+    runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for Dependabot PR and request rebase if conflicted
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const workflowRun = context.payload.workflow_run;
+
+            // Get all open Dependabot PRs
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              creator: 'dependabot[bot]'
+            });
+
+            for (const pr of pullRequests) {
+              // Check if PR is mergeable
+              const { data: pullRequest } = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number: pr.number
+              });
+
+              if (pullRequest.mergeable === false) {
+                // Comment to request rebase
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  body: '@dependabot rebase'
+                });
+
+                console.log(`Requested rebase for PR #${pr.number} due to merge conflict`);
+              }
+            }
