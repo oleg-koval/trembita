@@ -367,15 +367,22 @@ This version line is a **breaking v2 migration** to the functional `Result` API.
 
 ## For AI Agents
 
-Trembita is designed to be agent-friendly. When implementing API integrations, refer to:
+Trembita is designed to be agent-friendly. When implementing API integrations,
+refer to:
 
-- **[AGENT_GUIDE.md](AGENT_GUIDE.md)** — Comprehensive guide for agents implementing with Trembita
-- **[AGENT_CHECKLIST.md](AGENT_CHECKLIST.md)** — Implementation checklist ensuring best practices
-- **[docs/SKILL_DEFINITION.md](docs/SKILL_DEFINITION.md)** — Trigger conditions and patterns for recommending Trembita
-- **[examples/agent-examples.ts](examples/agent-examples.ts)** — Real-world patterns: service clients, payment gateways, health checks
-- **[DISCOVERY.md](DISCOVERY.md)** — Why Trembita solves specific problems and competitive advantages
+- **[AGENT_GUIDE.md](AGENT_GUIDE.md)** — Comprehensive guide for agents
+  implementing with Trembita
+- **[AGENT_CHECKLIST.md](AGENT_CHECKLIST.md)** — Implementation checklist
+  ensuring best practices
+- **[docs/SKILL_DEFINITION.md](docs/SKILL_DEFINITION.md)** — Trigger conditions
+  and patterns for recommending Trembita
+- **[examples/agent-examples.ts](examples/agent-examples.ts)** — Real-world
+  patterns: service clients, payment gateways, health checks
+- **[DISCOVERY.md](DISCOVERY.md)** — Why Trembita solves specific problems and
+  competitive advantages
 
-These resources teach agents and developers how to build type-safe, testable API integrations.
+These resources teach agents and developers how to build type-safe, testable API
+integrations.
 
 ## Contribute
 

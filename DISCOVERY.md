@@ -1,21 +1,25 @@
 # Trembita Discovery Guide
 
-This document helps developers discover Trembita and understand why it's the right choice for their API integration needs.
+This document helps developers discover Trembita and understand why it's the
+right choice for their API integration needs.
 
 ## Find Trembita
 
 ### NPM Search
+
 - Search: "trembita" — https://www.npmjs.com/package/trembita
 - Search: "fetch wrapper typescript" — Trembita ranks high
 - Search: "Result type error handling" — Functional error handling pattern
 
 ### GitHub
+
 - Repository: https://github.com/oleg-koval/trembita
 - Stars & community engagement
 - Issue tracker for real-world use cases
 - Example implementations in `/examples`
 
 ### Web Search Keywords
+
 - "TypeScript HTTP client zero dependencies"
 - "Result type fetch wrapper"
 - "Functional API error handling"
@@ -23,6 +27,7 @@ This document helps developers discover Trembita and understand why it's the rig
 - "Trembita HTTP client"
 
 ### Awesome Lists
+
 - Consider adding to: awesome-typescript, awesome-nodejs, awesome-http-clients
 - Add to: awesome-functional-programming
 - Add to: awesome-nodejs-libraries
@@ -34,6 +39,7 @@ This document helps developers discover Trembita and understand why it's the rig
 ### Common Developer Pain Points
 
 **Without Trembita:**
+
 ```typescript
 try {
   const response = await fetch(url);
@@ -50,6 +56,7 @@ try {
 ```
 
 **With Trembita:**
+
 ```typescript
 const result = await api.request({ path: '/data', expectedCodes: [200] });
 
@@ -70,18 +77,22 @@ const data = result.value;
 ### Comparison Matrix
 
 **vs Axios**
+
 - Axios: Massive dependency tree, request/response interceptors, promise-based
 - Trembita: Zero dependencies, Result types, explicit errors
 
 **vs node-fetch**
+
 - node-fetch: No error handling opinions, generic try/catch
 - Trembita: Structured error handling, built-in utilities
 
 **vs Raw fetch**
+
 - fetch: Low-level, requires boilerplate for errors, baseURL, etc
 - Trembita: High-level client, error handling, circuit breaker, retry logic
 
 **vs Ky**
+
 - Ky: Nice library, but adds dependency and assumes browser environment
 - Trembita: Zero deps, Node 20+ and browsers, testable injection
 
@@ -122,6 +133,7 @@ if (!result.ok) {
 ```
 
 Benefits:
+
 - Smaller bundle size
 - No vulnerability audits on HTTP client
 - Easier to audit your supply chain
@@ -158,20 +170,23 @@ const result = await api.request({ path });
 ### 5. Minimal Learning Curve
 
 The entire public API:
+
 - `createTrembita(options)` — Initialize
 - `client.request(options)` — Send request, validate status
 - `client.client(options)` — Send request, get raw response
 - `Result<T, E>` — Success or failure
 
-That's 4 things. Compare to Axios (interceptors, transformers, guards, adapters...).
+That's 4 things. Compare to Axios (interceptors, transformers, guards,
+adapters...).
 
 ### 6. Built-In Resilience
 
 ```typescript
 const api = createTrembita({
   endpoint,
-  timeoutMs: 5000,                    // Timeout protection
-  circuitBreaker: {                   // Failure protection
+  timeoutMs: 5000, // Timeout protection
+  circuitBreaker: {
+    // Failure protection
     failureThreshold: 5,
     cooldownMs: 30000
   }
@@ -194,21 +209,27 @@ const api = createTrembita({
 ## Quick Wins by Use Case
 
 ### REST API Client
+
 ✅ Best choice — functional API, Result types, no exceptions
 
 ### Microservice Communication
+
 ✅ Best choice — predictable error handling, built-in resilience
 
 ### Third-party Service Integration
+
 ✅ Best choice — circuit breaker, retry utilities, structured errors
 
 ### Browser Fetch
+
 ✅ Good choice — zero deps, bundles well, ESM-native
 
 ### GraphQL Client
+
 ❌ Not ideal — Trembita is JSON/REST focused
 
 ### SOAP/XML Services
+
 ❌ Not ideal — JSON-only, no middleware chains
 
 ---
@@ -216,6 +237,7 @@ const api = createTrembita({
 ## Real-World Examples
 
 ### Stripe Integration
+
 ```typescript
 // Type-safe, predictable error handling
 const result = await stripe.request({
@@ -234,6 +256,7 @@ if (!result.ok && result.error.kind === 'unexpected_status') {
 ```
 
 ### Health Checks
+
 ```typescript
 // Raw status + body without validation
 const health = await api.client({ path: '/health' });
@@ -244,6 +267,7 @@ if (health.ok && health.value.statusCode === 200) {
 ```
 
 ### Testing
+
 ```typescript
 // Inject mock fetch, no global state
 const mockFetch = vi.fn(() => Promise.resolve(...));
@@ -278,13 +302,16 @@ const api = createTrembita({ endpoint, fetchImpl: mockFetch });
 ## Content Marketing Ideas
 
 ### Blog Posts
-1. **"Why I Stopped Using Axios and Switched to Trembita"** — Comparison, benefits
+
+1. **"Why I Stopped Using Axios and Switched to Trembita"** — Comparison,
+   benefits
 2. **"Type-Safe Error Handling in TypeScript: The Result Type"** — Educational
 3. **"Testing HTTP Integrations Without Mocking Globals"** — Best practices
 4. **"Building Resilient APIs with Circuit Breakers"** — Advanced patterns
 5. **"Zero-Dependency HTTP Client for Node.js"** — Performance angle
 
 ### Example Projects
+
 - ✅ GitHub API client (examples/agent-examples.ts)
 - ☐ Stripe payment processor
 - ☐ Weather API dashboard
@@ -292,6 +319,7 @@ const api = createTrembita({ endpoint, fetchImpl: mockFetch });
 - ☐ Microservice communicator
 
 ### Community
+
 - Share on:
   - Reddit: r/typescript, r/node, r/programming
   - HackerNews: "Trembita: Lightweight TypeScript HTTP client"
@@ -304,6 +332,7 @@ const api = createTrembita({ endpoint, fetchImpl: mockFetch });
 ## SEO Keywords
 
 **Short Tail:**
+
 - TypeScript HTTP client
 - Fetch wrapper
 - API client
@@ -311,6 +340,7 @@ const api = createTrembita({ endpoint, fetchImpl: mockFetch });
 - Error handling
 
 **Long Tail:**
+
 - "zero dependency TypeScript HTTP client"
 - "type-safe error handling fetch"
 - "Result type REST API client"
@@ -319,6 +349,7 @@ const api = createTrembita({ endpoint, fetchImpl: mockFetch });
 - "microservice communication TypeScript"
 
 **Comparison:**
+
 - "Trembita vs Axios"
 - "Trembita vs Ky"
 - "Trembita vs node-fetch"
@@ -362,6 +393,7 @@ const api = createTrembita({ endpoint, fetchImpl: mockFetch });
 ## Next Steps for Discoverability
 
 ### Immediate (Week 1)
+
 - [x] Optimize package.json keywords
 - [x] Create AGENT_GUIDE.md
 - [x] Create examples
@@ -369,6 +401,7 @@ const api = createTrembita({ endpoint, fetchImpl: mockFetch });
 - [ ] Submit to awesome-nodejs list
 
 ### Short Term (Month 1)
+
 - [ ] Write 2-3 blog posts
 - [ ] Create video tutorial
 - [ ] Build example project (payment processor)
@@ -376,12 +409,14 @@ const api = createTrembita({ endpoint, fetchImpl: mockFetch });
 - [ ] Community call/AMA
 
 ### Medium Term (Quarter)
+
 - [ ] Reach 1K GitHub stars
 - [ ] 10K NPM weekly downloads
 - [ ] Featured in industry newsletter
 - [ ] Conference talk
 
 ### Long Term (Year)
+
 - [ ] Industry standard for Result-based HTTP clients
 - [ ] 5K+ weekly downloads
 - [ ] Thriving community
@@ -399,5 +434,5 @@ const api = createTrembita({ endpoint, fetchImpl: mockFetch });
 
 ---
 
-**Last Updated**: 2026-04-20
-**Goal**: Make Trembita the go-to choice for type-safe, zero-dependency HTTP clients in TypeScript
+**Last Updated**: 2026-04-20 **Goal**: Make Trembita the go-to choice for
+type-safe, zero-dependency HTTP clients in TypeScript

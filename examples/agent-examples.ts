@@ -5,7 +5,12 @@
  * implementing API integrations with Trembita.
  */
 
-import { createTrembita, HTTP_OK, HTTP_CREATED, Result } from '../dist/index.js';
+import {
+  createTrembita,
+  HTTP_OK,
+  HTTP_CREATED,
+  Result
+} from '../dist/index.js';
 import type {
   TrembitaClient,
   TrembitaRequestError,
@@ -43,7 +48,9 @@ export class GitHubAPIClient {
     });
 
     if (!client.ok) {
-      throw new Error(`Failed to initialize GitHub client: ${client.error.kind}`);
+      throw new Error(
+        `Failed to initialize GitHub client: ${client.error.kind}`
+      );
     }
 
     this.api = client.value;
@@ -84,7 +91,10 @@ export class GitHubAPIClient {
         ok: false,
         error: {
           kind: 'network_error' as const,
-          statusCode: result.error.kind === 'unexpected_status' ? result.error.statusCode : undefined,
+          statusCode:
+            result.error.kind === 'unexpected_status'
+              ? result.error.statusCode
+              : undefined,
           message: `Failed to fetch user: ${result.error.kind}`
         }
       };
@@ -176,7 +186,7 @@ export async function createPaymentIntent(
       customer: customerId
     },
     headers: {
-      'Authorization': `Bearer ${process.env.STRIPE_API_KEY || ''}`
+      Authorization: `Bearer ${process.env.STRIPE_API_KEY || ''}`
     },
     expectedCodes: [HTTP_OK, HTTP_CREATED]
   });
@@ -191,7 +201,7 @@ export async function createPaymentIntent(
           ok: false,
           error: {
             kind: 'insufficient_funds' as const,
-            message: body.message as string || 'Insufficient funds',
+            message: (body.message as string) || 'Insufficient funds',
             retryable: false
           }
         };
@@ -203,7 +213,9 @@ export async function createPaymentIntent(
             ok: false,
             error: {
               kind: 'invalid_card' as const,
-              message: (body.error as Record<string, unknown>)?.message as string || 'Invalid card',
+              message:
+                ((body.error as Record<string, unknown>)?.message as string) ||
+                'Invalid card',
               retryable: false
             }
           };
@@ -226,7 +238,9 @@ export async function createPaymentIntent(
       error: {
         kind: 'service_error' as const,
         message: `Stripe request failed: ${result.error.kind}`,
-        retryable: result.error.kind === 'timeout' || result.error.kind === 'fetch_failed'
+        retryable:
+          result.error.kind === 'timeout' ||
+          result.error.kind === 'fetch_failed'
       }
     };
   }
@@ -238,7 +252,8 @@ export async function createPaymentIntent(
     value: {
       transactionId: intent.id as string,
       amount: (intent.amount as number) / 100,
-      status: (intent.status as string) === 'succeeded' ? 'completed' : 'pending'
+      status:
+        (intent.status as string) === 'succeeded' ? 'completed' : 'pending'
     }
   };
 }
@@ -335,7 +350,8 @@ export async function requestWithRetry<T>(
     const isTransient =
       result.error.kind === 'timeout' ||
       result.error.kind === 'fetch_failed' ||
-      (result.error.kind === 'unexpected_status' && result.error.statusCode >= 500);
+      (result.error.kind === 'unexpected_status' &&
+        result.error.statusCode >= 500);
 
     if (!isTransient || attempt === maxAttempts - 1) {
       return result;
@@ -347,7 +363,7 @@ export async function requestWithRetry<T>(
       maxDelayMs
     );
 
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
 
   // Should never reach here

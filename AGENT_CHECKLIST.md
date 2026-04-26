@@ -1,6 +1,7 @@
 # Trembita Implementation Checklist
 
-Use this checklist when implementing API integrations with Trembita. It ensures you follow best practices and don't miss important considerations.
+Use this checklist when implementing API integrations with Trembita. It ensures
+you follow best practices and don't miss important considerations.
 
 ## Pre-Implementation
 
@@ -13,7 +14,8 @@ Use this checklist when implementing API integrations with Trembita. It ensures 
 ## Setup Phase
 
 - [ ] **Install package** — `npm install trembita`
-- [ ] **Install optional OpenAPI support** — `npm install @trembita/openapi` (if needed)
+- [ ] **Install optional OpenAPI support** — `npm install @trembita/openapi` (if
+      needed)
 - [ ] **Import types correctly** — Use named imports from `'trembita'`
 - [ ] **Import Result helpers** — Import `ok`, `err`, `Result` for custom errors
 
@@ -190,21 +192,25 @@ Use this checklist when implementing API integrations with Trembita. It ensures 
 ## When to Use Alternatives
 
 Use Trembita's `client()` instead of `request()` when:
+
 - You need the raw HTTP status code
 - Response status doesn't determine success (health checks)
 - You want to handle all status codes the same
 
 Use `createRetryingFetch` when:
+
 - You need automatic retry with backoff
 - Transient failures are common
 - You want centralized retry logic
 
 Use `requestWithStandardSchema` when:
+
 - You need runtime response validation
 - Response schema can change
 - You want type safety after validation
 
 Use custom `log` handler when:
+
 - You need structured logging
 - You're integrating with a logging platform
 - You need to redact additional headers
@@ -223,6 +229,5 @@ Use custom `log` handler when:
 
 ---
 
-**Last Updated**: 2026-04-20
-**Checklist Version**: 1.0
-**Trembita Target Version**: 2.x
+**Last Updated**: 2026-04-20 **Checklist Version**: 1.0 **Trembita Target
+Version**: 2.x
