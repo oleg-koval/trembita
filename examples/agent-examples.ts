@@ -5,17 +5,8 @@
  * implementing API integrations with Trembita.
  */
 
-import {
-  createTrembita,
-  HTTP_OK,
-  HTTP_CREATED,
-  Result
-} from '../dist/index.js';
-import type {
-  TrembitaClient,
-  TrembitaRequestError,
-  TrembitaSendError
-} from '../dist/index.js';
+import { createTrembita, HTTP_OK, HTTP_CREATED } from 'trembita';
+import type { Result, TrembitaClient, TrembitaRequestError } from 'trembita';
 
 // ============================================================================
 // Example 1: REST API Service Client
@@ -36,15 +27,12 @@ interface GitHubError {
 
 export class GitHubAPIClient {
   private api: TrembitaClient;
+  private authHeaders: Record<string, string>;
 
   constructor(token: string) {
     const client = createTrembita({
       endpoint: 'https://api.github.com',
-      timeoutMs: 10000,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github+json'
-      }
+      timeoutMs: 10000
     });
 
     if (!client.ok) {
@@ -54,11 +42,16 @@ export class GitHubAPIClient {
     }
 
     this.api = client.value;
+    this.authHeaders = {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github+json'
+    };
   }
 
   async getUser(username: string): Promise<Result<GitHubUser, GitHubError>> {
     const result = await this.api.request({
       path: `/users/${username}`,
+      headers: this.authHeaders,
       expectedCodes: [HTTP_OK]
     });
 
@@ -118,6 +111,7 @@ export class GitHubAPIClient {
   async getRepos(username: string): Promise<Result<unknown[], GitHubError>> {
     const result = await this.api.request({
       path: `/users/${username}/repos`,
+      headers: this.authHeaders,
       query: { per_page: '10', sort: 'updated' },
       expectedCodes: [HTTP_OK]
     });
@@ -194,28 +188,38 @@ export async function createPaymentIntent(
   if (!result.ok) {
     if (result.error.kind === 'unexpected_status') {
       const status = result.error.statusCode;
-      const body = result.error.body as Record<string, unknown>;
+      const body =
+        typeof result.error.body === 'object' && result.error.body !== null
+          ? (result.error.body as Record<string, unknown>)
+          : {};
 
       if (status === 402) {
         return {
           ok: false,
           error: {
             kind: 'insufficient_funds' as const,
-            message: (body.message as string) || 'Insufficient funds',
+            message:
+              (typeof body.message === 'string' ? body.message : null) ||
+              'Insufficient funds',
             retryable: false
           }
         };
       }
       if (status === 400) {
-        const errorType = (body.error as Record<string, unknown>)?.type;
+        const errorObj =
+          typeof body.error === 'object' && body.error !== null
+            ? (body.error as Record<string, unknown>)
+            : null;
+        const errorType = errorObj?.type;
         if (errorType === 'card_error') {
           return {
             ok: false,
             error: {
               kind: 'invalid_card' as const,
               message:
-                ((body.error as Record<string, unknown>)?.message as string) ||
-                'Invalid card',
+                (typeof errorObj?.message === 'string'
+                  ? errorObj.message
+                  : null) || 'Invalid card',
               retryable: false
             }
           };
@@ -486,14 +490,16 @@ export async function testGitHubClient() {
     fetchImpl: createMockFetch(mockResponses) as typeof fetch
   });
 
-  if (api.ok) {
-    const result = await api.value.request({
-      path: '/users/octocat',
-      expectedCodes: [HTTP_OK]
-    });
-
-    console.log('Test passed:', result.ok);
+  if (!api.ok) {
+    throw new Error(`createTrembita failed: ${api.error.kind}`);
   }
+
+  const result = await api.value.request({
+    path: '/users/octocat',
+    expectedCodes: [HTTP_OK]
+  });
+
+  console.log('Test passed:', result.ok);
 }
 
 // ============================================================================

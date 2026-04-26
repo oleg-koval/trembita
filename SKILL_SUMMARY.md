@@ -236,7 +236,7 @@ From discovery → learning → implementation → testing → deployment → ma
 ### Long Term (This Year)
 
 - [ ] Industry standard for Result-based HTTP clients
-- [ ] 5K+ weekly downloads
+- [ ] 50K+ weekly downloads
 - [ ] Conference talk at major JS conference
 - [ ] Multiple corporate case studies
 

@@ -96,10 +96,7 @@ if (result.ok) {
 import { createTrembita, HTTP_OK } from 'trembita';
 
 const stripe = createTrembita({
-  endpoint: 'https://api.stripe.com/v1',
-  headers: {
-    Authorization: `Bearer ${process.env.STRIPE_API_KEY}`
-  }
+  endpoint: 'https://api.stripe.com/v1'
 });
 
 if (!stripe.ok) throw new Error('Stripe client failed');
@@ -107,6 +104,7 @@ if (!stripe.ok) throw new Error('Stripe client failed');
 const charges = await stripe.value.request({
   path: '/charges',
   query: { limit: '10' },
+  headers: { Authorization: `Bearer ${process.env.STRIPE_API_KEY}` },
   expectedCodes: [HTTP_OK]
 });
 
