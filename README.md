@@ -15,10 +15,11 @@ _Named after the Carpathian **trembita** — a long signal horn. One small clien
 explicit success/failure at a distance._
 
 **Quick links:** [Install](#install) · [Minimal example](#minimal-example) ·
-[Why trembita](#why-trembita) · [Use cases](#use-cases) ·
-[@trembita/openapi](#trembitaopenapi-optional) ·
+[Learning guide](./LEARNING_GUIDE.md) · [Examples](./EXAMPLES.md) ·
+[Agent skill](./SKILL.md) · [Why trembita](#why-trembita) ·
+[Use cases](#use-cases) · [@trembita/openapi](#trembitaopenapi-optional) ·
 [Error handling](#error-handling) · [API reference](#api-reference) ·
-[Migration from v1](#migration-from-v1)
+[For AI agents](#for-ai-agents) · [Migration from v1](#migration-from-v1)
 
 ## Install
 
@@ -60,6 +61,45 @@ if (!json.ok) {
   console.error(json.error.kind);
 }
 ```
+
+## Learning Path
+
+**Choose your starting point based on available time:**
+
+### ⚡ Super Quick (2 minutes)
+
+**[QUICK_START.md](./QUICK_START.md)** — Install, 3-step example, common
+patterns, error types, FAQ.
+
+### 🎓 Complete Learning (30 minutes)
+
+**[LEARNING_GUIDE.md](./LEARNING_GUIDE.md)** — Core concepts, building clients,
+error handling, testing, advanced features, patterns.
+
+### 🏗️ System Design (15 minutes)
+
+**[ARCHITECTURE.md](./ARCHITECTURE.md)** — Visual diagrams, request pipeline,
+error flow, feature matrix, integration patterns.
+
+### 🤔 Right Tool for You? (10 minutes)
+
+**[DECISION_GUIDE.md](./DECISION_GUIDE.md)** — Compare with Axios/Got/Fetch,
+scenario-based recommendations, migration guides.
+
+### 💡 Real-World Examples (varies)
+
+**[EXAMPLES.md](./EXAMPLES.md)** — 7+ use cases: GitHub API, payments,
+microservices, health checks, webhooks, search, backups.
+
+### 📝 Starter Code
+
+**[examples/](./examples/)** directory — Copy-paste ready:
+
+- `rest-api-client.ts` — Complete CRUD client
+- `testing-with-mock-fetch.test.ts` — Unit test patterns
+- `resilience-patterns.ts` — Retries, circuit breaker, failover
+
+**See [examples/README.md](./examples/README.md) for navigation.**
 
 ## Why trembita
 
@@ -324,6 +364,25 @@ This version line is a **breaking v2 migration** to the functional `Result` API.
 | Install     | `npm install trembita @trembita/openapi` — **`trembita` is a peer dependency** (^2) of the OpenAPI package.                                                                                                                                                                                                                                               |
 | Path typing | Generate `paths` with **`openapi-typescript`**, keep templates aligned with `keyof paths`, expand with **`Result`**.                                                                                                                                                                                                                                      |
 | Publishing  | Same **semantic-release** run publishes **`trembita`** then **`@trembita/openapi`**. Use **Trusted Publishing** for **both** packages on npm (or an **Automation** granular token); see [CONTRIBUTING.md](CONTRIBUTING.md). If only `trembita` has OIDC and **`NPM_TOKEN`** is set, OpenAPI may fall back to token auth and fail with **EOTP** under 2FA. |
+
+## For AI Agents
+
+Trembita is designed to be agent-friendly. When implementing API integrations,
+refer to:
+
+- **[AGENT_GUIDE.md](AGENT_GUIDE.md)** — Comprehensive guide for agents
+  implementing with Trembita
+- **[AGENT_CHECKLIST.md](AGENT_CHECKLIST.md)** — Implementation checklist
+  ensuring best practices
+- **[docs/SKILL_DEFINITION.md](docs/SKILL_DEFINITION.md)** — Trigger conditions
+  and patterns for recommending Trembita
+- **[examples/agent-examples.ts](examples/agent-examples.ts)** — Real-world
+  patterns: service clients, payment gateways, health checks
+- **[DISCOVERY.md](DISCOVERY.md)** — Why Trembita solves specific problems and
+  competitive advantages
+
+These resources teach agents and developers how to build type-safe, testable API
+integrations.
 
 ## Contribute
 
