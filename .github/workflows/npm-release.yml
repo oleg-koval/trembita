@@ -1,22 +1,12 @@
 name: Release to NPM
 
-# npm Trusted Publishing (OIDC) + optional NPM_TOKEN bootstrap:
+# npm Trusted Publishing (OIDC):
 # https://gist.github.com/kettanaito/debde3cabfae4f68d37cf0f8f3a6a666
-#
 # - Node 24+ is required for Trusted Publishing on the npm side.
-# - This repo publishes TWO packages: `trembita` (root) and `@trembita/openapi`.
-#   Each must have its own Trusted Publisher on npmjs.com. If OIDC fails for one
-#   package (e.g. 404 "package not found" during token exchange) while NPM_TOKEN
-#   is set, @semantic-release/npm falls back to token auth for that package; npm
-#   may then return EOTP ("requires a one-time password") for accounts with 2FA.
-#   Fix: add Trusted Publishing for `@trembita/openapi`, or use an npm **Granular**
-#   access token with **Automation** + publish rights and 2FA bypass for CI.
-# - While the NPM_TOKEN secret is set, setup-node uses registry-url + always-auth.
-#   You must pass NODE_AUTH_TOKEN into that same step; otherwise setup-node falls
-#   back to a placeholder token and npm returns E401 / invalid token.
-# - After Trusted Publishers exist for BOTH packages, remove NPM_TOKEN from repo
-#   secrets; the conditionals then omit registry-url/always-auth so npm uses OIDC only
-#   (per gist steps 12–14).
+# - This repo publishes TWO packages: `trembita` and `@trembita/openapi`.
+# - Each package must have its own Trusted Publisher on npmjs.com for this workflow.
+# - OIDC-only publishing is intentional. Do not pass NPM_TOKEN here: token fallback
+#   can fail with EOTP when 2FA is enabled.
 
 on:
   push:
@@ -39,14 +29,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         with:
           node-version: '24'
           cache: npm
-          # prettier-ignore
-          registry-url: "${{ secrets.NPM_TOKEN != '' && 'https://registry.npmjs.org' || '' }}"
-          always-auth: ${{ secrets.NPM_TOKEN != '' }}
       - run: npm ci --no-audit
       - run: npm audit
       - run: npm run build
@@ -55,6 +40,5 @@ jobs:
       - env:
           CI: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
         run: npx semantic-release
