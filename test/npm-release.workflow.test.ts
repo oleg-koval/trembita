@@ -12,8 +12,6 @@ const WORKFLOW_PATH = path.join(
   'npm-release.yml'
 );
 
-const TOKEN_SET_CONDITION = "secrets.NPM_TOKEN != ''";
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -36,31 +34,18 @@ function setupNodeWithBlock(doc: unknown): Record<string, unknown> {
   return withBlock;
 }
 
-function innerExpression(raw: unknown): string {
-  if (typeof raw !== 'string') return '';
-  const match = /^\$\{\{\s*([\s\S]*?)\s*\}\}$/.exec(raw);
-  return match?.[1]?.trim() ?? '';
-}
-
 describe('npm-release.yml workflow', () => {
   const doc: unknown = parse(readFileSync(WORKFLOW_PATH, 'utf8'));
 
-  describe('setup-node: always-auth conditional (NPM Trusted Publishing)', () => {
+  describe('setup-node: OIDC-only npm publishing', () => {
     const withBlock = setupNodeWithBlock(doc);
 
-    it('always-auth is set conditionally based on NPM_TOKEN secret', () => {
-      expect(withBlock['always-auth']).toBe("${{ secrets.NPM_TOKEN != '' }}");
+    it('does not set always-auth', () => {
+      expect(withBlock['always-auth']).toBeUndefined();
     });
 
-    it('always-auth and registry-url use the same NPM_TOKEN condition', () => {
-      const registryRaw = withBlock['registry-url'];
-      const alwaysAuthRaw = withBlock['always-auth'];
-      expect(typeof registryRaw).toBe('string');
-      expect(typeof alwaysAuthRaw).toBe('string');
-      const registryInner = innerExpression(registryRaw);
-      const authInner = innerExpression(alwaysAuthRaw);
-      expect(authInner).toBe(TOKEN_SET_CONDITION);
-      expect(registryInner.startsWith(`${TOKEN_SET_CONDITION} &&`)).toBe(true);
+    it('does not set registry-url for token auth', () => {
+      expect(withBlock['registry-url']).toBeUndefined();
     });
   });
 });

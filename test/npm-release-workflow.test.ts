@@ -102,77 +102,13 @@ describe('npm-release.yml workflow', () => {
     });
   });
 
-  describe('setup-node: registry-url conditional (NPM Trusted Publishing)', () => {
-    it('registry-url is set conditionally based on NPM_TOKEN secret', () => {
-      expect(workflowContent).toContain(
-        "secrets.NPM_TOKEN != '' && 'https://registry.npmjs.org' || ''"
-      );
+  describe('setup-node: OIDC-only npm publishing', () => {
+    it('does not configure registry-url for token auth', () => {
+      expect(workflowContent).not.toMatch(/^\s*registry-url:/m);
     });
 
-    it('registry-url resolves to npmjs registry when NPM_TOKEN is set', () => {
-      // When NPM_TOKEN is non-empty the expression evaluates to the npm registry URL.
-      expect(workflowContent).toContain('https://registry.npmjs.org');
-    });
-
-    it('registry-url falls back to empty string when NPM_TOKEN is absent', () => {
-      // The trailing `|| ''` ensures an empty string (no registry) when NPM_TOKEN is unset,
-      // enabling OIDC-only Trusted Publishing without a token.
-      // The value is on the next line (YAML block scalar / multiline), so we check for the
-      // full conditional string anywhere in the file.
-      expect(workflowContent).toContain(
-        "secrets.NPM_TOKEN != '' && 'https://registry.npmjs.org' || ''"
-      );
-    });
-
-    it('registry-url expression uses GitHub Actions expression syntax', () => {
-      expect(workflowContent).toMatch(/registry-url:.*\$\{\{.*NPM_TOKEN/);
-    });
-  });
-
-  describe('setup-node: always-auth conditional (NPM Trusted Publishing)', () => {
-    it('always-auth is set conditionally based on NPM_TOKEN secret', () => {
-      expect(workflowContent).toContain(
-        "always-auth: ${{ secrets.NPM_TOKEN != '' }}"
-      );
-    });
-
-    it('always-auth and registry-url use the same NPM_TOKEN condition', () => {
-      // Both settings must check the same secret to stay in sync.
-      // Skip comment lines (starting with #) when looking for the yaml config lines.
-      const isYamlConfigLine = (l: string): boolean =>
-        !l.trimStart().startsWith('#');
-
-      const registryUrlLine = workflowLines.find(
-        (l) => l.includes('registry-url') && isYamlConfigLine(l)
-      );
-      // Find the line containing the registry-url expression (may be inline or on a continuation line).
-      // Use an https-specific pattern to avoid matching other single-quoted strings like '' or ' && '.
-      const registryUrlValueLine = workflowLines.find((l) => {
-        if (!l.includes("secrets.NPM_TOKEN != ''")) {
-          return false;
-        }
-
-        const quotedUrlMatch = l.match(/'(https?:\/\/[^']+)'/);
-        const capturedUrl = quotedUrlMatch?.[1];
-        if (!capturedUrl) {
-          return false;
-        }
-
-        try {
-          return new URL(capturedUrl).host === 'registry.npmjs.org';
-        } catch {
-          return false;
-        }
-      });
-      const alwaysAuthLine = workflowLines.find(
-        (l) => l.includes('always-auth') && isYamlConfigLine(l)
-      );
-
-      // The registry-url yaml key line must be present (even if value is on next line)
-      expect(registryUrlLine).toBeDefined();
-      // Both the registry-url expression and always-auth reference secrets.NPM_TOKEN != ''
-      expect(registryUrlValueLine).toContain("NPM_TOKEN != ''");
-      expect(alwaysAuthLine).toContain("NPM_TOKEN != ''");
+    it('does not configure always-auth', () => {
+      expect(workflowContent).not.toMatch(/^\s*always-auth:/m);
     });
   });
 
@@ -187,12 +123,12 @@ describe('npm-release.yml workflow', () => {
       expect(workflowContent).toContain('Node 24+ is required');
     });
 
-    it('documents the NPM_TOKEN bootstrap flow', () => {
+    it('documents that NPM_TOKEN fallback is disabled', () => {
       expect(workflowContent).toContain('NPM_TOKEN');
     });
 
-    it('references the OIDC-only fallback instructions (steps 12–14 of the gist)', () => {
-      expect(workflowContent).toContain('OIDC only');
+    it('documents OIDC-only publishing', () => {
+      expect(workflowContent).toContain('OIDC-only');
     });
   });
 
@@ -251,8 +187,10 @@ describe('npm-release.yml workflow', () => {
       );
     });
 
-    it('passes NPM_TOKEN to semantic-release step', () => {
-      expect(workflowContent).toContain('NPM_TOKEN: ${{ secrets.NPM_TOKEN }}');
+    it('does not pass NPM_TOKEN to semantic-release step', () => {
+      expect(workflowContent).not.toContain(
+        'NPM_TOKEN: ${{ secrets.NPM_TOKEN }}'
+      );
     });
   });
 
