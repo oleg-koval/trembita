@@ -104,7 +104,7 @@ const resolveQuery = (
 const buildRequestInit = (options: TrembitaFetchOptions): RequestInit => {
   const method =
     options.method ?? (options.body !== undefined ? 'POST' : 'GET');
-  const headers = new Headers(options.headers as HeadersInit | undefined);
+  const headers = new Headers(options.headers);
   if (options.body !== undefined && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
