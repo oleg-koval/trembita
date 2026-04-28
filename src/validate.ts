@@ -80,9 +80,7 @@ export const validateInitOptions = (
 
   return ok({
     endpoint: endpointResult.value,
-    ...(typeof o.log === 'object' && o.log !== null
-      ? { log: o.log as Logger }
-      : {}),
+    ...(typeof o.log === 'object' && o.log !== null ? { log: o.log } : {}),
     ...(typeof o.fetchImpl === 'function'
       ? { fetchImpl: o.fetchImpl as typeof fetch }
       : {}),
