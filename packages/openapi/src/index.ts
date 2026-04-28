@@ -4,6 +4,16 @@ export {
   type RequestOpenapiPathError
 } from './requestOpenapiPath.js';
 export {
+  createOpenapiClient,
+  type OpenapiClient,
+  type OpenapiClientError,
+  type OpenapiClientOptions,
+  type OpenapiInvalidResponseError,
+  type OpenapiOperationPolicy,
+  type OpenapiRequestOptions,
+  type OpenapiResponseSchemaMap
+} from './client.js';
+export {
   createTrembita,
   createRetryingFetch,
   HTTP_OK,

@@ -22,9 +22,48 @@ no truthiness check on an `error` field that might be empty.
 ## API
 
 - **`expandOpenapiPath(template, params)`** — `Result<string, ExpandPathError>`
+- **`createOpenapiClient<paths>(options)`** — contract boundary client with
+  typed OpenAPI paths, `Result` errors, operation policy, and optional Standard
+  Schema response validation.
 - Re-exports: `createTrembita`, `HTTP_OK`, `createRetryingFetch`,
   `traceContextHeaders`, `validateStandardSchema`, `requestWithStandardSchema`,
   and common types.
+
+## Contract boundary client
+
+`createOpenapiClient<paths>()` turns an `openapi-typescript` `paths` type into a
+small backend boundary client. It expands path params, applies per-operation
+policy, checks the expected status, and optionally validates successful response
+bodies with Standard Schema.
+
+```typescript
+import type { paths } from './fixtures/mini-api.paths.js';
+import { createOpenapiClient } from '@trembita/openapi';
+
+const created = createOpenapiClient<paths>({
+  endpoint: 'https://api.example.com',
+  policies: {
+    'GET /users/{userId}': { expectedStatus: 200, timeoutMs: 500 }
+  },
+  responseSchemas: {
+    'GET /users/{userId} 200': userSchema
+  }
+});
+
+if (!created.ok) throw new Error('invalid client config');
+
+const user = await created.value.GET('/users/{userId}', {
+  params: { userId: 'alice' }
+});
+
+if (!user.ok) {
+  // ExpandPathError | TrembitaRequestError | { kind: 'invalid_response' }
+  console.error(user.error.kind);
+}
+```
+
+See [docs/contract-boundary-client.md](../../docs/contract-boundary-client.md)
+for the design notes.
 
 ## Real `paths` fixture + DX
 
