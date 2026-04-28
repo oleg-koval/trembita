@@ -23,10 +23,7 @@ export const expandOpenapiPath = (
   const re = /\{([^}]+)\}/g;
   const missing: string[] = [];
   for (const m of out.matchAll(re)) {
-    const seg = m[1];
-    if (seg !== undefined && seg.length > 0) {
-      missing.push(seg);
-    }
+    missing.push(m[1] as string);
   }
   if (missing.length > 0) {
     return err({
