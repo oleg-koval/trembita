@@ -79,7 +79,7 @@
     "semantic-release-npm-github-publish": "^1.7.3",
     "tsup": "^8.4.0",
     "typedoc": "^0.28.19",
-    "typescript": "^5.8.3",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.29.1",
     "vitest": "^4.1.5"
   },
