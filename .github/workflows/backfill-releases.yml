@@ -1,0 +1,59 @@
+name: Backfill GitHub Releases
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Release to NPM
+    types:
+      - completed
+
+jobs:
+  backfill:
+    name: Backfill missing GitHub releases
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MIN_RELEASE_TAG: v2.0.0
+        run: |
+          set -euo pipefail
+
+          git fetch --tags --force
+
+          existing_releases="$(gh release list --limit 1000 --json tagName --jq '.[].tagName')"
+          latest_stable_tag="$(git tag -l 'v[0-9]*' | grep -Ev '-' | sort -V | tail -n 1 || true)"
+
+          git tag -l 'v[0-9]*' --sort=version:refname | while IFS= read -r tag; do
+            if [ -z "$tag" ]; then
+              continue
+            fi
+
+            first_tag="$(printf '%s\n%s\n' "$MIN_RELEASE_TAG" "$tag" | sort -V | head -n 1)"
+            if [ "$first_tag" != "$MIN_RELEASE_TAG" ]; then
+              echo "Skipping $tag before $MIN_RELEASE_TAG"
+              continue
+            fi
+
+            if printf '%s\n' "$existing_releases" | grep -Fxq "$tag"; then
+              echo "Release already exists for $tag"
+              continue
+            fi
+
+            args=(release create "$tag" --verify-tag --generate-notes)
+            if [[ "$tag" == *-* ]]; then
+              args+=(--prerelease --latest=false)
+            elif [ "$tag" = "$latest_stable_tag" ]; then
+              args+=(--latest=true)
+            else
+              args+=(--latest=false)
+            fi
+
+            echo "Creating GitHub release for $tag"
+            gh "${args[@]}"
+          done
