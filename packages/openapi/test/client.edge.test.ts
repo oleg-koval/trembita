@@ -159,8 +159,13 @@ describe('createOpenapiClient edge cases', () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(logInfo).toHaveBeenCalledTimes(1);
-    expect(onValidation).toHaveBeenCalledTimes(1);
+    expect(logInfo).toHaveBeenCalledWith(
+      'openapi:response_validation',
+      expect.objectContaining({ ok: true })
+    );
+    expect(onValidation).toHaveBeenCalledWith(
+      expect.objectContaining({ ok: true })
+    );
   });
 
   it('returns unvalidated bodies when no response schema is configured', async () => {
