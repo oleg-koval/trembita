@@ -134,17 +134,19 @@ describe('createOpenapiClient edge cases', () => {
         new Response(JSON.stringify({ ok: true }), { status: 200 })
       )
     );
+    const logInfo = vi.fn(() => {
+      throw new Error('logger failed');
+    });
+    const onValidation = vi.fn(() => {
+      throw new Error('hook failed');
+    });
     const created = createOpenapiClient<edgePaths>({
       endpoint: 'https://api.example.test',
       fetchImpl,
       log: {
-        info: () => {
-          throw new Error('logger failed');
-        }
+        info: logInfo
       },
-      onValidation: () => {
-        throw new Error('hook failed');
-      },
+      onValidation,
       responseSchemas: {
         'GET /search 200': okSchema
       }
@@ -157,6 +159,8 @@ describe('createOpenapiClient edge cases', () => {
     });
 
     expect(result.ok).toBe(true);
+    expect(logInfo).toHaveBeenCalledTimes(1);
+    expect(onValidation).toHaveBeenCalledTimes(1);
   });
 
   it('returns unvalidated bodies when no response schema is configured', async () => {
