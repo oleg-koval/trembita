@@ -37,7 +37,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --coverage",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "benchmark:validation": "npm run build && node ./scripts/benchmark-validation.mjs"
   },
   "peerDependencies": {
     "trembita": "^2.0.0"

@@ -23,8 +23,8 @@ no truthiness check on an `error` field that might be empty.
 
 - **`expandOpenapiPath(template, params)`** — `Result<string, ExpandPathError>`
 - **`createOpenapiClient<paths>(options)`** — contract boundary client with
-  typed OpenAPI paths, `Result` errors, operation policy, and optional Standard
-  Schema response validation.
+  typed OpenAPI paths, `Result` errors, operation policy, optional Standard
+  Schema response validation, and validation timing events.
 - Re-exports: `createTrembita`, `HTTP_OK`, `createRetryingFetch`,
   `traceContextHeaders`, `validateStandardSchema`, `requestWithStandardSchema`,
   and common types.
@@ -88,8 +88,9 @@ const user = created.ok
 ```
 
 See [docs/contract-boundary-client.md](../../docs/contract-boundary-client.md)
-for the design notes and
-[framework examples](../../docs/contract-boundary-framework-examples.md).
+for the design notes,
+[framework examples](../../docs/contract-boundary-framework-examples.md), and
+[validation performance guidance](../../docs/contract-boundary-validation-performance.md).
 
 ## Real `paths` fixture + DX
 

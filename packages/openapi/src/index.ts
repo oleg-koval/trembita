@@ -17,7 +17,8 @@ export {
   type OpenapiRequestOptions,
   type OpenapiResponseSchemaKey,
   type OpenapiResponseSchemaMap,
-  type OpenapiUnexpectedStatusError
+  type OpenapiUnexpectedStatusError,
+  type OpenapiValidationEvent
 } from './client.js';
 export {
   createTrembita,

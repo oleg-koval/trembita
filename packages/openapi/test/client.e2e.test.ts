@@ -44,9 +44,13 @@ describe('createOpenapiClient e2e', () => {
       );
     });
 
+    const onValidation = vi.fn();
+    const log = { info: vi.fn() };
     const created = createOpenapiClient<paths>({
       endpoint: 'https://api.example.test',
       fetchImpl,
+      log,
+      onValidation,
       policies: {
         'GET /users/{userId}': {
           expectedStatus: 200,
@@ -70,15 +74,30 @@ describe('createOpenapiClient e2e', () => {
     if (result.ok) {
       expect(result.value.name).toBe('Alice');
     }
+    expect(onValidation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        operationKey: 'GET /users/{userId}',
+        schemaKey: 'GET /users/{userId} 200',
+        path: '/users/alice',
+        ok: true,
+        issueCount: 0
+      })
+    );
+    expect(log.info).toHaveBeenCalledWith(
+      'openapi:response_validation',
+      expect.objectContaining({ ok: true })
+    );
   });
 
   it('returns invalid_response when the downstream body violates the schema', async () => {
     const fetchImpl = vi.fn(() =>
       Promise.resolve(new Response(JSON.stringify({ id: 1 }), { status: 200 }))
     );
+    const onValidation = vi.fn();
     const created = createOpenapiClient<paths>({
       endpoint: 'https://api.example.test',
       fetchImpl,
+      onValidation,
       responseSchemas: {
         'GET /users/{userId} 200': userSchema
       }
@@ -101,6 +120,9 @@ describe('createOpenapiClient e2e', () => {
         expect(result.error.issues).toContainEqual({ message: 'user_invalid' });
       }
     }
+    expect(onValidation).toHaveBeenCalledWith(
+      expect.objectContaining({ ok: false, issueCount: 1 })
+    );
   });
 
   it('returns unexpected_status before schema validation', async () => {

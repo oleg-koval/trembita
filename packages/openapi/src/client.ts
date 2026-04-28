@@ -165,6 +165,18 @@ export type OpenapiResponseSchemaMap<Paths extends PathRecord> = Readonly<
   Partial<Record<OpenapiResponseSchemaKey<Paths>, StandardSchemaV1>>
 >;
 
+export type OpenapiValidationEvent = Readonly<{
+  operationKey: string;
+  schemaKey: string;
+  method: PublicMethod;
+  template: string;
+  path: string;
+  statusCode: number;
+  durationMs: number;
+  ok: boolean;
+  issueCount: number;
+}>;
+
 export type OpenapiClientOptions<Paths extends PathRecord> = Readonly<{
   endpoint: string;
   fetchImpl?: typeof fetch;
@@ -173,6 +185,7 @@ export type OpenapiClientOptions<Paths extends PathRecord> = Readonly<{
   circuitBreaker?: CircuitBreakerOptions;
   policies?: OpenapiPolicyMap<Paths>;
   responseSchemas?: OpenapiResponseSchemaMap<Paths>;
+  onValidation?: (event: OpenapiValidationEvent) => void;
 }>;
 
 export type OpenapiInvalidResponseError = Readonly<{
@@ -295,6 +308,25 @@ const mergeHeaders = (
   };
 };
 
+const nowMs = (): number => performance.now();
+
+const reportValidation = (
+  logger: Logger | undefined,
+  onValidation: ((event: OpenapiValidationEvent) => void) | undefined,
+  event: OpenapiValidationEvent
+): void => {
+  try {
+    logger?.info?.('openapi:response_validation', event);
+  } catch {
+    /* user logger must not break Result/no-throw contract */
+  }
+  try {
+    onValidation?.(event);
+  } catch {
+    /* user hook must not break Result/no-throw contract */
+  }
+};
+
 const findResponseSchema = <Paths extends PathRecord>(
   responseSchemas: OpenapiResponseSchemaMap<Paths> | undefined,
   method: PublicMethod,
@@ -387,11 +419,24 @@ export const createOpenapiClient = <Paths extends PathRecord>(
       return ok(sent.value.body);
     }
 
+    const validationStartedMs = nowMs();
     const validated = await validateStandardSchema(
       sent.value.body,
       schema.schema
     );
+    const durationMs = nowMs() - validationStartedMs;
     if (!validated.ok) {
+      reportValidation(options.log, options.onValidation, {
+        operationKey,
+        schemaKey: schema.key,
+        method,
+        template: path,
+        path: sent.value.path,
+        statusCode: sent.value.statusCode,
+        durationMs,
+        ok: false,
+        issueCount: validated.error.issues.length
+      });
       return err({
         kind: 'invalid_response',
         operationKey,
@@ -403,6 +448,17 @@ export const createOpenapiClient = <Paths extends PathRecord>(
         issues: validated.error.issues
       });
     }
+    reportValidation(options.log, options.onValidation, {
+      operationKey,
+      schemaKey: schema.key,
+      method,
+      template: path,
+      path: sent.value.path,
+      statusCode: sent.value.statusCode,
+      durationMs,
+      ok: true,
+      issueCount: 0
+    });
     return ok(validated.value);
   };
 
