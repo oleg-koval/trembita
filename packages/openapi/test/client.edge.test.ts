@@ -128,6 +128,46 @@ describe('createOpenapiClient edge cases', () => {
     }
   });
 
+  it('ignores validation telemetry failures to preserve Result contract', async () => {
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ ok: true }), { status: 200 })
+      )
+    );
+    const logInfo = vi.fn(() => {
+      throw new Error('logger failed');
+    });
+    const onValidation = vi.fn(() => {
+      throw new Error('hook failed');
+    });
+    const created = createOpenapiClient<edgePaths>({
+      endpoint: 'https://api.example.test',
+      fetchImpl,
+      log: {
+        info: logInfo
+      },
+      onValidation,
+      responseSchemas: {
+        'GET /search 200': okSchema
+      }
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const result = await created.value.GET('/search', {
+      query: { q: 'typed' }
+    });
+
+    expect(result.ok).toBe(true);
+    expect(logInfo).toHaveBeenCalledWith(
+      'openapi:response_validation',
+      expect.objectContaining({ ok: true })
+    );
+    expect(onValidation).toHaveBeenCalledWith(
+      expect.objectContaining({ ok: true })
+    );
+  });
+
   it('returns unvalidated bodies when no response schema is configured', async () => {
     const fetchImpl = vi.fn((input: RequestInfo | URL) => {
       expect(requestInputToString(input)).toBe(

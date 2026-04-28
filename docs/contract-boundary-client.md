@@ -31,6 +31,7 @@ anti-corruption layer:
 - no truthiness checks on optional `error` fields;
 - tagged `error.kind` for all branches;
 - optional runtime validation for untrusted downstream responses;
+- validation timing events for metrics and profiling;
 - timeout/header/status policy colocated with the operation.
 
 ## MVP API
@@ -91,6 +92,8 @@ shape drift would cause a production incident.
 
 Framework examples live in
 [contract-boundary-framework-examples.md](./contract-boundary-framework-examples.md).
+Validation performance guidance lives in
+[contract-boundary-validation-performance.md](./contract-boundary-validation-performance.md).
 
 ## Enterprise/platform notes
 
