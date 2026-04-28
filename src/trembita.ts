@@ -253,7 +253,7 @@ const makeSend =
     callLog(log, 'debug', 'request:start', {
       endpoint,
       path: pathResult.value,
-      method: init.method ?? 'GET',
+      method: init.method,
       headers: sanitizeHeaders(init.headers)
     });
     try {
