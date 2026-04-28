@@ -1,12 +1,24 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createOpenapiClient } from '../src/client.js';
+import {
+  createOpenapiClient,
+  openapiOperationKey,
+  openapiResponseSchemaKey
+} from '../src/client.js';
 
 const requestInputToString = (input: RequestInfo | URL): string => {
   if (typeof input === 'string') return input;
   if (input instanceof URL) return input.href;
   return input.url;
 };
+
+const okSchema = {
+  '~standard': {
+    version: 1,
+    vendor: 'test',
+    validate: (value: unknown) => ({ value })
+  }
+} as const;
 
 type edgePaths = {
   '/search': {
@@ -33,9 +45,38 @@ type edgePaths = {
       responses: { 201: { content: { 'application/json': { id: string } } } };
     };
   };
+  '/ping': {
+    get: {
+      parameters: { path?: never };
+      requestBody?: never;
+      responses: { 204: { content?: never } };
+    };
+  };
+  '/fallback': {
+    get: {
+      parameters: { path?: never };
+      requestBody?: never;
+      responses: {
+        default: { content: { 'application/json': { ok: boolean } } };
+      };
+    };
+  };
 };
 
 describe('createOpenapiClient edge cases', () => {
+  it('builds typed operation and response schema keys', () => {
+    expect(
+      openapiOperationKey<edgePaths, 'GET', '/search'>('GET', '/search')
+    ).toBe('GET /search');
+    expect(
+      openapiResponseSchemaKey<edgePaths, 'GET', '/search', 200>(
+        'GET',
+        '/search',
+        200
+      )
+    ).toBe('GET /search 200');
+  });
+
   it('returns init errors from the core client', () => {
     const created = createOpenapiClient<edgePaths>({ endpoint: 'ftp://bad' });
     expect(created.ok).toBe(false);
@@ -78,7 +119,6 @@ describe('createOpenapiClient edge cases', () => {
     if (!created.ok) return;
 
     const result = await created.value.GET('/search', {
-      params: {},
       query: { q: 'typed' }
     });
 
@@ -105,8 +145,52 @@ describe('createOpenapiClient edge cases', () => {
     if (!created.ok) return;
 
     const result = await created.value.GET('/search', {
-      params: {},
       query: { q: 'typed' }
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value).toEqual({ ok: true });
+    }
+  });
+
+  it('supports 204 responses with no JSON content', async () => {
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(new Response(null, { status: 204 }))
+    );
+    const created = createOpenapiClient<edgePaths>({
+      endpoint: 'https://api.example.test',
+      fetchImpl
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const result = await created.value.GET('/ping', { expectedStatus: 204 });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value).toBeUndefined();
+    }
+  });
+
+  it('uses default response schema fallback when status-specific schema is absent', async () => {
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ ok: true }), { status: 202 })
+      )
+    );
+    const created = createOpenapiClient<edgePaths>({
+      endpoint: 'https://api.example.test',
+      fetchImpl,
+      responseSchemas: {
+        'GET /fallback default': okSchema
+      }
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const result = await created.value.GET('/fallback', {
+      expectedStatus: 202
     });
 
     expect(result.ok).toBe(true);
@@ -132,7 +216,6 @@ describe('createOpenapiClient edge cases', () => {
     if (!created.ok) return;
 
     const result = await created.value.POST('/events', {
-      params: {},
       headers: { 'x-request': 'yes' },
       body: { name: 'created' },
       expectedStatus: 201
@@ -157,7 +240,6 @@ describe('createOpenapiClient edge cases', () => {
     if (!created.ok) return;
 
     const result = await created.value.GET('/search', {
-      params: {},
       query: { q: 'typed' },
       timeoutMs: 100,
       signal: controller.signal

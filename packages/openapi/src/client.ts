@@ -9,7 +9,6 @@ import {
   type StandardSchemaIssue,
   type StandardSchemaV1,
   type TrembitaInitError,
-  type TrembitaRequestError,
   type TrembitaSendError
 } from 'trembita';
 
@@ -66,7 +65,7 @@ type PathParams<Op> =
 
 type QueryParams<Op> =
   OperationParameters<Op> extends {
-    readonly query?: infer Query;
+    readonly query: infer Query;
   }
     ? Query extends never
       ? Record<string, never>
@@ -92,11 +91,21 @@ type JsonRequestBody<Op> = Op extends {
 
 type Responses<Op> = Op extends { readonly responses: infer R } ? R : never;
 
+type StatusFromKey<Key> = Key extends number
+  ? Key
+  : Key extends `${infer Status extends number}`
+    ? Status
+    : never;
+
+type KnownStatus<Op> = StatusFromKey<keyof Responses<Op>>;
+
 type StatusKey<Op, Status extends number> = Status extends keyof Responses<Op>
   ? Status
   : `${Status}` extends keyof Responses<Op>
     ? `${Status}`
-    : never;
+    : 'default' extends keyof Responses<Op>
+      ? 'default'
+      : never;
 
 type JsonResponse<Op, Status extends number> =
   StatusKey<Op, Status> extends infer Key
@@ -105,14 +114,42 @@ type JsonResponse<Op, Status extends number> =
           readonly content: { readonly 'application/json': infer Body };
         }
         ? Body
-        : unknown
+        : undefined
       : unknown
     : unknown;
+
+type EmptyObject<T> = [T] extends [Record<string, never>]
+  ? true
+  : keyof T extends never
+    ? true
+    : false;
+
+type PathParamsOption<Op> =
+  EmptyObject<PathParams<Op>> extends true
+    ? { readonly params?: never }
+    : { readonly params: PathParams<Op> };
+
+type QueryOption<Op> =
+  EmptyObject<QueryParams<Op>> extends true
+    ? { readonly query?: never }
+    : { readonly query: QueryParams<Op> };
 
 type RequestBodyOption<Op> =
   JsonRequestBody<Op> extends never
     ? { readonly body?: never }
     : { readonly body: JsonRequestBody<Op> };
+
+export type OpenapiOperationKey<Paths extends PathRecord> = {
+  [M in PublicMethod]: `${M} ${PathsForMethod<Paths, M>}`;
+}[PublicMethod];
+
+export type OpenapiResponseSchemaKey<Paths extends PathRecord> = {
+  [M in PublicMethod]: {
+    [Path in PathsForMethod<Paths, M>]:
+      | `${M} ${Path} ${KnownStatus<Operation<Paths, M, Path>>}`
+      | `${M} ${Path} default`;
+  }[PathsForMethod<Paths, M>];
+}[PublicMethod];
 
 export type OpenapiOperationPolicy = Readonly<{
   expectedStatus?: number;
@@ -120,43 +157,63 @@ export type OpenapiOperationPolicy = Readonly<{
   headers?: Readonly<Record<string, string>>;
 }>;
 
-export type OpenapiResponseSchemaMap = Readonly<
-  Record<string, StandardSchemaV1>
+export type OpenapiPolicyMap<Paths extends PathRecord> = Readonly<
+  Partial<Record<OpenapiOperationKey<Paths>, OpenapiOperationPolicy>>
 >;
 
-export type OpenapiClientOptions = Readonly<{
+export type OpenapiResponseSchemaMap<Paths extends PathRecord> = Readonly<
+  Partial<Record<OpenapiResponseSchemaKey<Paths>, StandardSchemaV1>>
+>;
+
+export type OpenapiClientOptions<Paths extends PathRecord> = Readonly<{
   endpoint: string;
   fetchImpl?: typeof fetch;
   log?: Logger;
   timeoutMs?: number;
   circuitBreaker?: CircuitBreakerOptions;
-  policies?: Readonly<Record<string, OpenapiOperationPolicy>>;
-  responseSchemas?: OpenapiResponseSchemaMap;
+  policies?: OpenapiPolicyMap<Paths>;
+  responseSchemas?: OpenapiResponseSchemaMap<Paths>;
 }>;
 
 export type OpenapiInvalidResponseError = Readonly<{
   kind: 'invalid_response';
+  operationKey: string;
+  schemaKey: string;
   method: PublicMethod;
+  template: string;
   path: string;
   statusCode: number;
   issues: readonly StandardSchemaIssue[];
 }>;
 
+export type OpenapiUnexpectedStatusError = Readonly<{
+  kind: 'unexpected_status';
+  operationKey: string;
+  method: PublicMethod;
+  template: string;
+  statusCode: number;
+  body: unknown;
+  request: Readonly<{
+    endpoint: string;
+    path: string;
+    expectedCodes: readonly number[];
+  }>;
+}>;
+
 export type OpenapiClientError =
   | ExpandPathError
   | TrembitaSendError
-  | TrembitaRequestError
+  | OpenapiUnexpectedStatusError
   | OpenapiInvalidResponseError;
 
 export type OpenapiRequestOptions<Op> = Readonly<
-  {
-    params: PathParams<Op>;
-    query?: QueryParams<Op>;
-    headers?: HeaderParams<Op> & Readonly<Record<string, string>>;
-    expectedStatus?: number;
-    timeoutMs?: number;
-    signal?: AbortSignal;
-  } & RequestBodyOption<Op>
+  PathParamsOption<Op> &
+    QueryOption<Op> & {
+      headers?: HeaderParams<Op> & Readonly<Record<string, string>>;
+      expectedStatus?: number;
+      timeoutMs?: number;
+      signal?: AbortSignal;
+    } & RequestBodyOption<Op>
 >;
 
 type OpenapiCall<Paths extends PathRecord, M extends PublicMethod> = <
@@ -179,7 +236,7 @@ export type OpenapiClient<Paths extends PathRecord> = Readonly<{
 }>;
 
 type RuntimeRequestOptions = Readonly<{
-  params: Readonly<Record<string, unknown>>;
+  params?: Readonly<Record<string, unknown>>;
   query?: Readonly<
     Record<string, string | number | boolean | null | undefined>
   >;
@@ -190,14 +247,28 @@ type RuntimeRequestOptions = Readonly<{
   signal?: AbortSignal;
 }>;
 
-const policyKey = (method: PublicMethod, path: string): string =>
-  `${method} ${path}`;
+export const openapiOperationKey = <
+  Paths extends PathRecord,
+  M extends PublicMethod = PublicMethod,
+  Path extends PathsForMethod<Paths, M> = PathsForMethod<Paths, M>
+>(
+  method: M,
+  path: Path
+): `${M} ${Path}` => `${method} ${path}`;
 
-const schemaKey = (
-  method: PublicMethod,
-  path: string,
-  statusCode: number
-): string => `${method} ${path} ${String(statusCode)}`;
+export const openapiResponseSchemaKey = <
+  Paths extends PathRecord,
+  M extends PublicMethod = PublicMethod,
+  Path extends PathsForMethod<Paths, M> = PathsForMethod<Paths, M>,
+  Status extends KnownStatus<Operation<Paths, M, Path>> | 'default' =
+    | KnownStatus<Operation<Paths, M, Path>>
+    | 'default'
+>(
+  method: M,
+  path: Path,
+  status: Status
+): `${M} ${Path} ${Status}` =>
+  `${method} ${path} ${String(status)}` as `${M} ${Path} ${Status}`;
 
 const toPathParams = (
   params: Readonly<Record<string, unknown>>
@@ -224,8 +295,27 @@ const mergeHeaders = (
   };
 };
 
+const findResponseSchema = <Paths extends PathRecord>(
+  responseSchemas: OpenapiResponseSchemaMap<Paths> | undefined,
+  method: PublicMethod,
+  path: string,
+  statusCode: number
+): Readonly<{ key: string; schema: StandardSchemaV1 }> | undefined => {
+  const exactKey = `${method} ${path} ${String(statusCode)}`;
+  const exact = responseSchemas?.[exactKey as OpenapiResponseSchemaKey<Paths>];
+  if (exact !== undefined) {
+    return { key: exactKey, schema: exact };
+  }
+  const defaultKey = `${method} ${path} default`;
+  const fallback =
+    responseSchemas?.[defaultKey as OpenapiResponseSchemaKey<Paths>];
+  return fallback === undefined
+    ? undefined
+    : { key: defaultKey, schema: fallback };
+};
+
 export const createOpenapiClient = <Paths extends PathRecord>(
-  options: OpenapiClientOptions
+  options: OpenapiClientOptions<Paths>
 ): Result<OpenapiClient<Paths>, TrembitaInitError> => {
   const created = createTrembita(options);
   if (!created.ok) {
@@ -237,15 +327,17 @@ export const createOpenapiClient = <Paths extends PathRecord>(
     path: string,
     requestOptions: RuntimeRequestOptions
   ): Promise<Result<unknown, OpenapiClientError>> => {
+    const operationKey = `${method} ${path}`;
     const expanded = expandOpenapiPath(
       path,
-      toPathParams(requestOptions.params)
+      toPathParams(requestOptions.params ?? {})
     );
     if (!expanded.ok) {
       return expanded;
     }
 
-    const policy = options.policies?.[policyKey(method, path)];
+    const policy =
+      options.policies?.[operationKey as OpenapiOperationKey<Paths>];
     const expectedStatus =
       requestOptions.expectedStatus ?? policy?.expectedStatus ?? 200;
     const headers = mergeHeaders(policy?.headers, requestOptions.headers);
@@ -272,6 +364,9 @@ export const createOpenapiClient = <Paths extends PathRecord>(
     if (sent.value.statusCode !== expectedStatus) {
       return err({
         kind: 'unexpected_status',
+        operationKey,
+        method,
+        template: path,
         statusCode: sent.value.statusCode,
         body: sent.value.body,
         request: {
@@ -282,18 +377,28 @@ export const createOpenapiClient = <Paths extends PathRecord>(
       });
     }
 
-    const schema =
-      options.responseSchemas?.[schemaKey(method, path, sent.value.statusCode)];
+    const schema = findResponseSchema(
+      options.responseSchemas,
+      method,
+      path,
+      sent.value.statusCode
+    );
     if (schema === undefined) {
       return ok(sent.value.body);
     }
 
-    const validated = await validateStandardSchema(sent.value.body, schema);
+    const validated = await validateStandardSchema(
+      sent.value.body,
+      schema.schema
+    );
     if (!validated.ok) {
       return err({
         kind: 'invalid_response',
+        operationKey,
+        schemaKey: schema.key,
         method,
-        path,
+        template: path,
+        path: sent.value.path,
         statusCode: sent.value.statusCode,
         issues: validated.error.issues
       });

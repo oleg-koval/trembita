@@ -95,6 +95,9 @@ describe('createOpenapiClient e2e', () => {
     if (!result.ok) {
       expect(result.error.kind).toBe('invalid_response');
       if (result.error.kind === 'invalid_response') {
+        expect(result.error.operationKey).toBe('GET /users/{userId}');
+        expect(result.error.schemaKey).toBe('GET /users/{userId} 200');
+        expect(result.error.path).toBe('/users/alice');
         expect(result.error.issues).toContainEqual({ message: 'user_invalid' });
       }
     }
@@ -121,6 +124,10 @@ describe('createOpenapiClient e2e', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error.kind).toBe('unexpected_status');
+      if (result.error.kind === 'unexpected_status') {
+        expect(result.error.operationKey).toBe('GET /users/{userId}');
+        expect(result.error.template).toBe('/users/{userId}');
+      }
     }
   });
 });

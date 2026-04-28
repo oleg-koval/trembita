@@ -14,6 +14,16 @@ wrong status, malformed JSON, an empty body, or a response shape that drifted
 from the TypeScript contract. Static OpenAPI types help at compile time, but
 they do not protect runtime boundaries.
 
+## Why not compose openapi-fetch + Zod + neverthrow?
+
+You can, but every team then has to design the same boundary contract: how
+transport failures map to validation failures, how unexpected statuses are
+reported, how operation names appear in logs, and how empty/error bodies narrow.
+Trembita provides one operational contract across those cases: every call
+returns `Result`, every failure has stable `error.kind`, and response validation
+is colocated with the OpenAPI operation. The goal is not to replace every
+generated SDK; it is to make backend service boundaries hard to misuse.
+
 Trembita's differentiator is not another fetch wrapper. It is a contract-first
 anti-corruption layer:
 
@@ -27,19 +37,30 @@ anti-corruption layer:
 
 ```ts
 import type { paths } from './generated/paths.js';
-import { createOpenapiClient } from '@trembita/openapi';
+import {
+  createOpenapiClient,
+  openapiOperationKey,
+  openapiResponseSchemaKey
+} from '@trembita/openapi';
+
+const getUser = openapiOperationKey<paths>('GET', '/users/{userId}');
+const getUser200 = openapiResponseSchemaKey<paths>(
+  'GET',
+  '/users/{userId}',
+  200
+);
 
 const created = createOpenapiClient<paths>({
   endpoint: 'https://api.example.com',
   policies: {
-    'GET /users/{userId}': {
+    [getUser]: {
       expectedStatus: 200,
       timeoutMs: 500,
       headers: { 'x-service': 'accounts' }
     }
   },
   responseSchemas: {
-    'GET /users/{userId} 200': userSchema
+    [getUser200]: userSchema
   }
 });
 
@@ -60,6 +81,30 @@ if (!user.ok) {
   }
 }
 ```
+
+## Backend consumer path
+
+Start minimal: create a client with only `endpoint`, call a typed path, and
+branch on `result.ok`. Add `policies` when an operation needs explicit status,
+timeout, or headers. Add `responseSchemas` only for boundaries where runtime
+shape drift would cause a production incident.
+
+Framework examples live in
+[contract-boundary-framework-examples.md](./contract-boundary-framework-examples.md).
+
+## Enterprise/platform notes
+
+The MVP keeps policy as local plain data. That is enough for service-level
+adoption. Larger platform teams can wrap `createOpenapiClient` with shared
+service presets later, without changing the underlying operation policy shape.
+That follow-up should stay additive and avoid global middleware chains.
+
+## Release positioning
+
+Ship and document this as an experimental contract boundary client, not as a
+full generated SDK replacement. The promise is backend boundary safety:
+OpenAPI-guided calls, explicit operational failures, optional runtime
+validation, and policy colocated with the operation.
 
 ## Design constraints
 

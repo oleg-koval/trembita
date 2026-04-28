@@ -38,15 +38,26 @@ bodies with Standard Schema.
 
 ```typescript
 import type { paths } from './fixtures/mini-api.paths.js';
-import { createOpenapiClient } from '@trembita/openapi';
+import {
+  createOpenapiClient,
+  openapiOperationKey,
+  openapiResponseSchemaKey
+} from '@trembita/openapi';
+
+const getUser = openapiOperationKey<paths>('GET', '/users/{userId}');
+const getUser200 = openapiResponseSchemaKey<paths>(
+  'GET',
+  '/users/{userId}',
+  200
+);
 
 const created = createOpenapiClient<paths>({
   endpoint: 'https://api.example.com',
   policies: {
-    'GET /users/{userId}': { expectedStatus: 200, timeoutMs: 500 }
+    [getUser]: { expectedStatus: 200, timeoutMs: 500 }
   },
   responseSchemas: {
-    'GET /users/{userId} 200': userSchema
+    [getUser200]: userSchema
   }
 });
 
@@ -57,13 +68,28 @@ const user = await created.value.GET('/users/{userId}', {
 });
 
 if (!user.ok) {
-  // ExpandPathError | TrembitaRequestError | { kind: 'invalid_response' }
-  console.error(user.error.kind);
+  // ExpandPathError | TrembitaSendError | unexpected_status | invalid_response
+  console.error(
+    user.error.kind,
+    'operationKey' in user.error ? user.error.operationKey : undefined
+  );
 }
 ```
 
+For small API clients, skip policies and schemas at first:
+
+```typescript
+const created = createOpenapiClient<paths>({
+  endpoint: 'https://api.example.com'
+});
+const user = created.ok
+  ? await created.value.GET('/users/{userId}', { params: { userId: 'alice' } })
+  : created;
+```
+
 See [docs/contract-boundary-client.md](../../docs/contract-boundary-client.md)
-for the design notes.
+for the design notes and
+[framework examples](../../docs/contract-boundary-framework-examples.md).
 
 ## Real `paths` fixture + DX
 
