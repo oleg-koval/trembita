@@ -4,7 +4,7 @@
   "description": "OpenAPI path helpers for trembita (spike workspace)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/oleg-koval/trembita.git",
+    "url": "git+https://github.com/oleg-koval/trembita.git",
     "directory": "packages/openapi"
   },
   "license": "MIT",

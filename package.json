@@ -6,7 +6,7 @@
   "author": "Oleg Koval <kvl.olg@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/oleg-koval/trembita.git"
+    "url": "git+https://github.com/oleg-koval/trembita.git"
   },
   "bugs": "https://github.com/oleg-koval/trembita/issues",
   "keywords": [
