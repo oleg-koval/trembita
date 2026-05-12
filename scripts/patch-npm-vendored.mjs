@@ -29,6 +29,7 @@ function replaceVendored(destRelative, packageName) {
 try {
   replaceVendored('brace-expansion', 'brace-expansion');
   replaceVendored(join('tinyglobby', 'node_modules', 'picomatch'), 'picomatch');
+  replaceVendored('ip-address', 'ip-address');
 } catch (err) {
   const message = err instanceof Error ? err.message : String(err);
   console.warn('[patch-npm-vendored] skipped:', message);
