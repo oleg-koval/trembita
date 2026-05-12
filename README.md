@@ -391,3 +391,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 MIT © 2018–2026
+
+---
+
+<a href="https://sellwithboost.com" target="_blank" rel="noopener noreferrer">
+  <img src="https://sellwithboost.com/badge/listing.svg" alt="Listed on Sell With Boost" style="height: 40px; width: auto;" />
+</a>
