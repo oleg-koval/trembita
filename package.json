@@ -69,6 +69,7 @@
     "@eslint/js": "^10.0.1",
     "@types/node": "^25.6.0",
     "@vitest/coverage-v8": "^4.1.5",
+    "braces": "file:vendor/braces",
     "brace-expansion": "5.0.12",
     "conventional-changelog-conventionalcommits": "^9.3.1",
     "eslint": "^10.2.1",
@@ -86,7 +87,8 @@
   },
   "private": false,
   "overrides": {
-    "esbuild": "0.27.2"
+    "esbuild": "0.27.2",
+    "braces": "$braces"
   },
   "workspaces": [
     "packages/openapi"
