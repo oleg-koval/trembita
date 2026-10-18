@@ -33,6 +33,7 @@ export default tseslint.config(
       'site/**',
       'coverage/**',
       'node_modules/**',
+      'vendor/braces/**',
       'eslint.config.js',
       'package-lock.json',
       'scripts/**',

@@ -1,0 +1,16 @@
+{
+  "name": "braces",
+  "version": "3.0.4-trembita.0",
+  "description": "Bash-like brace expansion with a nesting-depth security limit; locally patched for Trembita.",
+  "license": "MIT",
+  "homepage": "https://github.com/micromatch/braces",
+  "repository": "micromatch/braces",
+  "main": "index.js",
+  "files": ["index.js", "lib"],
+  "engines": {
+    "node": ">=8.3"
+  },
+  "dependencies": {
+    "fill-range": "^7.1.1"
+  }
+}
