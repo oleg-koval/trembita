@@ -7,7 +7,7 @@ const braces = require('braces') as {
   expand(pattern: string): string[];
 };
 const micromatch = require('micromatch') as {
-  parse(pattern: string): unknown[];
+  braceExpand(pattern: string): string[];
 };
 
 describe('vendored braces security patch', () => {
@@ -16,7 +16,9 @@ describe('vendored braces security patch', () => {
 
     expect(hostilePattern.length).toBeLessThan(10_000);
     expect(() => braces(hostilePattern)).toThrow(/exceeds max depth/);
-    expect(() => micromatch.parse(hostilePattern)).toThrow(/exceeds max depth/);
+    expect(() => micromatch.braceExpand(hostilePattern)).toThrow(
+      /exceeds max depth/
+    );
   });
 
   it('rejects deeply nested parenthesis patterns', () => {
