@@ -541,7 +541,12 @@ describe('createTrembita', () => {
 
   it('client fails on invalid json body', async () => {
     const fetchImpl = vi.fn(() =>
-      Promise.resolve(new Response('{', { status: HTTP_OK }))
+      Promise.resolve(
+        new Response('{', {
+          status: HTTP_OK,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      )
     );
     const created = createTrembita({ ...clientOptions, fetchImpl });
     expect(created.ok).toBe(true);
@@ -554,6 +559,51 @@ describe('createTrembita', () => {
       return;
     }
     expect(res.error.kind).toBe('invalid_json');
+  });
+
+  it.each([
+    undefined,
+    '',
+    '   ',
+    'application/json',
+    'Application/Problem+JSON; charset=utf-8'
+  ])('rejects malformed JSON with content type %j', async (contentType) => {
+    const response = new Response('{', { status: HTTP_OK });
+    if (contentType === undefined) {
+      response.headers.delete('content-type');
+    } else {
+      response.headers.set('content-type', contentType);
+    }
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl: () => Promise.resolve(response)
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    expect(await created.value.client({ path: '/malformed' })).toMatchObject({
+      ok: false,
+      error: { kind: 'invalid_json' }
+    });
+  });
+
+  it('parses valid JSON despite an explicitly non-JSON content type', async () => {
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl: () =>
+        Promise.resolve(
+          new Response('{"ok":true}', {
+            headers: { 'Content-Type': 'text/plain' }
+          })
+        )
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    expect(await created.value.request({ path: '/mislabelled' })).toEqual({
+      ok: true,
+      value: { ok: true }
+    });
   });
 
   it('client fails on fetch throw', async () => {
@@ -645,9 +695,44 @@ describe('createTrembita', () => {
     expect(headers.get('content-type')).toBe('application/json');
   });
 
+  it('request preserves text error bodies for unexpected statuses', async () => {
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(
+        new Response('upstream unavailable', {
+          status: 503,
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+        })
+      )
+    );
+    const created = createTrembita({ ...clientOptions, fetchImpl });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+
+    const res = await created.value.request({
+      path: '/unavailable',
+      expectedCodes: [HTTP_OK]
+    });
+
+    expect(res).toMatchObject({
+      ok: false,
+      error: {
+        kind: 'unexpected_status',
+        statusCode: 503,
+        body: 'upstream unavailable'
+      }
+    });
+  });
+
   it('request propagates invalid_json from client', async () => {
     const fetchImpl = vi.fn(() =>
-      Promise.resolve(new Response('{', { status: HTTP_OK }))
+      Promise.resolve(
+        new Response('{', {
+          status: HTTP_OK,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      )
     );
     const created = createTrembita({ ...clientOptions, fetchImpl });
     expect(created.ok).toBe(true);
@@ -758,7 +843,12 @@ describe('createTrembita', () => {
 
   it('counts invalid_json failures in circuit breaker', async () => {
     const fetchImpl = vi.fn(() =>
-      Promise.resolve(new Response('{', { status: 200 }))
+      Promise.resolve(
+        new Response('{', {
+          status: HTTP_OK,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      )
     );
     const created = createTrembita({
       ...clientOptions,
@@ -980,6 +1070,24 @@ describe('createTrembita', () => {
       return;
     }
     expect(res.value).toBeUndefined();
+  });
+
+  it('parses a 204 response body as undefined', async () => {
+    const fetchImpl = vi.fn(() =>
+      Promise.resolve(new Response(null, { status: 204 }))
+    );
+    const created = createTrembita({ ...clientOptions, fetchImpl });
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+
+    const res = await created.value.request({
+      path: '/no-content',
+      expectedCodes: [204]
+    });
+
+    expect(res).toEqual({ ok: true, value: undefined });
   });
 
   it('omits query string when all query values are nullish', async () => {

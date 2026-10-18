@@ -5,13 +5,26 @@ import {
   validateStandardSchema
 } from '@trembita/openapi';
 
-const fetchImpl = () =>
-  Promise.resolve(
+const fetchImpl = (input) => {
+  const { pathname } = new URL(String(input));
+  if (pathname.endsWith('/no-content')) {
+    return Promise.resolve(new Response(null, { status: 204 }));
+  }
+  if (pathname.endsWith('/unavailable')) {
+    return Promise.resolve(
+      new Response('upstream unavailable', {
+        status: 503,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+      })
+    );
+  }
+  return Promise.resolve(
     new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     })
   );
+};
 
 const created = createTrembita({
   endpoint: 'https://api.example.com',
@@ -54,6 +67,29 @@ const req = await requestOpenapiPath(
 );
 if (!req.ok) {
   console.error('dogfood: requestOpenapiPath failed', req.error);
+  process.exit(1);
+}
+
+const noContent = await created.value.request({
+  path: '/no-content',
+  expectedCodes: [204]
+});
+if (!noContent.ok || noContent.value !== undefined) {
+  console.error('dogfood: 204 response was not treated as empty', noContent);
+  process.exit(1);
+}
+
+const unavailable = await created.value.request({
+  path: '/unavailable',
+  expectedCodes: [HTTP_OK]
+});
+if (
+  unavailable.ok ||
+  unavailable.error.kind !== 'unexpected_status' ||
+  unavailable.error.statusCode !== 503 ||
+  unavailable.error.body !== 'upstream unavailable'
+) {
+  console.error('dogfood: text HTTP error was not preserved', unavailable);
   process.exit(1);
 }
 

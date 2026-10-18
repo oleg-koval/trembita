@@ -32,7 +32,8 @@
   },
   "files": [
     "dist",
-    "SKILL.md"
+    "SKILL.md",
+    "scripts/patch-npm-vendored.mjs"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -63,6 +64,8 @@
     "spike:openapi": "npm run build && npm run spike:bundle --workspace=@trembita/openapi",
     "check:openapi-fetch-types": "node scripts/check-openapi-fetch-types.mjs",
     "verify:openapi-dogfood": "cd examples/openapi-dogfood && npm install && node main.mjs",
+    "verify:packed-consumer": "node scripts/verify-packed-consumer.mjs",
+    "example:github": "npm run build && node examples/github-repository/main.mjs",
     "semantic-release": "semantic-release"
   },
   "devDependencies": {

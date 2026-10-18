@@ -304,9 +304,32 @@ Sends a request and returns the parsed JSON body if the status matches
 
 Returns `Promise<Result<unknown, TrembitaRequestError>>`.
 
+Run the real GitHub REST API integration against the current public API (no
+token or third-party validation dependency required):
+
+```sh
+npm run example:github -- oleg-koval/trembita
+```
+
+The example validates GitHub's response at runtime with a Standard Schema v1
+validator. For an offline install/build/type/runtime path against the actual npm
+tarball (including its install script), run:
+
+```sh
+npm run verify:packed-consumer
+```
+
 ### `client(options)`
 
 Sends a request and returns `{ statusCode, body, path }` regardless of status.
+
+An empty response body (including `204 No Content`) becomes `undefined`. For
+non-empty bodies, Trembita first attempts JSON parsing, even when a server
+mislabels valid JSON. If parsing fails and the server explicitly declares a
+non-JSON content type, Trembita preserves the text body so `request()` can
+report an `unexpected_status` with the HTTP status and readable error body.
+Malformed `application/json` (including `+json`) and bodies without a content
+type still return `invalid_json`.
 
 Returns `Promise<Result<TrembitaHttpResponse, TrembitaSendError>>`.
 

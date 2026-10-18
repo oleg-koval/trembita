@@ -195,13 +195,25 @@ const registerSuccess = (state: CircuitBreakerState): void => {
   state.openedUntilMs = undefined;
 };
 
-const parseJsonBody = (text: string): Result<unknown, TrembitaSendError> => {
+const parseResponseBody = (
+  text: string,
+  contentType: string | null
+): Result<unknown, TrembitaSendError> => {
   if (text.length === 0) {
     return ok(undefined);
   }
   try {
     return ok(JSON.parse(text) as unknown);
   } catch (cause) {
+    const mediaType = contentType?.split(';', 1)[0]?.trim().toLowerCase();
+    if (
+      mediaType !== undefined &&
+      mediaType !== '' &&
+      mediaType !== 'application/json' &&
+      !mediaType.endsWith('+json')
+    ) {
+      return ok(text);
+    }
     return err({ kind: 'invalid_json', cause });
   }
 };
@@ -259,7 +271,10 @@ const makeSend =
     try {
       const response = await fetchImpl(fullUrl, init);
       const text = await response.text();
-      const bodyResult = parseJsonBody(text);
+      const bodyResult = parseResponseBody(
+        text,
+        response.headers.get('content-type')
+      );
       if (!bodyResult.ok) {
         if (circuitBreaker !== undefined) {
           registerFailure(circuitBreaker);
