@@ -40,10 +40,10 @@ the issue in a realistic configuration.
 
 Security fixes are applied to the latest released major version.
 
-| Version | Supported |
-| ------- | --------- |
-| latest `main` / latest release | ✅ |
-| older releases | ❌ |
+| Version                        | Supported |
+| ------------------------------ | --------- |
+| latest `main` / latest release | ✅        |
+| older releases                 | ❌        |
 
 ## Response Expectations
 

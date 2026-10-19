@@ -49,6 +49,8 @@ jobs:
       - run: npm test
       - name: Dogfood OpenAPI example (file-linked workspace packages)
         run: npm run verify:openapi-dogfood
+      - name: Packed consumer (normal install, types, native fetch)
+        run: npm run verify:packed-consumer
       - name: Coveralls
         uses: coverallsapp/github-action@v2
         with:

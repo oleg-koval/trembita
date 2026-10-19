@@ -195,13 +195,26 @@ const registerSuccess = (state: CircuitBreakerState): void => {
   state.openedUntilMs = undefined;
 };
 
-const parseJsonBody = (text: string): Result<unknown, TrembitaSendError> => {
+const parseResponseBody = (
+  text: string,
+  contentType: string | null,
+  allowTextFallback: boolean
+): Result<{ body: unknown; textFallback: boolean }, TrembitaSendError> => {
   if (text.length === 0) {
-    return ok(undefined);
+    return ok({ body: undefined, textFallback: false });
   }
   try {
-    return ok(JSON.parse(text) as unknown);
+    return ok({ body: JSON.parse(text) as unknown, textFallback: false });
   } catch (cause) {
+    const mediaType = contentType?.split(';', 1)[0]?.trim().toLowerCase();
+    const isTextualMediaType =
+      mediaType?.startsWith('text/') === true ||
+      mediaType === 'application/xml' ||
+      mediaType === 'application/xhtml+xml' ||
+      mediaType?.endsWith('+xml') === true;
+    if (allowTextFallback && isTextualMediaType) {
+      return ok({ body: text, textFallback: true });
+    }
     return err({ kind: 'invalid_json', cause });
   }
 };
@@ -259,7 +272,13 @@ const makeSend =
     try {
       const response = await fetchImpl(fullUrl, init);
       const text = await response.text();
-      const bodyResult = parseJsonBody(text);
+      const bodyResult = parseResponseBody(
+        text,
+        response.headers.get('content-type'),
+        !(options.expectedCodes ?? DEFAULT_EXPECTED_CODES).includes(
+          response.status
+        )
+      );
       if (!bodyResult.ok) {
         if (circuitBreaker !== undefined) {
           registerFailure(circuitBreaker);
@@ -275,7 +294,11 @@ const makeSend =
       }
 
       if (circuitBreaker !== undefined) {
-        registerSuccess(circuitBreaker);
+        if (bodyResult.value.textFallback) {
+          registerFailure(circuitBreaker);
+        } else {
+          registerSuccess(circuitBreaker);
+        }
       }
       callLog(log, 'info', 'request:success', {
         endpoint,
@@ -285,7 +308,7 @@ const makeSend =
       });
       return ok({
         statusCode: response.status,
-        body: bodyResult.value,
+        body: bodyResult.value.body,
         path: pathResult.value
       });
     } catch (cause) {

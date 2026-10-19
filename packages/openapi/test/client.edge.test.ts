@@ -109,7 +109,12 @@ describe('createOpenapiClient edge cases', () => {
 
   it('returns send errors from the core client', async () => {
     const fetchImpl = vi.fn(() =>
-      Promise.resolve(new Response('{', { status: 200 }))
+      Promise.resolve(
+        new Response('{', {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      )
     );
     const created = createOpenapiClient<edgePaths>({
       endpoint: 'https://api.example.test',
@@ -126,6 +131,36 @@ describe('createOpenapiClient edge cases', () => {
     if (!result.ok) {
       expect(result.error.kind).toBe('invalid_json');
     }
+  });
+
+  it('preserves plain-text HTTP errors with operation metadata', async () => {
+    const created = createOpenapiClient<edgePaths>({
+      endpoint: 'https://api.example.test',
+      fetchImpl: () =>
+        Promise.resolve(
+          new Response('upstream unavailable', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+          })
+        )
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const result = await created.value.GET('/search', {
+      query: { q: 'typed' }
+    });
+    expect(result).toMatchObject({
+      ok: false,
+      error: {
+        kind: 'unexpected_status',
+        operationKey: 'GET /search',
+        method: 'GET',
+        template: '/search',
+        statusCode: 503,
+        body: 'upstream unavailable'
+      }
+    });
   });
 
   it('ignores validation telemetry failures to preserve Result contract', async () => {
