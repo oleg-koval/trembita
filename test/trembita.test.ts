@@ -725,6 +725,63 @@ describe('createTrembita', () => {
     });
   });
 
+  it('rejects malformed plain text on an expected status', async () => {
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl: () =>
+        Promise.resolve(
+          new Response('not json', {
+            status: HTTP_OK,
+            headers: { 'Content-Type': 'text/plain' }
+          })
+        )
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const result = await created.value.request({ path: '/malformed' });
+    expect(result).toMatchObject({
+      ok: false,
+      error: { kind: 'invalid_json' }
+    });
+  });
+
+  it('does not clear breaker failures for unexpected plain text', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('network failure'))
+      .mockResolvedValueOnce(
+        new Response('upstream unavailable', {
+          status: 503,
+          headers: { 'Content-Type': 'text/plain' }
+        })
+      )
+      .mockRejectedValueOnce(new Error('network failure'));
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl,
+      circuitBreaker: { failureThreshold: 2, cooldownMs: 60_000 }
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const first = await created.value.request({ path: '/unstable' });
+    const second = await created.value.request({ path: '/unstable' });
+    const third = await created.value.request({ path: '/unstable' });
+
+    expect(first).toMatchObject({ ok: false, error: { kind: 'fetch_failed' } });
+    expect(second).toMatchObject({
+      ok: false,
+      error: {
+        kind: 'unexpected_status',
+        statusCode: 503,
+        body: 'upstream unavailable'
+      }
+    });
+    expect(third).toMatchObject({ ok: false, error: { kind: 'circuit_open' } });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
   it('request propagates invalid_json from client', async () => {
     const fetchImpl = vi.fn(() =>
       Promise.resolve(
