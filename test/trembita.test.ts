@@ -725,6 +725,30 @@ describe('createTrembita', () => {
     });
   });
 
+  it('does not decode unexpected binary error bodies as text', async () => {
+    const created = createTrembita({
+      ...clientOptions,
+      fetchImpl: () =>
+        Promise.resolve(
+          new Response(new Uint8Array([0xff, 0xfe, 0xfd]), {
+            status: 503,
+            headers: { 'Content-Type': 'application/octet-stream' }
+          })
+        )
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const result = await created.value.request({
+      path: '/binary-error',
+      expectedCodes: [HTTP_OK]
+    });
+    expect(result).toMatchObject({
+      ok: false,
+      error: { kind: 'invalid_json' }
+    });
+  });
+
   it('rejects malformed plain text on an expected status', async () => {
     const created = createTrembita({
       ...clientOptions,

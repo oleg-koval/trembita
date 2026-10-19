@@ -1,6 +1,14 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { cpSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +22,7 @@ const run = (args, cwd, options = {}) =>
     stdio: 'inherit',
     timeout: 180_000,
     env: { ...process.env, npm_config_ignore_scripts: 'false' },
+    shell: process.platform === 'win32',
     ...options
   });
 
@@ -50,15 +59,35 @@ try {
     })
   );
   cpSync(join(root, 'examples/packed-consumer'), consumer, { recursive: true });
-  run(
+  const installOutput = run(
     [
       'install',
       '--no-fund',
       '--no-audit',
+      '--foreground-scripts',
       '--ignore-scripts=false',
       join(temporary, packed[0].filename)
     ],
-    consumer
+    consumer,
+    { stdio: ['ignore', 'pipe', 'inherit'], encoding: 'utf8' }
+  );
+  const installedPackagePath = join(consumer, 'node_modules/trembita');
+  const installedManifest = JSON.parse(
+    readFileSync(join(installedPackagePath, 'package.json'), 'utf8')
+  );
+  assert.equal(
+    installedManifest.scripts.postinstall,
+    'node scripts/patch-npm-vendored.mjs',
+    'the packed manifest must declare the postinstall hook'
+  );
+  assert.ok(
+    existsSync(join(installedPackagePath, 'scripts/patch-npm-vendored.mjs')),
+    'the packed postinstall script must be present after installation'
+  );
+  assert.match(
+    installOutput,
+    /> trembita@[^\s]+ postinstall[\s\S]*> node scripts\/patch-npm-vendored\.mjs/,
+    'installing the tarball must execute the packed postinstall hook'
   );
   run(
     ['rebuild', 'trembita', '--foreground-scripts', '--ignore-scripts=false'],

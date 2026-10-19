@@ -207,13 +207,12 @@ const parseResponseBody = (
     return ok({ body: JSON.parse(text) as unknown, textFallback: false });
   } catch (cause) {
     const mediaType = contentType?.split(';', 1)[0]?.trim().toLowerCase();
-    if (
-      allowTextFallback &&
-      mediaType !== undefined &&
-      mediaType !== '' &&
-      mediaType !== 'application/json' &&
-      !mediaType.endsWith('+json')
-    ) {
+    const isTextualMediaType =
+      mediaType?.startsWith('text/') === true ||
+      mediaType === 'application/xml' ||
+      mediaType === 'application/xhtml+xml' ||
+      mediaType?.endsWith('+xml') === true;
+    if (allowTextFallback && isTextualMediaType) {
       return ok({ body: text, textFallback: true });
     }
     return err({ kind: 'invalid_json', cause });
