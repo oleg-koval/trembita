@@ -197,22 +197,24 @@ const registerSuccess = (state: CircuitBreakerState): void => {
 
 const parseResponseBody = (
   text: string,
-  contentType: string | null
-): Result<unknown, TrembitaSendError> => {
+  contentType: string | null,
+  allowTextFallback: boolean
+): Result<{ body: unknown; textFallback: boolean }, TrembitaSendError> => {
   if (text.length === 0) {
-    return ok(undefined);
+    return ok({ body: undefined, textFallback: false });
   }
   try {
-    return ok(JSON.parse(text) as unknown);
+    return ok({ body: JSON.parse(text) as unknown, textFallback: false });
   } catch (cause) {
     const mediaType = contentType?.split(';', 1)[0]?.trim().toLowerCase();
     if (
+      allowTextFallback &&
       mediaType !== undefined &&
       mediaType !== '' &&
       mediaType !== 'application/json' &&
       !mediaType.endsWith('+json')
     ) {
-      return ok(text);
+      return ok({ body: text, textFallback: true });
     }
     return err({ kind: 'invalid_json', cause });
   }
@@ -273,7 +275,10 @@ const makeSend =
       const text = await response.text();
       const bodyResult = parseResponseBody(
         text,
-        response.headers.get('content-type')
+        response.headers.get('content-type'),
+        !(options.expectedCodes ?? DEFAULT_EXPECTED_CODES).includes(
+          response.status
+        )
       );
       if (!bodyResult.ok) {
         if (circuitBreaker !== undefined) {
@@ -290,7 +295,11 @@ const makeSend =
       }
 
       if (circuitBreaker !== undefined) {
-        registerSuccess(circuitBreaker);
+        if (bodyResult.value.textFallback) {
+          registerFailure(circuitBreaker);
+        } else {
+          registerSuccess(circuitBreaker);
+        }
       }
       callLog(log, 'info', 'request:success', {
         endpoint,
@@ -300,7 +309,7 @@ const makeSend =
       });
       return ok({
         statusCode: response.status,
-        body: bodyResult.value,
+        body: bodyResult.value.body,
         path: pathResult.value
       });
     } catch (cause) {
